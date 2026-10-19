@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctors - Hopewell Staff</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="components.css">
+  <link rel="stylesheet" href="staff.css">
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-brand">🏥 Hopewell Staff</div>
+      <ul class="sidebar-menu">
+        <li><a href="dashboard.html">📊 Dashboard</a></li>
+        <li><a href="patients.html">🧑‍🦱 Patients</a></li>
+        <li><a href="appointments.html">📅 Appointments</a></li>
+        <li><a href="queue.html">⏳ Live Queue</a></li>
+        <li class="active"><a href="doctors.html">🩺 Doctors</a></li>
+        <li><a href="departments.html">🏢 Departments</a></li>
+        <li><a href="reports.html">📈 Reports</a></li>
+        <li style="margin-top: auto;"><a href="logout.html">🚪 Logout</a></li>
+      </ul>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="top-nav">
+        <div style="display: flex; align-items: center;">
+          <button class="mobile-menu-btn">☰</button>
+          <div class="page-title">Doctor Management</div>
+        </div>
+        <div class="user-profile">
+          <div class="user-avatar">AD</div>
+          <div><strong>Administrator</strong><br><small style="color:var(--text-muted)">General Admin</small></div>
+        </div>
+      </header>
+
+      <main class="content-body">
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3>Medical Staff & Availability</h3>
+            <button class="btn btn-primary" onclick="openModal('addDocModal')">+ Add Doctor</button>
+          </div>
+          <input id="doctorSearch" class="form-control" placeholder="Search by doctor, department, or status..." style="max-width: 360px; margin-bottom: 16px;">
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Doctor ID</th>
+                  <th>Name</th>
+                  <th>Department</th>
+                  <th>Specialty</th>
+                  <th>Availability</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="doctorsTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add Doctor Modal -->
+  <div class="modal-backdrop" id="addDocModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Add Doctor</h3>
+        <button class="modal-close" onclick="closeModal('addDocModal')">&times;</button>
+      </div>
+      <form id="newDocForm">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="doc_name" class="form-control" placeholder="Dr. First Last" required>
+        </div>
+        <div class="form-group">
+          <label>Department</label>
+          <select id="doc_dept" class="form-control">
+            <option>Cardiology</option>
+            <option>Pediatrics</option>
+            <option>General Medicine</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Specialty</label>
+          <input type="text" id="doc_spec" class="form-control" placeholder="e.g. Pediatric Surgeon" required>
+        </div>
+        <button type="submit" class="btn btn-teal" style="width: 100%;">Save Doctor</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="staff.js"></script>
+  <script>
+    function renderDoctors() {
+      const query = document.getElementById('doctorSearch').value.trim().toLowerCase();
+      const docs = DataStore.get('mq_doctors').filter(d => !query ||
+        [d.name, d.dept, d.available].some(value => String(value || '').toLowerCase().includes(query)));
+      document.getElementById('doctorsTbody').innerHTML = docs.length ? docs.map(d => `
+        <tr>
+          <td><strong>${escapeHtml(d.id)}</strong></td>
+          <td>${escapeHtml(d.name)}</td>
+          <td>${escapeHtml(d.dept)}</td>
+          <td>${escapeHtml(d.specialty)}</td>
+          <td><span class="badge ${d.available === 'On Duty' ? 'badge-onduty' : 'badge-offduty'}">${escapeHtml(d.available)}</span></td>
+          <td>
+            <button class="btn btn-outline btn-sm" onclick="toggleDuty('${escapeHtml(d.id)}')">Switch Status</button>
+          </td>
+        </tr>
+      `).join('') : '<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:20px;">No doctors found.</td></tr>';
+    }
+
+    function toggleDuty(id) {
+      const docs = DataStore.get('mq_doctors');
+      const doctor = docs.find(item => item.id === id);
+      if (!doctor) return showToast('Doctor was not found.', 'error');
+      doctor.available = doctor.available === 'On Duty' ? 'Off Duty' : 'On Duty';
+      DataStore.set('mq_doctors', docs);
+      renderDoctors();
+      showToast('Duty status toggled.');
+    }
+
+    document.getElementById('newDocForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('doc_name').value.trim();
+      const specialty = document.getElementById('doc_spec').value.trim();
+      const dept = document.getElementById('doc_dept').value;
+      if (!name || !specialty || !DataStore.get('mq_depts').some(item => item.name === dept && item.status === 'Active')) {
+        showToast('Enter doctor details and choose an active department.', 'error');
+        return;
+      }
+      const docs = DataStore.get('mq_doctors');
+      docs.push({
+        id: makeId('D', docs),
+        name,
+        dept,
+        specialty,
+        available: 'On Duty'
+      });
+      DataStore.set('mq_doctors', docs);
+      closeModal('addDocModal');
+      renderDoctors();
+      showToast('Doctor registered.');
+      e.target.reset();
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      checkPageAccess();
+      document.getElementById('doctorSearch').addEventListener('input', renderDoctors);
+      const departmentSelect = document.getElementById('doc_dept');
+      departmentSelect.innerHTML = DataStore.get('mq_depts').filter(dept => dept.status === 'Active')
+        .map(dept => `<option>${escapeHtml(dept.name)}</option>`).join('');
+      renderDoctors();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Departments - Hopewell Staff</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="components.css">
+  <link rel="stylesheet" href="staff.css">
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-brand">🏥 Hopewell Staff</div>
+      <ul class="sidebar-menu">
+        <li><a href="dashboard.html">📊 Dashboard</a></li>
+        <li><a href="patients.html">🧑‍🦱 Patients</a></li>
+        <li><a href="appointments.html">📅 Appointments</a></li>
+        <li><a href="queue.html">⏳ Live Queue</a></li>
+        <li><a href="doctors.html">🩺 Doctors</a></li>
+        <li class="active"><a href="departments.html">🏢 Departments</a></li>
+        <li><a href="reports.html">📈 Reports</a></li>
+        <li style="margin-top: auto;"><a href="logout.html">🚪 Logout</a></li>
+      </ul>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="top-nav">
+        <div style="display: flex; align-items: center;">
+          <button class="mobile-menu-btn">☰</button>
+          <div class="page-title">Hopewell Hospital Departments</div>
+        </div>
+        <div class="user-profile">
+          <div class="user-avatar">AD</div>
+          <div><strong>Administrator</strong><br><small style="color:var(--text-muted)">General Admin</small></div>
+        </div>
+      </header>
+
+      <main class="content-body">
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3>Clinical Units</h3>
+            <button class="btn btn-primary" onclick="openModal('addDeptModal')">+ Add Department</button>
+          </div>
+          <input id="departmentSearch" class="form-control" placeholder="Search departments..." style="max-width: 320px; margin-bottom: 16px;">
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Department Name</th>
+                  <th>Clinical Lead</th>
+                  <th>Consultation Rooms</th>
+                  <th>Operating Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="deptTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add Dept Modal -->
+  <div class="modal-backdrop" id="addDeptModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Add Clinical Department</h3>
+        <button class="modal-close" onclick="closeModal('addDeptModal')">&times;</button>
+      </div>
+      <form id="newDeptForm">
+        <div class="form-group">
+          <label>Department Code</label>
+          <input type="text" id="dept_code" class="form-control" placeholder="e.g. ORTH" required>
+        </div>
+        <div class="form-group">
+          <label>Department Name</label>
+          <input type="text" id="dept_name" class="form-control" placeholder="e.g. Orthopedics" required>
+        </div>
+        <div class="form-group">
+          <label>Clinical Lead</label>
+          <input type="text" id="dept_lead" class="form-control" placeholder="e.g. Dr. Peter Otieno" required>
+        </div>
+        <div class="form-group">
+          <label>Number of Consultation Rooms</label>
+          <input type="number" id="dept_rooms" class="form-control" value="2" min="1" required>
+        </div>
+        <button type="submit" class="btn btn-teal" style="width: 100%;">Create Department</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="staff.js"></script>
+  <script>
+    function renderDepts() {
+      const query = document.getElementById('departmentSearch').value.trim().toLowerCase();
+      const depts = DataStore.get('mq_depts').filter(d => !query ||
+        [d.code, d.name, d.lead, d.status].some(value => String(value || '').toLowerCase().includes(query)));
+      document.getElementById('deptTbody').innerHTML = depts.length ? depts.map(d => `
+        <tr>
+          <td><strong>${escapeHtml(d.code)}</strong></td>
+          <td>${escapeHtml(d.name)}</td>
+          <td>${escapeHtml(d.lead)}</td>
+          <td>${escapeHtml(d.rooms)} Rooms</td>
+          <td><span class="badge ${d.status === 'Active' ? 'badge-active' : 'badge-inactive'}">${escapeHtml(d.status)}</span></td>
+          <td><button class="btn btn-outline btn-sm" onclick="toggleDepartment('${escapeHtml(d.id || d.code)}')">Set ${d.status === 'Active' ? 'Inactive' : 'Active'}</button></td>
+        </tr>
+      `).join('') : '<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:20px;">No departments found.</td></tr>';
+    }
+
+    function toggleDepartment(id) {
+      const depts = DataStore.get('mq_depts');
+      const dept = depts.find(item => (item.id || item.code) === id);
+      if (!dept) return showToast('Department was not found.', 'error');
+      dept.status = dept.status === 'Active' ? 'Inactive' : 'Active';
+      DataStore.set('mq_depts', depts);
+      renderDepts();
+      showToast(`Department set to ${dept.status}.`);
+    }
+
+    document.getElementById('newDeptForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const code = document.getElementById('dept_code').value.trim().toUpperCase();
+      const name = document.getElementById('dept_name').value.trim();
+      const lead = document.getElementById('dept_lead').value.trim();
+      const rooms = Number(document.getElementById('dept_rooms').value);
+      const depts = DataStore.get('mq_depts');
+      if (!code || !name || !lead || !Number.isInteger(rooms) || rooms < 1) {
+        showToast('Complete all department fields with a valid room count.', 'error');
+        return;
+      }
+      if (depts.some(dept => dept.code.toUpperCase() === code)) {
+        showToast('Department code already exists.', 'error');
+        return;
+      }
+      depts.push({
+        id: makeId('DEP-', depts),
+        code,
+        name,
+        lead,
+        rooms,
+        status: 'Active'
+      });
+      DataStore.set('mq_depts', depts);
+      closeModal('addDeptModal');
+      renderDepts();
+      showToast('Department added successfully.');
+      e.target.reset();
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      checkPageAccess();
+      document.getElementById('departmentSearch').addEventListener('input', renderDepts);
+      renderDepts();
+    });
+  </script>
+</body>
+</html>

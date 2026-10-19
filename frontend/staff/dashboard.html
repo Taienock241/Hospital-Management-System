@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Hopewell Staff</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="components.css">
+  <link rel="stylesheet" href="staff.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">🏥 Hopewell Staff</div>
+      <ul class="sidebar-menu">
+        <li class="active"><a href="dashboard.html">📊 Dashboard</a></li>
+        <li><a href="patients.html">🧑‍🦱 Patients</a></li>
+        <li><a href="appointments.html">📅 Appointments</a></li>
+        <li><a href="queue.html">⏳ Live Queue</a></li>
+        <li><a href="doctors.html">🩺 Doctors</a></li>
+        <li><a href="departments.html">🏢 Departments</a></li>
+        <li><a href="reports.html">📈 Reports</a></li>
+        <li style="margin-top: auto;"><a href="logout.html">🚪 Logout</a></li>
+      </ul>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="top-nav">
+        <div style="display: flex; align-items: center;">
+          <button class="mobile-menu-btn">☰</button>
+          <div class="page-title">Operational Dashboard</div>
+        </div>
+        <div class="user-profile">
+          <div class="user-avatar">AD</div>
+          <div>
+            <strong>Administrator</strong><br>
+            <small style="color:var(--text-muted)">General Admin</small>
+          </div>
+        </div>
+      </header>
+
+      <main class="content-body">
+        <section class="dashboard-intro">
+          <div>
+            <span class="eyebrow">HOPEWELL HOSPITAL</span>
+            <h1>Good morning, <span id="dashboard-user-name">Administrator</span></h1>
+            <p>Here is what is happening across your hospital today.</p>
+          </div>
+          <div class="dashboard-date">
+            <span class="dashboard-date-icon">◷</span>
+            <div><strong id="dashboard-date">Today</strong><small>Live operational view</small></div>
+          </div>
+        </section>
+
+        <div class="stats-grid">
+          <div class="stat-card stat-card-blue">
+            <div class="stat-icon">♙</div>
+            <div class="stat-label">Total Patients</div>
+            <div class="stat-value" id="kpi-patients">0</div>
+            <div class="stat-foot">Registered records</div>
+          </div>
+          <div class="stat-card teal">
+            <div class="stat-icon">▣</div>
+            <div class="stat-label">Today's Appointments</div>
+            <div class="stat-value" id="kpi-appointments">0</div>
+            <div class="stat-foot">Scheduled for today</div>
+          </div>
+          <div class="stat-card orange">
+            <div class="stat-icon">◷</div>
+            <div class="stat-label">Patients Waiting</div>
+            <div class="stat-value" id="kpi-waiting">0</div>
+            <div class="stat-foot">Currently in queue</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-icon">✓</div>
+            <div class="stat-label">Patients Served</div>
+            <div class="stat-value" id="kpi-served">0</div>
+            <div class="stat-foot">Completed today</div>
+          </div>
+        </div>
+
+        <div class="dashboard-chart-grid">
+          <section class="card chart-card chart-card-wide">
+            <div class="chart-heading">
+              <div>
+                <span class="eyebrow">ACTIVITY</span>
+                <h2>Appointment activity</h2>
+              </div>
+              <span class="chart-caption">Last 7 days</span>
+            </div>
+            <div class="chart-wrap"><canvas id="appointmentsChart" aria-label="Appointment activity for the last seven days"></canvas></div>
+            <p id="appointments-chart-fallback" class="chart-fallback" hidden>Chart data will appear when appointments are available.</p>
+          </section>
+          <section class="card chart-card">
+            <div class="chart-heading">
+              <div>
+                <span class="eyebrow">QUEUE STATUS</span>
+                <h2>Today's flow</h2>
+              </div>
+            </div>
+            <div class="chart-wrap chart-wrap-doughnut"><canvas id="queueChart" aria-label="Current queue status breakdown"></canvas></div>
+            <div class="queue-legend">
+              <span><i class="legend-dot legend-waiting"></i>Waiting <strong id="legend-waiting">0</strong></span>
+              <span><i class="legend-dot legend-called"></i>In progress <strong id="legend-progress">0</strong></span>
+              <span><i class="legend-dot legend-served"></i>Served <strong id="legend-served">0</strong></span>
+            </div>
+          </section>
+        </div>
+
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3>Live Waiting Snapshot</h3>
+            <a href="queue.html" class="btn btn-teal btn-sm">Open Full Calling Board →</a>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Ticket</th>
+                  <th>Patient Name</th>
+                  <th>Department</th>
+                  <th>Arrival Time</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="dash-queue-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="staff.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      checkPageAccess();
+
+      const patients = DataStore.get('mq_patients');
+      const appts = DataStore.get('mq_appointments');
+      const queue = DataStore.get('mq_queue');
+      const user = getCurrentUser();
+      const today = todayIso();
+      const todayLabel = new Date(`${today}T00:00:00`).toLocaleDateString(undefined, {
+        weekday: 'long', month: 'long', day: 'numeric'
+      });
+
+      document.getElementById('kpi-patients').innerText = patients.length;
+      const todayAppointments = appts.filter(item => item.date === today).length;
+      const waiting = queue.filter(item => item.status === 'Waiting').length;
+      const progress = queue.filter(item => ['Called', 'In Consultation'].includes(item.status)).length;
+      const served = queue.filter(item => item.status === 'Served' && (!item.servedAt || item.servedAt.slice(0, 10) === today)).length;
+      document.getElementById('kpi-appointments').innerText = todayAppointments;
+      document.getElementById('kpi-waiting').innerText = waiting;
+      document.getElementById('kpi-served').innerText = served;
+      document.getElementById('dashboard-user-name').textContent = user ? user.name.split(' ')[0] : 'Administrator';
+      document.getElementById('dashboard-date').textContent = todayLabel;
+      document.getElementById('legend-waiting').textContent = waiting;
+      document.getElementById('legend-progress').textContent = progress;
+      document.getElementById('legend-served').textContent = served;
+
+      const chartLabels = Array.from({ length: 7 }, (_, index) => {
+        const date = new Date();
+        date.setDate(date.getDate() - (6 - index));
+        return date;
+      });
+      const appointmentCounts = chartLabels.map(date => {
+        const iso = date.toISOString().slice(0, 10);
+        return appts.filter(item => item.date === iso).length;
+      });
+      if (window.Chart) {
+        new Chart(document.getElementById('appointmentsChart'), {
+          type: 'line',
+          data: {
+            labels: chartLabels.map(date => date.toLocaleDateString(undefined, { weekday: 'short' })),
+            datasets: [{
+              data: appointmentCounts,
+              borderColor: '#287A87',
+              backgroundColor: 'rgba(40, 122, 135, 0.12)',
+              borderWidth: 3,
+              pointBackgroundColor: '#fff',
+              pointBorderColor: '#287A87',
+              pointBorderWidth: 2,
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              fill: true,
+              tension: 0.4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { displayColors: false, padding: 10 } },
+            scales: {
+              y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: 'rgba(219, 226, 232, 0.55)' }, border: { display: false } },
+              x: { grid: { display: false }, border: { display: false } }
+            }
+          }
+        });
+        new Chart(document.getElementById('queueChart'), {
+          type: 'doughnut',
+          data: {
+            labels: ['Waiting', 'In progress', 'Served'],
+            datasets: [{ data: [waiting, progress, served], backgroundColor: ['#ed6c02', '#0288d1', '#2e7d32'], borderWidth: 0, hoverOffset: 5 }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '74%',
+            plugins: { legend: { display: false }, tooltip: { padding: 10 } }
+          }
+        });
+      } else {
+        document.getElementById('appointments-chart-fallback').hidden = false;
+      }
+
+      const tbody = document.getElementById('dash-queue-tbody');
+      const visibleQueue = queue.slice(0, 4);
+      tbody.innerHTML = visibleQueue.length ? visibleQueue.map(item => `
+        <tr>
+          <td><strong>${escapeHtml(item.ticket)}</strong></td>
+          <td>${escapeHtml(item.patient)}</td>
+          <td>${escapeHtml(item.dept)}</td>
+          <td>${escapeHtml(item.arrived)}</td>
+          <td><span class="badge badge-${escapeHtml(item.status.toLowerCase().replace(' ', ''))}">${escapeHtml(item.status)}</span></td>
+        </tr>
+      `).join('') : '<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:20px;">No queue activity yet.</td></tr>';
+    });
+  </script>
+</body>
+</html>

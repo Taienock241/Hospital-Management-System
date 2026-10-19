@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signed Out - Hopewell Hospital</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="components.css">
+  <link rel="stylesheet" href="staff.css">
+</head>
+<body class="login-body">
+  <main class="login-card logout-card">
+    <div class="logout-icon" aria-hidden="true">
+      <span class="logout-spinner"></span>
+    </div>
+    <h1>Successfully signed out</h1>
+    <p style="color: var(--text-muted); margin-top: 10px;">
+      You have been successfully logged out of Hopewell Hospital Staff Portal
+    </p>
+    <p class="logout-countdown">
+      Returning to login in <strong id="countdown">3</strong> seconds...
+    </p>
+    <a class="btn btn-primary" href="login.html">Return to Login Now</a>
+  </main>
+
+  <script>
+    localStorage.removeItem('mq_current_user');
+    localStorage.removeItem('hw_current_user');
+    sessionStorage.removeItem('mq_current_user');
+    sessionStorage.removeItem('hw_current_user');
+
+    let secondsRemaining = 3;
+    const countdown = document.getElementById('countdown');
+    const redirectTimer = setInterval(() => {
+      secondsRemaining -= 1;
+      countdown.textContent = secondsRemaining;
+
+      if (secondsRemaining <= 0) {
+        clearInterval(redirectTimer);
+        window.location.href = 'login.html';
+      }
+    }, 1000);
+  </script>
+</body>
+</html>

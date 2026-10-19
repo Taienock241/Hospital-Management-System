@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reports - Hopewell Staff</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="components.css">
+  <link rel="stylesheet" href="staff.css">
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-brand">🏥 Hopewell Staff</div>
+      <ul class="sidebar-menu">
+        <li><a href="dashboard.html">📊 Dashboard</a></li>
+        <li><a href="patients.html">🧑‍🦱 Patients</a></li>
+        <li><a href="appointments.html">📅 Appointments</a></li>
+        <li><a href="queue.html">⏳ Live Queue</a></li>
+        <li><a href="doctors.html">🩺 Doctors</a></li>
+        <li><a href="departments.html">🏢 Departments</a></li>
+        <li class="active"><a href="reports.html">📈 Reports</a></li>
+        <li style="margin-top: auto;"><a href="logout.html">🚪 Logout</a></li>
+      </ul>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="top-nav">
+        <div style="display: flex; align-items: center;">
+          <button class="mobile-menu-btn">☰</button>
+          <div class="page-title">Reports & Analytics</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <button class="btn btn-outline" onclick="window.print()">🖨️ Print Summary</button>
+          <div class="user-profile">
+            <div class="user-avatar">AD</div>
+            <div><strong>Administrator</strong><br><small style="color:var(--text-muted)">General Admin</small></div>
+          </div>
+        </div>
+      </header>
+
+      <main class="content-body">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total Appointments Booked</div>
+            <div class="stat-value" id="report-appointments">0</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-label">Patients Served (This Week)</div>
+            <div class="stat-value" id="report-served">0</div>
+          </div>
+          <div class="stat-card orange">
+            <div class="stat-label">Average Wait Time</div>
+            <div class="stat-value" id="report-wait">Unavailable</div>
+          </div>
+          <div class="stat-card" style="border-left-color: var(--status-red);">
+            <div class="stat-label">Cancellations</div>
+            <div class="stat-value" id="report-cancelled">0</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-bottom: 12px;">Weekly Patient Throughput</h3>
+          <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">
+            Simulated throughput report ready for connection to MySQL queries.
+          </p>
+          <div id="weeklySummary" style="background: var(--bg-page); padding: 20px; border-radius: var(--radius-sm); font-size: 14px; line-height: 1.8;"></div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="staff.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      checkPageAccess();
+      const appointments = DataStore.get('mq_appointments');
+      const queue = DataStore.get('mq_queue');
+      document.getElementById('report-appointments').textContent = appointments.length;
+      document.getElementById('report-served').textContent = queue.filter(item => item.status === 'Served').length;
+      document.getElementById('report-cancelled').textContent = appointments.filter(item => item.status === 'Cancelled').length;
+      document.getElementById('weeklySummary').textContent = queue.length
+        ? `${queue.filter(item => item.status === 'Served').length} queue patients served from saved records. Waiting-time metrics are unavailable because reliable service timestamps are not present.`
+        : 'Insufficient queue data for a throughput summary.';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Appointments - Hopewell Staff</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="components.css">
+  <link rel="stylesheet" href="staff.css">
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-brand">🏥 Hopewell Staff</div>
+      <ul class="sidebar-menu">
+        <li><a href="dashboard.html">📊 Dashboard</a></li>
+        <li><a href="patients.html">🧑‍🦱 Patients</a></li>
+        <li class="active"><a href="appointments.html">📅 Appointments</a></li>
+        <li><a href="queue.html">⏳ Live Queue</a></li>
+        <li><a href="doctors.html">🩺 Doctors</a></li>
+        <li><a href="departments.html">🏢 Departments</a></li>
+        <li><a href="reports.html">📈 Reports</a></li>
+        <li style="margin-top: auto;"><a href="logout.html">🚪 Logout</a></li>
+      </ul>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="top-nav">
+        <div style="display: flex; align-items: center;">
+          <button class="mobile-menu-btn">☰</button>
+          <div class="page-title">Appointment Management</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <button class="btn btn-primary" onclick="openModal('addAptModal')">+ New Appointment</button>
+          <div class="user-profile">
+            <div class="user-avatar">AD</div>
+            <div><strong>Administrator</strong><br><small style="color:var(--text-muted)">General Admin</small></div>
+          </div>
+        </div>
+      </header>
+
+      <main class="content-body">
+        <div class="card">
+          <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+            <input id="appointmentSearch" class="form-control" placeholder="Search patient, doctor, or department..." style="max-width: 320px;">
+            <select id="statusFilter" class="form-control" style="max-width: 200px;">
+              <option value="">All Statuses</option>
+              <option value="Confirmed">Confirmed</option>
+              <option value="Pending">Pending</option>
+              <option value="Completed">Completed</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Apt ID</th>
+                  <th>Patient</th>
+                  <th>Doctor</th>
+                  <th>Department</th>
+                  <th>Date & Time</th>
+                  <th>Status</th>
+                  <th>Change Status</th>
+                </tr>
+              </thead>
+              <tbody id="aptTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add Appointment Modal -->
+  <div class="modal-backdrop" id="addAptModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Book New Appointment</h3>
+        <button class="modal-close" onclick="closeModal('addAptModal')">&times;</button>
+      </div>
+      <form id="newAptForm">
+        <div class="form-group">
+          <label>Patient Name</label>
+          <input type="text" id="apt_patient" class="form-control" placeholder="e.g. John Kiprono" required>
+        </div>
+        <div class="form-group">
+          <label>Department</label>
+          <select id="apt_dept" class="form-control">
+            <option>Cardiology</option>
+            <option>Pediatrics</option>
+            <option>General Medicine</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Doctor</label>
+          <select id="apt_doctor" class="form-control">
+            <option>Dr. Sarah Ndwiga</option>
+            <option>Dr. Kevin Mutua</option>
+            <option>Dr. Jane Mwangi</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="apt_date" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Time Slot</label>
+          <input type="time" id="apt_time" class="form-control" value="10:00" required>
+        </div>
+        <button type="submit" class="btn btn-teal" style="width: 100%;">Create Appointment</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="staff.js"></script>
+  <script>
+    function renderAppts() {
+      const filter = document.getElementById('statusFilter').value;
+      const query = document.getElementById('appointmentSearch').value.trim().toLowerCase();
+      let data = DataStore.get('mq_appointments');
+      if (filter) data = data.filter(a => a.status === filter);
+      if (query) data = data.filter(a => [a.patient, a.doctor, a.dept].some(value => String(value || '').toLowerCase().includes(query)));
+
+      const tbody = document.getElementById('aptTbody');
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:20px;">No appointments matching criteria.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = data.map(item => `
+        <tr>
+          <td><strong>${escapeHtml(item.id)}</strong></td>
+          <td>${escapeHtml(item.patient)}</td>
+          <td>${escapeHtml(item.doctor)}</td>
+          <td>${escapeHtml(item.dept)}</td>
+          <td>${escapeHtml(item.date)} at ${escapeHtml(item.time)}</td>
+          <td><span class="badge badge-${escapeHtml(item.status.toLowerCase())}">${escapeHtml(item.status)}</span></td>
+          <td>
+            <select onchange="changeStatus('${escapeHtml(item.id)}', this.value)" class="form-control" style="font-size:12px; padding:3px 6px; width:auto;">
+              <option ${item.status==='Pending'?'selected':''}>Pending</option>
+              <option ${item.status==='Confirmed'?'selected':''}>Confirmed</option>
+              <option ${item.status==='Completed'?'selected':''}>Completed</option>
+              <option ${item.status==='Cancelled'?'selected':''}>Cancelled</option>
+            </select>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function changeStatus(id, newStatus) {
+      const appts = DataStore.get('mq_appointments');
+      const appointment = appts.find(item => item.id === id);
+      if (!appointment) return showToast('Appointment was not found.', 'error');
+      appointment.status = newStatus;
+      DataStore.set('mq_appointments', appts);
+      renderAppts();
+      showToast('Status updated to ' + newStatus);
+    }
+
+    document.getElementById('statusFilter').addEventListener('change', renderAppts);
+    document.getElementById('appointmentSearch').addEventListener('input', renderAppts);
+
+    document.getElementById('newAptForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const date = document.getElementById('apt_date').value;
+      const patient = document.getElementById('apt_patient').value.trim();
+      const dept = document.getElementById('apt_dept').value;
+      const doctor = document.getElementById('apt_doctor').value;
+      const departments = DataStore.get('mq_depts');
+      const doctors = DataStore.get('mq_doctors');
+      if (!patient || !departments.some(item => item.name === dept && item.status === 'Active') ||
+        !doctors.some(item => item.name === doctor && item.dept === dept)) {
+        showToast('Enter a patient and choose a valid active department and doctor.', 'error');
+        return;
+      }
+      if (date < todayIso()) {
+        showToast('Appointments cannot be scheduled in the past.', 'error');
+        return;
+      }
+      const appts = DataStore.get('mq_appointments');
+      appts.push({
+        id: makeId('APT-', appts),
+        patient,
+        dept,
+        doctor,
+        date,
+        time: document.getElementById('apt_time').value,
+        status: 'Pending'
+      });
+      DataStore.set('mq_appointments', appts);
+      closeModal('addAptModal');
+      renderAppts();
+      showToast('Appointment scheduled successfully!');
+      e.target.reset();
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      checkPageAccess();
+      const departments = DataStore.get('mq_depts').filter(item => item.status === 'Active');
+      const departmentSelect = document.getElementById('apt_dept');
+      departmentSelect.innerHTML = departments.map(item => `<option>${escapeHtml(item.name)}</option>`).join('');
+      const doctorSelect = document.getElementById('apt_doctor');
+      const doctors = DataStore.get('mq_doctors');
+      const refreshDoctors = () => {
+        const selectedDepartment = departmentSelect.value;
+        doctorSelect.innerHTML = doctors.filter(item => item.dept === selectedDepartment)
+          .map(item => `<option>${escapeHtml(item.name)}</option>`).join('');
+      };
+      departmentSelect.addEventListener('change', refreshDoctors);
+      refreshDoctors();
+      document.getElementById('apt_date').value = todayIso();
+      renderAppts();
+    });
+  </script>
+</body>
+</html>

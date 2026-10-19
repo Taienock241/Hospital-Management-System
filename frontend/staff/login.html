@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff Login - Hopewell</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="components.css">
+  <link rel="stylesheet" href="staff.css">
+</head>
+<body class="login-body">
+  <div class="login-card">
+    <div style="text-align: center; margin-bottom: 24px;">
+      <h2 style="color: var(--primary-blue);">🏥 Hopewell</h2>
+      <p style="color: var(--text-muted); font-size: 14px;">Staff & Administration Portal</p>
+    </div>
+    
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="username">Staff ID or Email</label>
+        <input type="text" id="username" class="form-control" value="admin@hopewell.org" required>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
+        <div style="margin-top: 6px;">
+          <input type="checkbox" id="showPass"> <label for="showPass" style="display:inline; font-size:12px; font-weight:normal;">Show Password</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="staffRole">Simulated Role</label>
+        <select id="staffRole" class="form-control">
+          <option value="admin">Administrator (All Access)</option>
+          <option value="doctor">Doctor (Consultations & Queues)</option>
+          <option value="nurse">Nurse / Triage (Vitals & Queues)</option>
+          <option value="receptionist">Receptionist (Bookings & Check-In)</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Sign In to Portal</button>
+    </form>
+  </div>
+
+  <script src="staff.js"></script>
+  <script>
+    document.getElementById('showPass').addEventListener('change', function() {
+      const pass = document.getElementById('password');
+      pass.type = this.checked ? 'text' : 'password';
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const role = document.getElementById('staffRole').value;
+      
+      const roleProfiles = {
+        admin: { name: 'System Administrator', dept: 'Hopewell Hospital IT & Admin' },
+        doctor: { name: 'Dr. Sarah Ndwiga', dept: 'Cardiology' },
+        nurse: { name: 'Nurse Mary Achieng', dept: 'Triage Desk' },
+        receptionist: { name: 'James Kariuki', dept: 'Outpatient Reception' }
+      };
+
+      const selected = roleProfiles[role];
+      const sessionUser = {
+        id: 'STF-' + Math.floor(100 + Math.random() * 900),
+        name: selected.name,
+        email: document.getElementById('username').value,
+        role: role,
+        dept: selected.dept
+      };
+
+      setCurrentUser(sessionUser);
+      showToast(`Demo login: ${sessionUser.role.toUpperCase()}`);
+
+      setTimeout(() => {
+        window.location.href = 'dashboard.html';
+      }, 500);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patients - Hopewell Staff</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="components.css">
+  <link rel="stylesheet" href="staff.css">
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-brand">🏥 Hopewell Staff</div>
+      <ul class="sidebar-menu">
+        <li><a href="dashboard.html">📊 Dashboard</a></li>
+        <li class="active"><a href="patients.html">🧑‍🦱 Patients</a></li>
+        <li><a href="appointments.html">📅 Appointments</a></li>
+        <li><a href="queue.html">⏳ Live Queue</a></li>
+        <li><a href="doctors.html">🩺 Doctors</a></li>
+        <li><a href="departments.html">🏢 Departments</a></li>
+        <li><a href="reports.html">📈 Reports</a></li>
+        <li style="margin-top: auto;"><a href="logout.html">🚪 Logout</a></li>
+      </ul>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="top-nav">
+        <div style="display: flex; align-items: center;">
+          <button class="mobile-menu-btn">☰</button>
+          <div class="page-title">Patient Directory</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <button class="btn btn-primary" onclick="openModal('addPatientModal')">+ Add Patient</button>
+          <div class="user-profile">
+            <div class="user-avatar">AD</div>
+            <div><strong>Administrator</strong><br><small style="color:var(--text-muted)">General Admin</small></div>
+          </div>
+        </div>
+      </header>
+
+      <main class="content-body">
+        <div class="card">
+          <div style="margin-bottom: 16px;">
+            <input type="text" id="patientSearch" class="form-control" placeholder="Search patient by name or ID (e.g. John or P101)...">
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Patient ID</th>
+                  <th>Full Name</th>
+                  <th>Phone Number</th>
+                  <th>Gender</th>
+                  <th>DOB</th>
+                  <th>Blood Group</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="patientsTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add Patient Modal -->
+  <div class="modal-backdrop" id="addPatientModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Register New Patient</h3>
+        <button class="modal-close" onclick="closeModal('addPatientModal')">&times;</button>
+      </div>
+      <form id="newPatientForm">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="p_name" class="form-control" placeholder="e.g. Mary Atieno" required>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="text" id="p_phone" class="form-control" placeholder="07XXXXXXXX" required>
+        </div>
+        <div class="form-group">
+          <label>Gender</label>
+          <select id="p_gender" class="form-control">
+            <option>Female</option>
+            <option>Male</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Date of Birth</label>
+          <input type="date" id="p_dob" class="form-control" value="1995-06-15" required>
+        </div>
+        <div class="form-group">
+          <label>Blood Group</label>
+          <select id="p_blood" class="form-control">
+            <option>O+</option>
+            <option>A+</option>
+            <option>B+</option>
+            <option>AB+</option>
+            <option>O-</option>
+            <option>A-</option>
+            <option>B-</option>
+            <option>AB-</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-teal" style="width: 100%;">Save Patient Record</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="staff.js"></script>
+  <script>
+    function renderPatients(query = '') {
+      const normalizedQuery = query.trim().toLowerCase();
+      const list = DataStore.get('mq_patients').filter(p =>
+        String(p.name || '').toLowerCase().includes(normalizedQuery) ||
+        String(p.id || '').toLowerCase().includes(normalizedQuery)
+      );
+      
+      const tbody = document.getElementById('patientsTbody');
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:20px;">No patient records found.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(p => `
+        <tr>
+          <td><strong>${escapeHtml(p.id)}</strong></td>
+          <td>${escapeHtml(p.name)}</td>
+          <td>${escapeHtml(p.phone)}</td>
+          <td>${escapeHtml(p.gender)}</td>
+          <td>${escapeHtml(p.dob)}</td>
+          <td><span class="badge badge-waiting">${escapeHtml(p.blood || 'Unknown')}</span></td>
+          <td>
+            <button class="btn btn-outline btn-sm" onclick="deletePatient('${escapeHtml(p.id)}')">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function deletePatient(id) {
+      if (confirm('Are you sure you want to delete this patient record?')) {
+        const patients = DataStore.get('mq_patients');
+        const next = patients.filter(patient => patient.id !== id);
+        if (next.length === patients.length) {
+          showToast('Patient record was not found.', 'error');
+          return;
+        }
+        DataStore.set('mq_patients', next);
+        renderPatients(document.getElementById('patientSearch').value);
+        showToast('Patient record deleted.');
+      }
+    }
+
+    document.getElementById('patientSearch').addEventListener('input', (e) => {
+      renderPatients(e.target.value);
+    });
+
+    document.getElementById('newPatientForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('p_name').value.trim();
+      const phone = document.getElementById('p_phone').value.trim();
+      const dob = document.getElementById('p_dob').value;
+      if (!/^(?:07|01)\d{8}$/.test(phone)) {
+        showToast('Enter a valid Kenyan phone number.', 'error');
+        return;
+      }
+      if (!dob || dob > todayIso()) {
+        showToast('Date of birth cannot be in the future.', 'error');
+        return;
+      }
+      const patients = DataStore.get('mq_patients');
+      patients.push({
+        id: makeId('P', patients),
+        name,
+        phone,
+        gender: document.getElementById('p_gender').value,
+        dob,
+        blood: document.getElementById('p_blood').value
+      });
+      DataStore.set('mq_patients', patients);
+      closeModal('addPatientModal');
+      renderPatients();
+      showToast('New patient registered successfully!');
+      e.target.reset();
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      checkPageAccess();
+      renderPatients();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Queue - Hopewell Staff</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="components.css">
+  <link rel="stylesheet" href="staff.css">
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-brand">🏥 Hopewell Staff</div>
+      <ul class="sidebar-menu">
+        <li><a href="dashboard.html">📊 Dashboard</a></li>
+        <li><a href="patients.html">🧑‍🦱 Patients</a></li>
+        <li><a href="appointments.html">📅 Appointments</a></li>
+        <li class="active"><a href="queue.html">⏳ Live Queue</a></li>
+        <li><a href="doctors.html">🩺 Doctors</a></li>
+        <li><a href="departments.html">🏢 Departments</a></li>
+        <li><a href="reports.html">📈 Reports</a></li>
+        <li style="margin-top: auto;"><a href="logout.html">🚪 Logout</a></li>
+      </ul>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="top-nav">
+        <div style="display: flex; align-items: center;">
+          <button class="mobile-menu-btn">☰</button>
+          <div class="page-title">Live Patient Queue</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <button class="btn btn-teal" onclick="callNext()">📢 Call Next Patient</button>
+          <div class="user-profile">
+            <div class="user-avatar">AD</div>
+            <div><strong>Administrator</strong><br><small style="color:var(--text-muted)">General Admin</small></div>
+          </div>
+        </div>
+      </header>
+
+      <main class="content-body">
+        <div class="hero-call">
+          <div>
+            <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9;">Currently In Consultation</div>
+            <h1 id="currentCall" style="font-size: 42px; font-weight: 800; margin-top: 4px;">No active call</h1>
+            <p id="currentCallDetails" style="font-size: 15px; opacity: 0.9;">Call a waiting patient to begin.</p>
+          </div>
+          <div>
+            <button class="btn btn-outline" onclick="openModal('ticketModal')">+ Issue Walk-in Ticket</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="margin-bottom: 16px;">
+            <h3>Waiting Line</h3>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Ticket</th>
+                  <th>Patient</th>
+                  <th>Department</th>
+                  <th>Arrival Time</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="queueTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Issue Ticket Modal -->
+  <div class="modal-backdrop" id="ticketModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Issue Walk-in Queue Ticket</h3>
+        <button class="modal-close" onclick="closeModal('ticketModal')">&times;</button>
+      </div>
+      <form id="newTicketForm">
+        <div class="form-group">
+          <label>Patient Name</label>
+          <input type="text" id="t_name" class="form-control" placeholder="e.g. Dennis Omari" required>
+        </div>
+        <div class="form-group">
+          <label>Department</label>
+          <select id="t_dept" class="form-control">
+            <option>General Medicine</option>
+            <option>Pediatrics</option>
+            <option>Cardiology</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-teal" style="width: 100%;">Print / Issue Ticket</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="staff.js"></script>
+  <script>
+    function renderQueue() {
+      const q = DataStore.get('mq_queue');
+      const tbody = document.getElementById('queueTbody');
+      const activeCall = q.find(item => ['Called', 'In Consultation'].includes(item.status));
+      document.getElementById('currentCall').innerText = activeCall ? `Ticket #${activeCall.ticket}` : 'No active call';
+      document.getElementById('currentCallDetails').innerText = activeCall
+        ? `${activeCall.patient} — ${activeCall.dept}` : 'Call a waiting patient to begin.';
+      if (!q.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:20px;">No queue tickets yet.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = q.map(item => `
+        <tr>
+          <td><strong>${escapeHtml(item.ticket)}</strong></td>
+          <td>${escapeHtml(item.patient)}</td>
+          <td>${escapeHtml(item.dept)}</td>
+          <td>${escapeHtml(item.arrived)}</td>
+          <td><span class="badge badge-${escapeHtml(item.status.toLowerCase().replace(' ', ''))}">${escapeHtml(item.status)}</span></td>
+          <td>
+            ${item.status !== 'Served' && item.status !== 'Cancelled' ? `<button class="btn btn-outline btn-sm" onclick="markServed('${escapeHtml(item.ticket)}')">Mark Served</button>` : 'Finished'}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function callNext() {
+      const q = DataStore.get('mq_queue');
+      const nextIndex = q.findIndex(item => item.status === 'Waiting');
+      if (nextIndex !== -1) {
+        q[nextIndex].status = 'Called';
+        DataStore.set('mq_queue', q);
+        renderQueue();
+        showToast('Calling Ticket ' + q[nextIndex].ticket);
+      } else {
+        showToast('No patients currently in Waiting status.');
+      }
+    }
+
+    function markServed(ticket) {
+      const q = DataStore.get('mq_queue');
+      const item = q.find(entry => entry.ticket === ticket);
+      if (!item) return showToast('Queue ticket was not found.', 'error');
+      item.status = 'Served';
+      item.servedAt = new Date().toISOString();
+      DataStore.set('mq_queue', q);
+      renderQueue();
+      showToast('Patient marked as served.');
+    }
+
+    document.getElementById('newTicketForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const q = DataStore.get('mq_queue');
+      const newTicketNumber = makeId('A', q, 'ticket');
+      const departments = DataStore.get('mq_depts').filter(dept => dept.status === 'Active');
+      const department = document.getElementById('t_dept').value;
+      if (!departments.some(dept => dept.name === department)) {
+        showToast('Select an active department.', 'error');
+        return;
+      }
+      
+      q.push({
+        ticket: newTicketNumber,
+        patient: document.getElementById('t_name').value.trim(),
+        dept: department,
+        arrived: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        arrivedAt: new Date().toISOString(),
+        status: 'Waiting'
+      });
+
+      DataStore.set('mq_queue', q);
+      closeModal('ticketModal');
+      renderQueue();
+      showToast('Issued ticket ' + newTicketNumber);
+      e.target.reset();
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      checkPageAccess();
+      const select = document.getElementById('t_dept');
+      select.innerHTML = DataStore.get('mq_depts').filter(dept => dept.status === 'Active')
+        .map(dept => `<option>${escapeHtml(dept.name)}</option>`).join('');
+      renderQueue();
+    });
+  </script>
+</body>
+</html>
