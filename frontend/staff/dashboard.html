@@ -135,24 +135,23 @@
 
   <script src="staff.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      checkPageAccess();
-
-      const patients = DataStore.get('mq_patients');
-      const appts = DataStore.get('mq_appointments');
-      const queue = DataStore.get('mq_queue');
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!(await checkPageAccess())) return;
+      try {
+      const data = await apiRequest('/dashboard');
+      const stats = data.stats;
+      const queue = data.queue;
       const user = getCurrentUser();
-      const today = todayIso();
+      const today = data.today;
       const todayLabel = new Date(`${today}T00:00:00`).toLocaleDateString(undefined, {
         weekday: 'long', month: 'long', day: 'numeric'
       });
 
-      document.getElementById('kpi-patients').innerText = patients.length;
-      const todayAppointments = appts.filter(item => item.date === today).length;
-      const waiting = queue.filter(item => item.status === 'Waiting').length;
-      const progress = queue.filter(item => ['Called', 'In Consultation'].includes(item.status)).length;
-      const served = queue.filter(item => item.status === 'Served' && (!item.servedAt || item.servedAt.slice(0, 10) === today)).length;
-      document.getElementById('kpi-appointments').innerText = todayAppointments;
+      const waiting = Number(stats.waiting);
+      const progress = Number(stats.in_progress);
+      const served = Number(stats.served);
+      document.getElementById('kpi-patients').innerText = stats.patients;
+      document.getElementById('kpi-appointments').innerText = stats.appointments;
       document.getElementById('kpi-waiting').innerText = waiting;
       document.getElementById('kpi-served').innerText = served;
       document.getElementById('dashboard-user-name').textContent = user ? user.name.split(' ')[0] : 'Administrator';
@@ -166,10 +165,8 @@
         date.setDate(date.getDate() - (6 - index));
         return date;
       });
-      const appointmentCounts = chartLabels.map(date => {
-        const iso = date.toISOString().slice(0, 10);
-        return appts.filter(item => item.date === iso).length;
-      });
+      const appointmentMap = Object.fromEntries(data.appointmentsByDay.map(row => [row.day, Number(row.count)]));
+      const appointmentCounts = chartLabels.map(date => appointmentMap[`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`] || 0);
       if (window.Chart) {
         new Chart(document.getElementById('appointmentsChart'), {
           type: 'line',
@@ -220,13 +217,14 @@
       const visibleQueue = queue.slice(0, 4);
       tbody.innerHTML = visibleQueue.length ? visibleQueue.map(item => `
         <tr>
-          <td><strong>${escapeHtml(item.ticket)}</strong></td>
+          <td><strong>${escapeHtml(item.ticket_number)}</strong></td>
           <td>${escapeHtml(item.patient)}</td>
-          <td>${escapeHtml(item.dept)}</td>
-          <td>${escapeHtml(item.arrived)}</td>
-          <td><span class="badge badge-${escapeHtml(item.status.toLowerCase().replace(' ', ''))}">${escapeHtml(item.status)}</span></td>
+          <td>${escapeHtml(item.department)}</td>
+          <td>${escapeHtml(new Date(item.arrived_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }))}</td>
+          <td><span class="badge badge-${escapeHtml(item.status.replaceAll('_', ''))}">${escapeHtml(item.status.replaceAll('_', ' '))}</span></td>
         </tr>
       `).join('') : '<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:20px;">No queue activity yet.</td></tr>';
+      } catch (error) { showToast(error.message, 'error'); }
     });
   </script>
 </body>

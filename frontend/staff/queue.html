@@ -88,6 +88,10 @@
           <input type="text" id="t_name" class="form-control" placeholder="e.g. Dennis Omari" required>
         </div>
         <div class="form-group">
+          <label>Patient Phone</label>
+          <input type="tel" id="t_phone" class="form-control" placeholder="07XXXXXXXX" required>
+        </div>
+        <div class="form-group">
           <label>Department</label>
           <select id="t_dept" class="form-control">
             <option>General Medicine</option>
@@ -102,88 +106,72 @@
 
   <script src="staff.js"></script>
   <script>
-    function renderQueue() {
-      const q = DataStore.get('mq_queue');
+    async function renderQueue() {
+      const q = (await apiRequest('/queue')).items;
       const tbody = document.getElementById('queueTbody');
-      const activeCall = q.find(item => ['Called', 'In Consultation'].includes(item.status));
-      document.getElementById('currentCall').innerText = activeCall ? `Ticket #${activeCall.ticket}` : 'No active call';
+      const activeCall = q.find(item => ['called', 'in_consultation'].includes(item.status));
+      document.getElementById('currentCall').innerText = activeCall ? `Ticket #${activeCall.ticket_number}` : 'No active call';
       document.getElementById('currentCallDetails').innerText = activeCall
-        ? `${activeCall.patient} — ${activeCall.dept}` : 'Call a waiting patient to begin.';
+        ? `${activeCall.patient_name} — ${activeCall.department_name}` : 'Call a waiting patient to begin.';
       if (!q.length) {
         tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:20px;">No queue tickets yet.</td></tr>';
         return;
       }
       tbody.innerHTML = q.map(item => `
         <tr>
-          <td><strong>${escapeHtml(item.ticket)}</strong></td>
-          <td>${escapeHtml(item.patient)}</td>
-          <td>${escapeHtml(item.dept)}</td>
-          <td>${escapeHtml(item.arrived)}</td>
-          <td><span class="badge badge-${escapeHtml(item.status.toLowerCase().replace(' ', ''))}">${escapeHtml(item.status)}</span></td>
+          <td><strong>${escapeHtml(item.ticket_number)}</strong></td>
+          <td>${escapeHtml(item.patient_name)}</td>
+          <td>${escapeHtml(item.department_name)}</td>
+          <td>${escapeHtml(new Date(item.arrived_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }))}</td>
+          <td><span class="badge badge-${escapeHtml(item.status.replaceAll('_', ''))}">${escapeHtml(item.status.replaceAll('_', ' '))}</span></td>
           <td>
-            ${item.status !== 'Served' && item.status !== 'Cancelled' ? `<button class="btn btn-outline btn-sm" onclick="markServed('${escapeHtml(item.ticket)}')">Mark Served</button>` : 'Finished'}
+            ${!['served', 'cancelled', 'no_show'].includes(item.status) ? `<button class="btn btn-outline btn-sm" onclick="markServed(${Number(item.queue_ticket_id)})">Mark Served</button>` : 'Finished'}
           </td>
         </tr>
       `).join('');
     }
 
-    function callNext() {
-      const q = DataStore.get('mq_queue');
-      const nextIndex = q.findIndex(item => item.status === 'Waiting');
-      if (nextIndex !== -1) {
-        q[nextIndex].status = 'Called';
-        DataStore.set('mq_queue', q);
-        renderQueue();
-        showToast('Calling Ticket ' + q[nextIndex].ticket);
-      } else {
-        showToast('No patients currently in Waiting status.');
-      }
+    async function callNext() {
+      try {
+        const q = (await apiRequest('/queue')).items;
+        const next = q.find(item => item.status === 'waiting');
+        if (!next) return showToast('No patients currently waiting.');
+        await apiRequest(`/queue/${next.queue_ticket_id}/status`, { method: 'PATCH', body: { status: 'called' } });
+        await renderQueue();
+        showToast('Calling Ticket ' + next.ticket_number);
+      } catch (error) { showToast(error.message, 'error'); }
     }
 
-    function markServed(ticket) {
-      const q = DataStore.get('mq_queue');
-      const item = q.find(entry => entry.ticket === ticket);
-      if (!item) return showToast('Queue ticket was not found.', 'error');
-      item.status = 'Served';
-      item.servedAt = new Date().toISOString();
-      DataStore.set('mq_queue', q);
-      renderQueue();
-      showToast('Patient marked as served.');
+    async function markServed(id) {
+      try {
+        await apiRequest(`/queue/${id}/status`, { method: 'PATCH', body: { status: 'served' } });
+        await renderQueue();
+        showToast('Patient marked as served.');
+      } catch (error) { showToast(error.message, 'error'); }
     }
 
-    document.getElementById('newTicketForm').addEventListener('submit', (e) => {
+    document.getElementById('newTicketForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const q = DataStore.get('mq_queue');
-      const newTicketNumber = makeId('A', q, 'ticket');
-      const departments = DataStore.get('mq_depts').filter(dept => dept.status === 'Active');
-      const department = document.getElementById('t_dept').value;
-      if (!departments.some(dept => dept.name === department)) {
-        showToast('Select an active department.', 'error');
-        return;
-      }
-      
-      q.push({
-        ticket: newTicketNumber,
-        patient: document.getElementById('t_name').value.trim(),
-        dept: department,
-        arrived: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        arrivedAt: new Date().toISOString(),
-        status: 'Waiting'
-      });
-
-      DataStore.set('mq_queue', q);
-      closeModal('ticketModal');
-      renderQueue();
-      showToast('Issued ticket ' + newTicketNumber);
-      e.target.reset();
+      try {
+        const response = await apiRequest('/queue', { method: 'POST', body: {
+          patient_name: document.getElementById('t_name').value.trim(),
+          phone: document.getElementById('t_phone').value.trim(),
+          department_id: Number(document.getElementById('t_dept').value)
+        }});
+        closeModal('ticketModal');
+        await renderQueue();
+        showToast('Issued ticket ' + response.item.ticket_number);
+        e.target.reset();
+      } catch (error) { showToast(error.message, 'error'); }
     });
 
-    document.addEventListener('DOMContentLoaded', () => {
-      checkPageAccess();
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!(await checkPageAccess())) return;
+      if (getCurrentUser()?.role === 'doctor') document.querySelector('.hero-call .btn-outline')?.setAttribute('hidden', 'hidden');
       const select = document.getElementById('t_dept');
-      select.innerHTML = DataStore.get('mq_depts').filter(dept => dept.status === 'Active')
-        .map(dept => `<option>${escapeHtml(dept.name)}</option>`).join('');
-      renderQueue();
+      const depts = (await apiRequest('/departments')).items.filter(dept => dept.status === 'active');
+      select.innerHTML = depts.map(dept => `<option value="${Number(dept.department_id)}">${escapeHtml(dept.department_name)}</option>`).join('');
+      try { await renderQueue(); } catch (error) { showToast(error.message, 'error'); }
     });
   </script>
 </body>

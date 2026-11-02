@@ -1,0 +1,56 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+!.env.*.example
+**/secrets.*
+**/*secret*
+**/*credential*
+backend/scripts/hash-password.php
+**/*password-hash*
+*.pgpass
+pgpass.conf
+*.pem
+*.key
+*.p12
+*.pfx
+*.p8
+*.jks
+*.keystore
+*.local
+*.local.*
+
+# Database scripts, exports, and backups (keep these out of Git)
+*.sql
+*.sql.gz
+*.dump
+*.backup
+*.bak
+*.db
+*.sqlite
+*.sqlite3
+**/db-backups/
+**/database-exports/
+**/data-exports/
+**/backups/
+**/exports/
+**/patient-data/
+**/medical-records/
+*.csv
+*.xls
+*.xlsx
+*.ods
+
+# Runtime data and logs
+**/uploads/
+**/private/
+**/storage/
+*.log
+
+# Common local dependencies and editor files
+node_modules/
+vendor/
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

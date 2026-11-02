@@ -82,23 +82,17 @@
       </div>
       <form id="newAptForm">
         <div class="form-group">
-          <label>Patient Name</label>
-          <input type="text" id="apt_patient" class="form-control" placeholder="e.g. John Kiprono" required>
+          <label>Patient</label>
+          <select id="apt_patient" class="form-control" required></select>
         </div>
         <div class="form-group">
           <label>Department</label>
           <select id="apt_dept" class="form-control">
-            <option>Cardiology</option>
-            <option>Pediatrics</option>
-            <option>General Medicine</option>
           </select>
         </div>
         <div class="form-group">
           <label>Doctor</label>
           <select id="apt_doctor" class="form-control">
-            <option>Dr. Sarah Ndwiga</option>
-            <option>Dr. Kevin Mutua</option>
-            <option>Dr. Jane Mwangi</option>
           </select>
         </div>
         <div class="form-group">
@@ -116,12 +110,13 @@
 
   <script src="staff.js"></script>
   <script>
+    let appointmentRows = [];
     function renderAppts() {
       const filter = document.getElementById('statusFilter').value;
       const query = document.getElementById('appointmentSearch').value.trim().toLowerCase();
-      let data = DataStore.get('mq_appointments');
-      if (filter) data = data.filter(a => a.status === filter);
-      if (query) data = data.filter(a => [a.patient, a.doctor, a.dept].some(value => String(value || '').toLowerCase().includes(query)));
+      let data = appointmentRows;
+      if (filter) data = data.filter(a => a.status === filter.toLowerCase());
+      if (query) data = data.filter(a => [a.patient_name, a.doctor_name, a.department_name].some(value => String(value || '').toLowerCase().includes(query)));
 
       const tbody = document.getElementById('aptTbody');
       if (data.length === 0) {
@@ -131,87 +126,86 @@
 
       tbody.innerHTML = data.map(item => `
         <tr>
-          <td><strong>${escapeHtml(item.id)}</strong></td>
-          <td>${escapeHtml(item.patient)}</td>
-          <td>${escapeHtml(item.doctor)}</td>
-          <td>${escapeHtml(item.dept)}</td>
-          <td>${escapeHtml(item.date)} at ${escapeHtml(item.time)}</td>
-          <td><span class="badge badge-${escapeHtml(item.status.toLowerCase())}">${escapeHtml(item.status)}</span></td>
+          <td><strong>${escapeHtml(item.appointment_number)}</strong></td>
+          <td>${escapeHtml(item.patient_name)}</td>
+          <td>${escapeHtml(item.doctor_name)}</td>
+          <td>${escapeHtml(item.department_name)}</td>
+          <td>${escapeHtml(new Date(item.scheduled_at).toLocaleString())}</td>
+          <td><span class="badge badge-${escapeHtml(item.status)}">${escapeHtml(item.status.replace('_', ' '))}</span></td>
           <td>
-            <select onchange="changeStatus('${escapeHtml(item.id)}', this.value)" class="form-control" style="font-size:12px; padding:3px 6px; width:auto;">
-              <option ${item.status==='Pending'?'selected':''}>Pending</option>
-              <option ${item.status==='Confirmed'?'selected':''}>Confirmed</option>
-              <option ${item.status==='Completed'?'selected':''}>Completed</option>
-              <option ${item.status==='Cancelled'?'selected':''}>Cancelled</option>
+            <select onchange="changeStatus(${Number(item.appointment_id)}, this.value)" class="form-control" style="font-size:12px; padding:3px 6px; width:auto;">
+              <option value="pending" ${item.status==='pending'?'selected':''}>Pending</option>
+              <option value="confirmed" ${item.status==='confirmed'?'selected':''}>Confirmed</option>
+              <option value="completed" ${item.status==='completed'?'selected':''}>Completed</option>
+              <option value="cancelled" ${item.status==='cancelled'?'selected':''}>Cancelled</option>
             </select>
           </td>
         </tr>
       `).join('');
     }
 
-    function changeStatus(id, newStatus) {
-      const appts = DataStore.get('mq_appointments');
-      const appointment = appts.find(item => item.id === id);
-      if (!appointment) return showToast('Appointment was not found.', 'error');
-      appointment.status = newStatus;
-      DataStore.set('mq_appointments', appts);
+    async function loadAppointments() {
+      appointmentRows = (await apiRequest('/appointments')).items;
       renderAppts();
-      showToast('Status updated to ' + newStatus);
+    }
+
+    async function changeStatus(id, newStatus) {
+      try {
+        await apiRequest(`/appointments/${id}`, { method: 'PATCH', body: { status: newStatus } });
+        await loadAppointments();
+        showToast('Appointment status updated.');
+      } catch (error) { showToast(error.message, 'error'); }
     }
 
     document.getElementById('statusFilter').addEventListener('change', renderAppts);
     document.getElementById('appointmentSearch').addEventListener('input', renderAppts);
 
-    document.getElementById('newAptForm').addEventListener('submit', (e) => {
+    let allDoctors = [];
+    document.getElementById('newAptForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const date = document.getElementById('apt_date').value;
-      const patient = document.getElementById('apt_patient').value.trim();
-      const dept = document.getElementById('apt_dept').value;
-      const doctor = document.getElementById('apt_doctor').value;
-      const departments = DataStore.get('mq_depts');
-      const doctors = DataStore.get('mq_doctors');
-      if (!patient || !departments.some(item => item.name === dept && item.status === 'Active') ||
-        !doctors.some(item => item.name === doctor && item.dept === dept)) {
-        showToast('Enter a patient and choose a valid active department and doctor.', 'error');
-        return;
-      }
       if (date < todayIso()) {
         showToast('Appointments cannot be scheduled in the past.', 'error');
         return;
       }
-      const appts = DataStore.get('mq_appointments');
-      appts.push({
-        id: makeId('APT-', appts),
-        patient,
-        dept,
-        doctor,
-        date,
-        time: document.getElementById('apt_time').value,
-        status: 'Pending'
-      });
-      DataStore.set('mq_appointments', appts);
-      closeModal('addAptModal');
-      renderAppts();
-      showToast('Appointment scheduled successfully!');
-      e.target.reset();
+      try {
+        const scheduledAt = new Date(`${date}T${document.getElementById('apt_time').value}`).toISOString();
+        await apiRequest('/appointments', { method: 'POST', body: {
+          patient_id: Number(document.getElementById('apt_patient').value),
+          department_id: Number(document.getElementById('apt_dept').value),
+          doctor_staff_id: Number(document.getElementById('apt_doctor').value) || null,
+          scheduled_at: scheduledAt
+        }});
+        closeModal('addAptModal');
+        await loadAppointments();
+        showToast('Appointment scheduled successfully!');
+        e.target.reset();
+      } catch (error) { showToast(error.message, 'error'); }
     });
 
-    document.addEventListener('DOMContentLoaded', () => {
-      checkPageAccess();
-      const departments = DataStore.get('mq_depts').filter(item => item.status === 'Active');
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!(await checkPageAccess())) return;
+      if (getCurrentUser()?.role !== 'admin' && getCurrentUser()?.role !== 'receptionist') {
+        document.querySelector('.top-nav .btn-primary')?.setAttribute('hidden', 'hidden');
+      }
+      const [departmentResponse, patientResponse, doctorResponse] = await Promise.all([
+        apiRequest('/departments'), apiRequest('/patients'), apiRequest('/doctors')
+      ]);
+      const departments = departmentResponse.items.filter(item => item.status === 'active');
       const departmentSelect = document.getElementById('apt_dept');
-      departmentSelect.innerHTML = departments.map(item => `<option>${escapeHtml(item.name)}</option>`).join('');
+      departmentSelect.innerHTML = departments.map(item => `<option value="${Number(item.department_id)}">${escapeHtml(item.department_name)}</option>`).join('');
+      document.getElementById('apt_patient').innerHTML = patientResponse.items.map(item => `<option value="${Number(item.patient_id)}">${escapeHtml(item.full_name)} (${escapeHtml(item.patient_number)})</option>`).join('');
       const doctorSelect = document.getElementById('apt_doctor');
-      const doctors = DataStore.get('mq_doctors');
+      allDoctors = doctorResponse.items;
       const refreshDoctors = () => {
-        const selectedDepartment = departmentSelect.value;
-        doctorSelect.innerHTML = doctors.filter(item => item.dept === selectedDepartment)
-          .map(item => `<option>${escapeHtml(item.name)}</option>`).join('');
+        const selectedDepartment = Number(departmentSelect.value);
+        doctorSelect.innerHTML = '<option value="">Unassigned</option>' + allDoctors.filter(item => Number(item.department_id) === selectedDepartment && item.availability === 'on_duty')
+          .map(item => `<option value="${Number(item.staff_id)}">${escapeHtml(item.full_name)}</option>`).join('');
       };
       departmentSelect.addEventListener('change', refreshDoctors);
       refreshDoctors();
       document.getElementById('apt_date').value = todayIso();
-      renderAppts();
+      try { await loadAppointments(); } catch (error) { showToast(error.message, 'error'); }
     });
   </script>
 </body>

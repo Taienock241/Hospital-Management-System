@@ -72,16 +72,16 @@
 
   <script src="staff.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      checkPageAccess();
-      const appointments = DataStore.get('mq_appointments');
-      const queue = DataStore.get('mq_queue');
-      document.getElementById('report-appointments').textContent = appointments.length;
-      document.getElementById('report-served').textContent = queue.filter(item => item.status === 'Served').length;
-      document.getElementById('report-cancelled').textContent = appointments.filter(item => item.status === 'Cancelled').length;
-      document.getElementById('weeklySummary').textContent = queue.length
-        ? `${queue.filter(item => item.status === 'Served').length} queue patients served from saved records. Waiting-time metrics are unavailable because reliable service timestamps are not present.`
-        : 'Insufficient queue data for a throughput summary.';
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!(await checkPageAccess())) return;
+      try {
+        const report = await apiRequest('/reports');
+        document.getElementById('report-appointments').textContent = report.appointments;
+        document.getElementById('report-served').textContent = report.served_this_week;
+        document.getElementById('report-cancelled').textContent = report.cancelled;
+        document.getElementById('report-wait').textContent = report.avg_wait_minutes === null ? 'Unavailable' : `${report.avg_wait_minutes} min`;
+        document.getElementById('weeklySummary').textContent = `${report.served_this_week} patients served this week. Average time from arrival to call is ${report.avg_wait_minutes === null ? 'not available yet' : `${report.avg_wait_minutes} minutes`}.`;
+      } catch (error) { showToast(error.message, 'error'); }
     });
   </script>
 </body>

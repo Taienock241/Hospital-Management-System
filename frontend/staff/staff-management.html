@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff Accounts - Hopewell</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="components.css">
+  <link rel="stylesheet" href="staff.css">
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-brand">🏥 Hopewell Staff</div>
+      <ul class="sidebar-menu">
+        <li><a href="dashboard.html">📊 Dashboard</a></li>
+        <li><a href="patients.html">🧑‍🦱 Patients</a></li>
+        <li><a href="appointments.html">📅 Appointments</a></li>
+        <li><a href="queue.html">⏳ Live Queue</a></li>
+        <li><a href="doctors.html">🩺 Doctors</a></li>
+        <li><a href="departments.html">🏢 Departments</a></li>
+        <li><a href="reports.html">📈 Reports</a></li>
+        <li class="active"><a href="staff-management.html">👥 Staff Accounts</a></li>
+        <li style="margin-top: auto;"><a href="logout.html">🚪 Logout</a></li>
+      </ul>
+    </aside>
+    <div class="main-wrapper">
+      <header class="top-nav">
+        <div style="display:flex;align-items:center;">
+          <button class="mobile-menu-btn">☰</button>
+          <div class="page-title">Staff Account Management</div>
+        </div>
+        <div class="user-profile"><div class="user-avatar">AD</div><div><strong>System Administrator</strong><br><small>Hopewell Hospital</small></div></div>
+      </header>
+      <main class="content-body">
+        <div class="card">
+          <div class="card-title"><h3>Add Staff Member</h3></div>
+          <p style="color:var(--text-muted);margin-bottom:16px;">Create an account for a doctor, nurse, or receptionist. Share the temporary password securely.</p>
+          <form id="newStaffForm" class="form-grid">
+            <div class="form-group"><label for="staff_name">Full Name</label><input id="staff_name" class="form-control" required maxlength="160"></div>
+            <div class="form-group"><label for="staff_email">Work Email</label><input id="staff_email" type="email" class="form-control" required maxlength="254"></div>
+            <div class="form-group"><label for="staff_role">Role</label><select id="staff_role" class="form-control"><option value="doctor">Doctor</option><option value="nurse">Nurse</option><option value="receptionist">Receptionist</option></select></div>
+            <div class="form-group"><label for="staff_dept">Department</label><select id="staff_dept" class="form-control"><option value="">No department</option></select></div>
+            <div class="form-group"><label for="staff_specialty">Specialty (optional)</label><input id="staff_specialty" class="form-control" maxlength="120"></div>
+            <div class="form-group"><label for="staff_password">Temporary Password (12+ characters)</label><input id="staff_password" type="password" class="form-control" minlength="12" required autocomplete="new-password"></div>
+            <div class="form-group"><button class="btn btn-primary" type="submit">Create Staff Account</button></div>
+          </form>
+        </div>
+        <div class="card">
+          <div class="card-title"><h3>Staff Directory</h3></div>
+          <div class="table-responsive"><table class="data-table">
+            <thead><tr><th>Staff No.</th><th>Name</th><th>Email</th><th>Role</th><th>Department</th><th>Account</th><th>Action</th></tr></thead>
+            <tbody id="staffTbody"></tbody>
+          </table></div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script src="staff.js"></script>
+  <script>
+    async function renderStaff() {
+      const rows = (await apiRequest('/staff')).items;
+      const tbody = document.getElementById('staffTbody');
+      tbody.innerHTML = rows.length ? rows.map(row => {
+        const active = String(row.is_active) === 'true' || row.is_active === true;
+        const isAdmin = row.role === 'admin';
+        return `<tr>
+          <td><strong>${escapeHtml(row.staff_number)}</strong></td>
+          <td>${escapeHtml(row.full_name)}</td>
+          <td>${escapeHtml(row.email)}</td>
+          <td>${escapeHtml(row.role)}</td>
+          <td>${escapeHtml(row.department_name || '—')}</td>
+          <td><span class="badge ${active ? 'badge-active' : 'badge-inactive'}">${active ? 'Active' : 'Inactive'}</span></td>
+          <td>${isAdmin ? 'Protected admin account' : `<button class="btn btn-outline btn-sm" onclick="setStaffActive(${Number(row.staff_id)}, ${!active})">${active ? 'Deactivate' : 'Reactivate'}</button>`}</td>
+        </tr>`;
+      }).join('') : '<tr><td colspan="7" style="text-align:center;padding:20px;">No staff records found.</td></tr>';
+    }
+
+    async function setStaffActive(id, isActive) {
+      const action = isActive ? 'reactivate' : 'deactivate';
+      if (!confirm(`Are you sure you want to ${action} this staff account?`)) return;
+      try {
+        await apiRequest(`/staff/${id}`, { method: 'PATCH', body: { is_active: isActive } });
+        await renderStaff();
+        showToast(`Staff account ${isActive ? 'reactivated' : 'deactivated'}.`);
+      } catch (error) { showToast(error.message, 'error'); }
+    }
+
+    document.getElementById('staff_role').addEventListener('change', () => {
+      const specialty = document.getElementById('staff_specialty');
+      specialty.required = document.getElementById('staff_role').value === 'doctor';
+    });
+    document.getElementById('newStaffForm').addEventListener('submit', async event => {
+      event.preventDefault();
+      try {
+        await apiRequest('/staff', { method: 'POST', body: {
+          full_name: document.getElementById('staff_name').value.trim(),
+          email: document.getElementById('staff_email').value.trim(),
+          role: document.getElementById('staff_role').value,
+          department_id: Number(document.getElementById('staff_dept').value) || null,
+          specialty: document.getElementById('staff_specialty').value.trim(),
+          temporary_password: document.getElementById('staff_password').value
+        }});
+        event.target.reset();
+        await renderStaff();
+        showToast('Staff account created. Share the temporary password securely.');
+      } catch (error) { showToast(error.message, 'error'); }
+    });
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!(await checkPageAccess())) return;
+      try {
+        const depts = (await apiRequest('/departments')).items;
+        document.getElementById('staff_dept').innerHTML = '<option value="">No department</option>' + depts.filter(dept => dept.status === 'active').map(dept => `<option value="${Number(dept.department_id)}">${escapeHtml(dept.department_name)}</option>`).join('');
+        await renderStaff();
+      } catch (error) { showToast(error.message, 'error'); }
+    });
+  </script>
+</body>
+</html>

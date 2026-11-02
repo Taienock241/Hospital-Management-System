@@ -79,14 +79,19 @@
         <div class="form-group">
           <label>Department</label>
           <select id="doc_dept" class="form-control">
-            <option>Cardiology</option>
-            <option>Pediatrics</option>
-            <option>General Medicine</option>
           </select>
         </div>
         <div class="form-group">
           <label>Specialty</label>
           <input type="text" id="doc_spec" class="form-control" placeholder="e.g. Pediatric Surgeon" required>
+        </div>
+        <div class="form-group">
+          <label>Work Email</label>
+          <input type="email" id="doc_email" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Temporary Password (at least 12 characters)</label>
+          <input type="password" id="doc_password" class="form-control" minlength="12" required>
         </div>
         <button type="submit" class="btn btn-teal" style="width: 100%;">Save Doctor</button>
       </form>
@@ -95,65 +100,57 @@
 
   <script src="staff.js"></script>
   <script>
-    function renderDoctors() {
+    async function renderDoctors() {
       const query = document.getElementById('doctorSearch').value.trim().toLowerCase();
-      const docs = DataStore.get('mq_doctors').filter(d => !query ||
-        [d.name, d.dept, d.available].some(value => String(value || '').toLowerCase().includes(query)));
+      const docs = (await apiRequest('/doctors')).items.filter(d => !query ||
+        [d.full_name, d.department_name, d.availability].some(value => String(value || '').toLowerCase().includes(query)));
       document.getElementById('doctorsTbody').innerHTML = docs.length ? docs.map(d => `
         <tr>
-          <td><strong>${escapeHtml(d.id)}</strong></td>
-          <td>${escapeHtml(d.name)}</td>
-          <td>${escapeHtml(d.dept)}</td>
+          <td><strong>${escapeHtml(d.staff_number)}</strong></td>
+          <td>${escapeHtml(d.full_name)}</td>
+          <td>${escapeHtml(d.department_name || '—')}</td>
           <td>${escapeHtml(d.specialty)}</td>
-          <td><span class="badge ${d.available === 'On Duty' ? 'badge-onduty' : 'badge-offduty'}">${escapeHtml(d.available)}</span></td>
+          <td><span class="badge ${d.availability === 'on_duty' ? 'badge-onduty' : 'badge-offduty'}">${escapeHtml(d.availability.replace('_', ' '))}</span></td>
           <td>
-            <button class="btn btn-outline btn-sm" onclick="toggleDuty('${escapeHtml(d.id)}')">Switch Status</button>
+            <button class="btn btn-outline btn-sm" onclick="toggleDuty(${Number(d.staff_id)}, '${d.availability === 'on_duty' ? 'off_duty' : 'on_duty'}')">Switch Status</button>
           </td>
         </tr>
       `).join('') : '<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:20px;">No doctors found.</td></tr>';
     }
 
-    function toggleDuty(id) {
-      const docs = DataStore.get('mq_doctors');
-      const doctor = docs.find(item => item.id === id);
-      if (!doctor) return showToast('Doctor was not found.', 'error');
-      doctor.available = doctor.available === 'On Duty' ? 'Off Duty' : 'On Duty';
-      DataStore.set('mq_doctors', docs);
-      renderDoctors();
-      showToast('Duty status toggled.');
+    async function toggleDuty(id, availability) {
+      try {
+        await apiRequest(`/doctors/${id}`, { method: 'PATCH', body: { availability } });
+        await renderDoctors();
+        showToast('Duty status updated.');
+      } catch (error) { showToast(error.message, 'error'); }
     }
 
-    document.getElementById('newDocForm').addEventListener('submit', (e) => {
+    document.getElementById('newDocForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const name = document.getElementById('doc_name').value.trim();
       const specialty = document.getElementById('doc_spec').value.trim();
-      const dept = document.getElementById('doc_dept').value;
-      if (!name || !specialty || !DataStore.get('mq_depts').some(item => item.name === dept && item.status === 'Active')) {
-        showToast('Enter doctor details and choose an active department.', 'error');
-        return;
-      }
-      const docs = DataStore.get('mq_doctors');
-      docs.push({
-        id: makeId('D', docs),
-        name,
-        dept,
-        specialty,
-        available: 'On Duty'
-      });
-      DataStore.set('mq_doctors', docs);
-      closeModal('addDocModal');
-      renderDoctors();
-      showToast('Doctor registered.');
-      e.target.reset();
+      try {
+        await apiRequest('/staff', { method: 'POST', body: {
+          full_name: name, role: 'doctor', specialty,
+          department_id: Number(document.getElementById('doc_dept').value),
+          email: document.getElementById('doc_email').value.trim(),
+          temporary_password: document.getElementById('doc_password').value
+        }});
+        closeModal('addDocModal');
+        await renderDoctors();
+        showToast('Doctor account created. Share the temporary password securely.');
+        e.target.reset();
+      } catch (error) { showToast(error.message, 'error'); }
     });
 
-    document.addEventListener('DOMContentLoaded', () => {
-      checkPageAccess();
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!(await checkPageAccess())) return;
       document.getElementById('doctorSearch').addEventListener('input', renderDoctors);
       const departmentSelect = document.getElementById('doc_dept');
-      departmentSelect.innerHTML = DataStore.get('mq_depts').filter(dept => dept.status === 'Active')
-        .map(dept => `<option>${escapeHtml(dept.name)}</option>`).join('');
-      renderDoctors();
+      const depts = (await apiRequest('/departments')).items.filter(dept => dept.status === 'active');
+      departmentSelect.innerHTML = depts.map(dept => `<option value="${Number(dept.department_id)}">${escapeHtml(dept.department_name)}</option>`).join('');
+      try { await renderDoctors(); } catch (error) { showToast(error.message, 'error'); }
     });
   </script>
 </body>

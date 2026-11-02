@@ -82,7 +82,7 @@
         </div>
         <div class="form-group">
           <label>Clinical Lead</label>
-          <input type="text" id="dept_lead" class="form-control" placeholder="e.g. Dr. Peter Otieno" required>
+          <input type="text" class="form-control" value="Assign after adding staff" disabled>
         </div>
         <div class="form-group">
           <label>Number of Consultation Rooms</label>
@@ -95,66 +95,53 @@
 
   <script src="staff.js"></script>
   <script>
-    function renderDepts() {
+    async function renderDepts() {
       const query = document.getElementById('departmentSearch').value.trim().toLowerCase();
-      const depts = DataStore.get('mq_depts').filter(d => !query ||
-        [d.code, d.name, d.lead, d.status].some(value => String(value || '').toLowerCase().includes(query)));
+      const all = (await apiRequest('/departments')).items;
+      const depts = all.filter(d => !query ||
+        [d.department_code, d.department_name, d.lead_name, d.status].some(value => String(value || '').toLowerCase().includes(query)));
       document.getElementById('deptTbody').innerHTML = depts.length ? depts.map(d => `
         <tr>
-          <td><strong>${escapeHtml(d.code)}</strong></td>
-          <td>${escapeHtml(d.name)}</td>
-          <td>${escapeHtml(d.lead)}</td>
-          <td>${escapeHtml(d.rooms)} Rooms</td>
-          <td><span class="badge ${d.status === 'Active' ? 'badge-active' : 'badge-inactive'}">${escapeHtml(d.status)}</span></td>
-          <td><button class="btn btn-outline btn-sm" onclick="toggleDepartment('${escapeHtml(d.id || d.code)}')">Set ${d.status === 'Active' ? 'Inactive' : 'Active'}</button></td>
+          <td><strong>${escapeHtml(d.department_code)}</strong></td>
+          <td>${escapeHtml(d.department_name)}</td>
+          <td>${escapeHtml(d.lead_name || '—')}</td>
+          <td>${escapeHtml(d.consultation_rooms)} Rooms</td>
+          <td><span class="badge ${d.status === 'active' ? 'badge-active' : 'badge-inactive'}">${escapeHtml(d.status)}</span></td>
+          <td><button class="btn btn-outline btn-sm" onclick="toggleDepartment(${Number(d.department_id)}, '${d.status === 'active' ? 'inactive' : 'active'}')">Set ${d.status === 'active' ? 'Inactive' : 'Active'}</button></td>
         </tr>
       `).join('') : '<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:20px;">No departments found.</td></tr>';
     }
 
-    function toggleDepartment(id) {
-      const depts = DataStore.get('mq_depts');
-      const dept = depts.find(item => (item.id || item.code) === id);
-      if (!dept) return showToast('Department was not found.', 'error');
-      dept.status = dept.status === 'Active' ? 'Inactive' : 'Active';
-      DataStore.set('mq_depts', depts);
-      renderDepts();
-      showToast(`Department set to ${dept.status}.`);
+    async function toggleDepartment(id, status) {
+      try {
+        await apiRequest(`/departments/${id}`, { method: 'PATCH', body: { status } });
+        await renderDepts();
+        showToast(`Department set to ${status}.`);
+      } catch (error) { showToast(error.message, 'error'); }
     }
 
-    document.getElementById('newDeptForm').addEventListener('submit', (e) => {
+    document.getElementById('newDeptForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const code = document.getElementById('dept_code').value.trim().toUpperCase();
       const name = document.getElementById('dept_name').value.trim();
-      const lead = document.getElementById('dept_lead').value.trim();
       const rooms = Number(document.getElementById('dept_rooms').value);
-      const depts = DataStore.get('mq_depts');
-      if (!code || !name || !lead || !Number.isInteger(rooms) || rooms < 1) {
+      if (!code || !name || !Number.isInteger(rooms) || rooms < 1) {
         showToast('Complete all department fields with a valid room count.', 'error');
         return;
       }
-      if (depts.some(dept => dept.code.toUpperCase() === code)) {
-        showToast('Department code already exists.', 'error');
-        return;
-      }
-      depts.push({
-        id: makeId('DEP-', depts),
-        code,
-        name,
-        lead,
-        rooms,
-        status: 'Active'
-      });
-      DataStore.set('mq_depts', depts);
-      closeModal('addDeptModal');
-      renderDepts();
-      showToast('Department added successfully.');
-      e.target.reset();
+      try {
+        await apiRequest('/departments', { method: 'POST', body: { department_code: code, department_name: name, consultation_rooms: rooms } });
+        closeModal('addDeptModal');
+        await renderDepts();
+        showToast('Department added successfully!');
+        e.target.reset();
+      } catch (error) { showToast(error.message, 'error'); }
     });
 
-    document.addEventListener('DOMContentLoaded', () => {
-      checkPageAccess();
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!(await checkPageAccess())) return;
       document.getElementById('departmentSearch').addEventListener('input', renderDepts);
-      renderDepts();
+      try { await renderDepts(); } catch (error) { showToast(error.message, 'error'); }
     });
   </script>
 </body>
