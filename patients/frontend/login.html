@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Sign In | Hopewell Health Care</title>
+
+  <style>
+    /* ==========================================================================
+       1. Design Tokens & CSS Variables (Matches Site-wide Soft Monochrome)
+       ========================================================================== */
+    :root {
+      --color-primary: #1f2428;
+      --color-primary-dark: #111417;
+      --color-primary-light: #424a52;
+      
+      --color-accent: #2d3339;
+      --color-accent-subtle: #f3f5f7;
+      --color-accent-border: #d0d5dd;
+      
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-text: #24292e;
+      --color-text-muted: #64748b;
+      --color-border: #e2e8f0;
+      --color-border-dark: #cbd5e1;
+      
+      --color-success: #059669;
+      --color-success-bg: #ecfdf5;
+      --color-success-border: #a7f3d0;
+
+      --color-warning: #d97706;
+      --color-warning-bg: #fffbeb;
+      --color-warning-border: #fde68a;
+
+      --color-danger: #b91c1c;
+      --color-danger-bg: #fef2f2;
+      --color-danger-border: #fecaca;
+
+      --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-family-heading: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2rem;
+      --space-2xl: 3rem;
+      --space-3xl: 4.5rem;
+
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
+
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-full: 9999px;
+
+      --container-max: 1200px;
+    }
+
+    /* Base Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-family-base);
+      color: var(--color-text);
+      background-color: var(--color-bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .container {
+      width: 100%;
+      max-width: var(--container-max);
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: var(--space-lg);
+      padding-right: var(--space-lg);
+    }
+
+    /* ==========================================================================
+       2. Reusable Buttons & Badges
+       ========================================================================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+      padding: 0.75rem 1.4rem;
+      font-size: 0.92rem;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.1s ease;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background-color: var(--color-primary-dark);
+      border-color: var(--color-primary-dark);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: #333a42;
+      border-color: #333a42;
+      color: #ffffff;
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border-color: var(--color-primary-dark);
+      color: var(--color-primary-dark);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--color-primary-dark);
+      color: #ffffff;
+    }
+
+    .btn-secondary {
+      background-color: #f1f5f9;
+      border-color: var(--color-border);
+      color: var(--color-text);
+    }
+
+    .btn-secondary:hover {
+      background-color: #e2e8f0;
+      border-color: var(--color-border-dark);
+    }
+
+    .demo-pill {
+      display: inline-block;
+      background-color: var(--color-accent-subtle);
+      color: var(--color-primary);
+      border: 1px solid var(--color-border);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-full);
+      margin-bottom: var(--space-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .alert-banner {
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      margin-bottom: var(--space-lg);
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .alert-banner.success {
+      background-color: var(--color-success-bg);
+      border: 1px solid var(--color-success-border);
+      color: var(--color-success);
+      display: flex;
+    }
+
+    .alert-banner.error {
+      background-color: var(--color-danger-bg);
+      border: 1px solid var(--color-danger-border);
+      color: var(--color-danger);
+      display: flex;
+    }
+
+    /* ==========================================================================
+       3. Utility Bar & Main Site Header
+       ========================================================================== */
+    .utility-bar {
+      background-color: #f1f4f8;
+      color: #475569;
+      font-size: 0.85rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .utility-bar .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .utility-links,
+    .utility-emergency {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      list-style: none;
+    }
+
+    .utility-bar a {
+      color: #334155;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.15s ease;
+    }
+
+    .utility-bar a:hover {
+      color: var(--color-primary-dark);
+      text-decoration: underline;
+    }
+
+    .emergency-tag {
+      color: #b91c1c;
+      font-weight: 700;
+      border-right: 1px solid var(--color-border);
+      padding-right: var(--space-md);
+    }
+
+    .site-header {
+      background-color: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .site-header .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 74px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background-color: var(--color-primary-dark);
+      color: #ffffff;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      font-weight: 800;
+    }
+
+    .brand-name {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-sub {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      letter-spacing: 0.05em;
+      font-weight: 600;
+      display: block;
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      list-style: none;
+    }
+
+    .nav-link {
+      position: relative;
+      font-weight: 600;
+      color: var(--color-text);
+      text-decoration: none;
+      font-size: 0.95rem;
+      padding: 0.55rem 0.85rem;
+      border-radius: var(--radius-sm);
+      transition: color 0.2s ease, background-color 0.2s ease, transform 0.15s ease;
+      display: inline-block;
+    }
+
+    .nav-link:hover {
+      color: var(--color-primary-dark);
+      background-color: #f1f5f9;
+      transform: translateY(-1px);
+    }
+
+    .nav-link::after {
+      content: "";
+      position: absolute;
+      bottom: 4px;
+      left: 0.85rem;
+      right: 0.85rem;
+      height: 2px;
+      background-color: var(--color-primary-dark);
+      border-radius: var(--radius-full);
+      transform: scaleX(0);
+      transform-origin: center;
+      transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-link:hover::after,
+    .nav-link.active::after {
+      transform: scaleX(1);
+    }
+
+    .nav-link.active {
+      color: var(--color-primary-dark);
+      background-color: #f8fafc;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .mobile-nav-toggle {
+      display: none;
+      background: transparent;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-size: 1.4rem;
+      color: var(--color-primary-dark);
+      cursor: pointer;
+      padding: 0.35rem 0.6rem;
+      line-height: 1;
+    }
+
+    /* ==========================================================================
+       4. Login Page Layout & Authentication Card
+       ========================================================================== */
+    .auth-section {
+      padding: var(--space-3xl) 0;
+    }
+
+    .login-container-wrapper {
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .auth-card {
+      background-color: var(--color-surface);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-2xl);
+      box-shadow: var(--shadow-md);
+    }
+
+    .auth-header {
+      margin-bottom: var(--space-xl);
+      text-align: center;
+    }
+
+    .auth-header h1 {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      letter-spacing: -0.02em;
+      margin-bottom: 0.35rem;
+    }
+
+    .auth-header p {
+      color: var(--color-text-muted);
+      font-size: 0.92rem;
+      margin-bottom: 0;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      margin-bottom: var(--space-lg);
+    }
+
+    .form-label {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--color-text);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .form-label-required {
+      color: var(--color-danger);
+      font-size: 0.85rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.82rem 0.95rem;
+      font-size: 0.95rem;
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      background-color: #fafbfc;
+      color: var(--color-text);
+      font-family: inherit;
+      transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--color-primary-dark);
+      background-color: #ffffff;
+      box-shadow: 0 0 0 3px rgba(31, 36, 40, 0.08);
+    }
+
+    .form-input.invalid {
+      border-color: var(--color-danger);
+      background-color: var(--color-danger-bg);
+    }
+
+    .password-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .password-input-wrapper input {
+      padding-right: 3rem;
+    }
+
+    .toggle-password-btn {
+      position: absolute;
+      right: 0.65rem;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      padding: 0.25rem 0.4rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .toggle-password-btn:hover {
+      color: var(--color-primary-dark);
+    }
+
+    .field-error {
+      font-size: 0.78rem;
+      color: var(--color-danger);
+      font-weight: 600;
+      margin-top: 0.2rem;
+      display: none;
+    }
+
+    .field-error.visible {
+      display: block;
+    }
+
+    .form-row-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-lg);
+      font-size: 0.85rem;
+    }
+
+    .remember-group {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+    }
+
+    .forgot-link {
+      color: var(--color-primary-dark);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .forgot-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Google OAuth & Social Auth Styling */
+    .btn-google {
+      width: 100%;
+      background-color: #ffffff;
+      color: #1f2428;
+      border: 1.5px solid var(--color-border);
+      font-weight: 600;
+      font-size: 0.92rem;
+      padding: 0.75rem 1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+      margin-bottom: var(--space-lg);
+    }
+
+    .btn-google:hover {
+      background-color: #f8fafc;
+      border-color: var(--color-border-dark);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-google svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 0 0 var(--space-lg);
+      color: var(--color-text-muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .auth-divider:not(:empty)::before {
+      margin-right: var(--space-md);
+    }
+
+    .auth-divider:not(:empty)::after {
+      margin-left: var(--space-md);
+    }
+
+    /* Quick Test Demo Chips */
+    .demo-accounts-card {
+      margin-top: var(--space-xl);
+      background-color: #fafbfc;
+      border: 1px dashed var(--color-border-dark);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      font-size: 0.82rem;
+    }
+
+    .demo-accounts-card h4 {
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .demo-chips-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .demo-chip-btn {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.45rem 0.65rem;
+      background-color: #ffffff;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+      text-align: left;
+    }
+
+    .demo-chip-btn:hover {
+      border-color: var(--color-primary-dark);
+      background-color: var(--color-accent-subtle);
+    }
+
+    .demo-chip-name {
+      font-weight: 700;
+      color: var(--color-primary-dark);
+    }
+
+    .demo-chip-email {
+      font-family: monospace;
+      color: var(--color-text-muted);
+    }
+
+    /* Staff Link Reminder */
+    .staff-switch-card {
+      margin-top: var(--space-lg);
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+    }
+
+    .staff-switch-card a {
+      color: var(--color-primary-dark);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .staff-switch-card a:hover {
+      text-decoration: underline;
+    }
+
+    /* ==========================================================================
+       5. Site Footer (Solid Deep Black)
+       ========================================================================== */
+    .site-footer {
+      background-color: #0f1115;
+      color: #94a3b8;
+      padding: var(--space-3xl) 0 var(--space-lg);
+      border-top: 1px solid #1e293b;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1.2fr;
+      gap: var(--space-2xl);
+      margin-bottom: var(--space-2xl);
+    }
+
+    .footer-col h4 {
+      color: #ffffff;
+      font-size: 1.05rem;
+      margin-bottom: var(--space-md);
+      font-weight: 700;
+    }
+
+    .footer-links {
+      list-style: none;
+    }
+
+    .footer-links li {
+      margin-bottom: var(--space-xs);
+    }
+
+    .footer-links a {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.15s ease;
+    }
+
+    .footer-links a:hover {
+      color: #ffffff;
+      text-decoration: underline;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid #1e293b;
+      padding-top: var(--space-lg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+
+    /* ==========================================================================
+       6. Responsive Breakpoints
+       ========================================================================== */
+    @media (max-width: 768px) {
+      .mobile-nav-toggle {
+        display: block;
+      }
+      .nav-menu {
+        position: absolute;
+        top: 74px;
+        left: 0;
+        right: 0;
+        background-color: var(--color-surface);
+        border-bottom: 2px solid var(--color-primary-dark);
+        flex-direction: column;
+        align-items: flex-start;
+        padding: var(--space-lg);
+        box-shadow: var(--shadow-md);
+        display: none;
+      }
+      .nav-menu.is-active {
+        display: flex;
+      }
+      .utility-bar .container {
+        flex-direction: column;
+        gap: var(--space-xs);
+        text-align: center;
+      }
+      .emergency-tag {
+        border-right: none;
+        padding-right: 0;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+      .footer-bottom {
+        flex-direction: column;
+        gap: var(--space-sm);
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Utility Bar -->
+  <aside class="utility-bar" aria-label="Quick Access Bar">
+    <div class="container">
+      <div class="utility-emergency">
+        <span class="emergency-tag">Medical Emergency: Call 911 immediately</span>
+        <span>General Inquiry: (800) 555-0199</span>
+      </div>
+      <ul class="utility-links">
+        <li><a href="queue.html">Track Wait Time</a></li>
+        <li><a href="login.html" style="font-weight: 700; color: var(--color-primary-dark);">Patient Sign In</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- Primary Site Header & Navigation -->
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="brand" aria-label="Hopewell Health Care Home">
+        <div class="brand-icon" aria-hidden="true">+</div>
+        <div class="brand-text">
+          <span class="brand-name">Hopewell</span>
+          <span class="brand-sub">Health Care System</span>
+        </div>
+      </a>
+
+      <!-- Main Navigation Menu -->
+      <nav aria-label="Primary Navigation">
+        <ul class="nav-menu" id="primary-nav">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="doctors.html" class="nav-link">Find a Doctor</a></li>
+          <li><a href="departments.html" class="nav-link">Departments</a></li>
+          <li><a href="appointments.html" class="nav-link">Book Appointment</a></li>
+          <li><a href="queue.html" class="nav-link">Live Queue</a></li>
+          <li><a href="about.html" class="nav-link">About</a></li>
+          <li><a href="contact.html" class="nav-link">Contact</a></li>
+        </ul>
+      </nav>
+
+      <!-- Action Button & Mobile Nav Trigger -->
+      <div class="nav-actions">
+        <a href="register.html" class="btn btn-outline">Register</a>
+        <button class="mobile-nav-toggle" id="mobile-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Toggle navigation menu">
+          &#9776;
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="auth-section">
+      <div class="container">
+        
+        <div class="login-container-wrapper">
+
+          <!-- Dynamic Alert Banner (Shows on redirect from register.html or error) -->
+          <div class="alert-banner" id="status-alert" role="alert">
+            <span id="alert-icon" aria-hidden="true">&#9432;</span>
+            <span id="alert-message">Notice message goes here.</span>
+          </div>
+
+          <!-- Login Form Card -->
+          <div class="auth-card">
+            
+            <div class="auth-header">
+              <span class="demo-pill">Patient Portal</span>
+              <h1>Sign In to Hopewell</h1>
+              <p>Enter your patient credentials to access your consultation history and queue tokens.</p>
+            </div>
+
+            <!-- Google OAuth Action Button -->
+            <button type="button" class="btn-google" id="google-signin-btn" aria-label="Google sign-in unavailable" disabled>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+                <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+              </svg>
+              <span>Google sign-in unavailable</span>
+            </button>
+
+            <!-- Divider -->
+            <div class="auth-divider">or continue with email</div>
+
+            <form id="login-form" novalidate>
+              
+              <div class="form-group">
+                <label for="login-email" class="form-label">
+                  <span>Email Address</span>
+                  <span class="form-label-required">*</span>
+                </label>
+                <input 
+                  type="email" 
+                  id="login-email" 
+                  class="form-input" 
+                  placeholder="name@example.com" 
+                  autocomplete="username" 
+                  required>
+                <span class="field-error" id="email-error">Please enter a valid email address.</span>
+              </div>
+
+              <div class="form-group">
+                <label for="login-password" class="form-label">
+                  <span>Password</span>
+                  <span class="form-label-required">*</span>
+                </label>
+                <div class="password-input-wrapper">
+                  <input 
+                    type="password" 
+                    id="login-password" 
+                    class="form-input" 
+                    placeholder="Enter password" 
+                    autocomplete="current-password" 
+                    required>
+                  <button type="button" class="toggle-password-btn" id="toggle-pw-btn" aria-label="Show password">Show</button>
+                </div>
+                <span class="field-error" id="password-error">Password is required.</span>
+              </div>
+
+              <div class="form-row-between">
+                <label class="remember-group">
+                  <input type="checkbox" id="remember-me" checked>
+                  <span>Remember my email</span>
+                </label>
+                <a href="contact.html" class="forgot-link">Need assistance?</a>
+              </div>
+
+              <button type="submit" class="btn btn-primary" id="login-btn" style="width: 100%; padding: 0.85rem;">
+                Sign In to Dashboard &rarr;
+              </button>
+
+            </form>
+
+            <div style="text-align: center; margin-top: var(--space-xl); padding-top: var(--space-md); border-top: 1px solid var(--color-border); font-size: 0.88rem;">
+              <span>Don't have a patient account?</span>
+              <a href="register.html" style="font-weight: 700; color: var(--color-primary-dark); text-decoration: none; margin-left: 0.25rem;">Create Account &rarr;</a>
+            </div>
+
+          </div>
+
+          <!-- Staff Portal Redirect Note -->
+          <div class="staff-switch-card">
+            <span>Hospital clinician or administrator?</span>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Site Footer (Solid Deep Black) -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>Hopewell Health Care</h4>
+          <p>
+            An integrated healthcare management system engineered for streamlined patient appointment access, outpatient consultation routing, and real-time clinic queue tracking.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Patient Services</h4>
+          <ul class="footer-links">
+            <li><a href="appointments.html">Book Appointment</a></li>
+            <li><a href="queue.html">Check Queue Position</a></li>
+            <li><a href="doctors.html">Doctor Directory</a></li>
+            <li><a href="departments.html">Clinical Departments</a></li>
+            <li><a href="patient-dashboard.html">Patient Dashboard</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Hospital & Care</h4>
+          <ul class="footer-links">
+            <li><a href="about.html">About Hopewell</a></li>
+            <li><a href="contact.html">Hours & Directions</a></li>
+            <li><a href="contact.html">Send Inquiry</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Emergency & Contacts</h4>
+          <p>Emergency Department: <strong>Open 24/7</strong></p>
+          <p>General Reception: (800) 555-0199</p>
+          <p>Clinic Hours: 08:00 – 17:00 Mon–Sat</p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 Hopewell Health Care System. All rights reserved.</p>
+        <p>Providing trusted, patient-first clinical excellence across all outpatient centers.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/api.js"></script>
+  <script>
+    /** Patient portal data loads through the shared PostgreSQL API. */
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initMobileNavigation();
+      initLoginForm();
+    });
+
+    /**
+     * Mobile Menu Navigation Handler
+     */
+    function initMobileNavigation() {
+      const toggleBtn = document.getElementById('mobile-toggle');
+      const navMenu = document.getElementById('primary-nav');
+
+      if (!toggleBtn || !navMenu) return;
+
+      toggleBtn.addEventListener('click', () => {
+        const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+        toggleBtn.setAttribute('aria-expanded', String(!isExpanded));
+        navMenu.classList.toggle('is-active');
+      });
+
+      document.addEventListener('click', (event) => {
+        if (!toggleBtn.contains(event.target) && !navMenu.contains(event.target)) {
+          navMenu.classList.remove('is-active');
+          toggleBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+
+    /**
+     * Login Form Handler
+     */
+    function initLoginForm() {
+      const form = document.getElementById('login-form');
+      const emailInput = document.getElementById('login-email');
+      const passwordInput = document.getElementById('login-password');
+      const togglePwBtn = document.getElementById('toggle-pw-btn');
+      const urlParams = new URLSearchParams(window.location.search);
+      const prefillEmail = urlParams.get('email');
+      if (urlParams.get('registered') === 'true' && prefillEmail) {
+        emailInput.value = prefillEmail;
+        passwordInput.focus();
+        showAlert('Registration successful! You can now sign in with your password.', 'success');
+      }
+
+      togglePwBtn.addEventListener('click', () => {
+        const isPassword = passwordInput.getAttribute('type') === 'password';
+        passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+        togglePwBtn.textContent = isPassword ? 'Hide' : 'Show';
+        togglePwBtn.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+      });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearErrors();
+
+        const enteredEmail = emailInput.value.trim().toLowerCase();
+        const enteredPassword = passwordInput.value;
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!enteredEmail || !emailPattern.test(enteredEmail)) {
+          showError('email-error', emailInput);
+          return;
+        }
+        if (!enteredPassword) {
+          showError('password-error', passwordInput);
+          return;
+        }
+
+        const submitButton = document.getElementById('login-btn');
+        submitButton.disabled = true;
+        try {
+          await HopewellAPI.request('auth/login.php', {
+            method: 'POST',
+            body: { email: enteredEmail, password: enteredPassword }
+          });
+          const nextPage = urlParams.get('next');
+          if (nextPage === 'queue.html') {
+            const reference = urlParams.get('ref') || '';
+            const safeReference = /^APT-[A-F0-9]{20}$/.test(reference) ? `?ref=${encodeURIComponent(reference)}` : '';
+            window.location.href = `queue.html${safeReference}`;
+          } else {
+            window.location.href = ['appointments.html', 'patient-dashboard.html'].includes(nextPage)
+              ? nextPage
+              : 'patient-dashboard.html';
+          }
+        } catch (error) {
+          showAlert(error.message, 'error');
+          if (error.status === 401) showError('password-error', passwordInput);
+        } finally {
+          submitButton.disabled = false;
+        }
+      });
+    }
+
+    function showAlert(message, type) {
+      const alertBanner = document.getElementById('status-alert');
+      const alertMessage = document.getElementById('alert-message');
+      alertBanner.className = `alert-banner ${type}`;
+      alertMessage.textContent = message;
+    }
+
+    function showError(errorId, inputElement) {
+      const errEl = document.getElementById(errorId);
+      if (errEl) errEl.classList.add('visible');
+      if (inputElement) inputElement.classList.add('invalid');
+    }
+
+    function clearErrors() {
+      document.querySelectorAll('.field-error').forEach(el => el.classList.remove('visible'));
+      document.querySelectorAll('.form-input').forEach(el => el.classList.remove('invalid'));
+    }
+  </script>
+</body>
+</html>

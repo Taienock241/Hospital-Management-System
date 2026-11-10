@@ -58,5 +58,8 @@ function database(): PDO
             PDO::ATTR_EMULATE_PREPARES => false,
         ]
     );
+    $timezone = getenv('APP_TIMEZONE') ?: 'Africa/Nairobi';
+    $timezoneStatement = $pdo->prepare("SELECT set_config('TimeZone', ?, false)");
+    $timezoneStatement->execute([$timezone]);
     return $pdo;
 }

@@ -1,0 +1,1876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book an Appointment | Hopewell Health Care</title>
+
+  <style>
+    /* ==========================================================================
+       1. Design Tokens & CSS Variables (Matches Site-wide Soft Monochrome)
+       ========================================================================== */
+    :root {
+      --color-primary: #1f2428;
+      --color-primary-dark: #111417;
+      --color-primary-light: #424a52;
+      
+      --color-accent: #2d3339;
+      --color-accent-subtle: #f3f5f7;
+      --color-accent-border: #d0d5dd;
+      
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-text: #24292e;
+      --color-text-muted: #64748b;
+      --color-border: #e2e8f0;
+      --color-border-dark: #cbd5e1;
+      
+      --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-family-heading: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2rem;
+      --space-2xl: 3rem;
+      --space-3xl: 4.5rem;
+
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
+
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-full: 9999px;
+
+      --container-max: 1200px;
+    }
+
+    /* Base Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-family-base);
+      color: var(--color-text);
+      background-color: var(--color-bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .container {
+      width: 100%;
+      max-width: var(--container-max);
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: var(--space-lg);
+      padding-right: var(--space-lg);
+    }
+
+    /* ==========================================================================
+       2. Reusable Buttons & Badges
+       ========================================================================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+      padding: 0.75rem 1.4rem;
+      font-size: 0.92rem;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.1s ease;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background-color: var(--color-primary-dark);
+      border-color: var(--color-primary-dark);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: #333a42;
+      border-color: #333a42;
+      color: #ffffff;
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border-color: var(--color-primary-dark);
+      color: var(--color-primary-dark);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--color-primary-dark);
+      color: #ffffff;
+    }
+
+    .btn-secondary {
+      background-color: #f1f5f9;
+      border-color: var(--color-border);
+      color: var(--color-text);
+    }
+
+    .btn-secondary:hover {
+      background-color: #e2e8f0;
+      border-color: var(--color-border-dark);
+    }
+
+    .demo-pill {
+      display: inline-block;
+      background-color: var(--color-accent-subtle);
+      color: var(--color-primary);
+      border: 1px solid var(--color-border);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-full);
+      margin-bottom: var(--space-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ==========================================================================
+       3. Utility Bar & Main Site Header
+       ========================================================================== */
+    .utility-bar {
+      background-color: #f1f4f8;
+      color: #475569;
+      font-size: 0.85rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .utility-bar .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .utility-links,
+    .utility-emergency {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      list-style: none;
+    }
+
+    .utility-bar a {
+      color: #334155;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.15s ease;
+    }
+
+    .utility-bar a:hover {
+      color: var(--color-primary-dark);
+      text-decoration: underline;
+    }
+
+    .emergency-tag {
+      color: #b91c1c;
+      font-weight: 700;
+      border-right: 1px solid var(--color-border);
+      padding-right: var(--space-md);
+    }
+
+    .site-header {
+      background-color: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .site-header .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 74px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background-color: var(--color-primary-dark);
+      color: #ffffff;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      font-weight: 800;
+    }
+
+    .brand-name {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-sub {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      letter-spacing: 0.05em;
+      font-weight: 600;
+      display: block;
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      list-style: none;
+    }
+
+    .nav-link {
+      position: relative;
+      font-weight: 600;
+      color: var(--color-text);
+      text-decoration: none;
+      font-size: 0.95rem;
+      padding: 0.55rem 0.85rem;
+      border-radius: var(--radius-sm);
+      transition: color 0.2s ease, background-color 0.2s ease, transform 0.15s ease;
+      display: inline-block;
+    }
+
+    .nav-link:hover {
+      color: var(--color-primary-dark);
+      background-color: #f1f5f9;
+      transform: translateY(-1px);
+    }
+
+    .nav-link::after {
+      content: "";
+      position: absolute;
+      bottom: 4px;
+      left: 0.85rem;
+      right: 0.85rem;
+      height: 2px;
+      background-color: var(--color-primary-dark);
+      border-radius: var(--radius-full);
+      transform: scaleX(0);
+      transform-origin: center;
+      transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-link:hover::after,
+    .nav-link.active::after {
+      transform: scaleX(1);
+    }
+
+    .nav-link.active {
+      color: var(--color-primary-dark);
+      background-color: #f8fafc;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .mobile-nav-toggle {
+      display: none;
+      background: transparent;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-size: 1.4rem;
+      color: var(--color-primary-dark);
+      cursor: pointer;
+      padding: 0.35rem 0.6rem;
+      line-height: 1;
+    }
+
+    /* ==========================================================================
+       4. Booking Layout & Multi-Column Experience
+       ========================================================================== */
+    .booking-hero {
+      background-color: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-2xl) 0 var(--space-xl);
+    }
+
+    .booking-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      letter-spacing: -0.02em;
+      margin-bottom: 0.4rem;
+    }
+
+    .booking-subtitle {
+      color: var(--color-text-muted);
+      font-size: 1.05rem;
+      max-width: 760px;
+    }
+
+    .booking-container {
+      padding: var(--space-3xl) 0;
+    }
+
+    .booking-layout-grid {
+      display: grid;
+      grid-template-columns: 1.7fr 1fr;
+      gap: var(--space-2xl);
+      align-items: start;
+    }
+
+    /* Booking Form Card */
+    .booking-form-card {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-2xl);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .form-section {
+      margin-bottom: var(--space-2xl);
+      padding-bottom: var(--space-xl);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .form-section:last-of-type {
+      margin-bottom: var(--space-xl);
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .form-section-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+    }
+
+    .section-badge {
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      background-color: var(--color-primary-dark);
+      color: #ffffff;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .form-section-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+    }
+
+    .form-section-desc {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin-top: 0.15rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-lg);
+      margin-bottom: var(--space-md);
+    }
+
+    .form-row.full {
+      grid-template-columns: 1fr;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .form-label {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--color-text);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .form-label-required {
+      color: #b91c1c;
+      font-size: 0.85rem;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 0.78rem 0.95rem;
+      font-size: 0.92rem;
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      background-color: #fafbfc;
+      color: var(--color-text);
+      font-family: inherit;
+      transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: var(--color-primary-dark);
+      background-color: #ffffff;
+      box-shadow: 0 0 0 3px rgba(31, 36, 40, 0.08);
+    }
+
+    .form-input.invalid,
+    .form-select.invalid,
+    .form-textarea.invalid {
+      border-color: #b91c1c;
+      background-color: #fef2f2;
+    }
+
+    .field-hint {
+      font-size: 0.78rem;
+      color: var(--color-text-muted);
+      margin-top: 0.2rem;
+    }
+
+    .field-error {
+      font-size: 0.78rem;
+      color: #b91c1c;
+      font-weight: 600;
+      margin-top: 0.2rem;
+      display: none;
+    }
+
+    .field-error.visible {
+      display: block;
+    }
+
+    /* Slot Picker Grid */
+    .slots-label {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: var(--space-sm);
+    }
+
+    .slots-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.6rem;
+      margin-top: 0.4rem;
+    }
+
+    .slot-pill {
+      background-color: #fafbfc;
+      border: 1.5px solid var(--color-border);
+      padding: 0.55rem 0.4rem;
+      border-radius: var(--radius-sm);
+      text-align: center;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--color-text);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .slot-pill:hover:not(.disabled) {
+      border-color: var(--color-primary-dark);
+      background-color: #f1f5f9;
+    }
+
+    .slot-pill.active {
+      background-color: var(--color-primary-dark);
+      border-color: var(--color-primary-dark);
+      color: #ffffff;
+    }
+
+    .slot-pill.disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      background-color: #f1f5f9;
+      text-decoration: line-through;
+    }
+
+    /* Doctor Spotlight Card in Form */
+    .doctor-context-box {
+      background-color: var(--color-accent-subtle);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-md);
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin-top: var(--space-sm);
+    }
+
+    .doctor-context-avatar {
+      width: 52px;
+      height: 52px;
+      min-width: 52px;
+      border-radius: var(--radius-sm);
+      object-fit: cover;
+      border: 1px solid var(--color-border);
+    }
+
+    .doctor-context-info h5 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--color-primary-dark);
+      margin-bottom: 0.1rem;
+    }
+
+    .doctor-context-info p {
+      font-size: 0.78rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0;
+      line-height: 1.35;
+    }
+
+    /* Checkbox & Radio controls */
+    .checkbox-group {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      margin-top: var(--space-sm);
+      cursor: pointer;
+    }
+
+    .checkbox-group input {
+      margin-top: 3px;
+      cursor: pointer;
+    }
+
+    .checkbox-text {
+      font-size: 0.85rem;
+      color: var(--color-text);
+      line-height: 1.45;
+    }
+
+    /* Booking Sidebar / Summary Card */
+    .booking-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-lg);
+      position: sticky;
+      top: 94px;
+    }
+
+    .summary-card {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-xl);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .summary-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      margin-bottom: var(--space-md);
+      padding-bottom: var(--space-sm);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .summary-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-lg);
+    }
+
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.88rem;
+      line-height: 1.4;
+    }
+
+    .summary-item-label {
+      color: var(--color-text-muted);
+    }
+
+    .summary-item-value {
+      font-weight: 700;
+      color: var(--color-primary-dark);
+      text-align: right;
+    }
+
+    .summary-notice {
+      background-color: #fafbfc;
+      border: 1px dashed var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 0.9rem;
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      line-height: 1.45;
+      margin-bottom: var(--space-md);
+    }
+
+    .summary-support-card {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+    }
+
+    .summary-support-card h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--color-primary-dark);
+      margin-bottom: 0.35rem;
+    }
+
+    /* ==========================================================================
+       5. Confirmation Modal / Receipt State
+       ========================================================================== */
+    .confirmation-view {
+      display: none;
+      background-color: var(--color-surface);
+      border: 1.5px solid var(--color-primary-dark);
+      border-radius: var(--radius-md);
+      padding: var(--space-2xl);
+      box-shadow: var(--shadow-lg);
+      margin-bottom: var(--space-2xl);
+      animation: fadeIn 0.25s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .confirmation-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+      padding-bottom: var(--space-lg);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .confirmation-icon {
+      width: 48px;
+      height: 48px;
+      min-width: 48px;
+      background-color: #059669;
+      color: #ffffff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+
+    .confirmation-header h2 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      line-height: 1.2;
+    }
+
+    .confirmation-header p {
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0;
+    }
+
+    .receipt-token-banner {
+      background-color: var(--color-accent-subtle);
+      border: 1.5px dashed var(--color-border-dark);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-xl);
+      flex-wrap: wrap;
+      gap: var(--space-md);
+    }
+
+    .token-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+    }
+
+    .token-code {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      letter-spacing: 0.05em;
+      font-family: monospace;
+    }
+
+    .receipt-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-lg);
+      margin-bottom: var(--space-2xl);
+    }
+
+    .receipt-block {
+      background-color: #fafbfc;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-md);
+    }
+
+    .receipt-block-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .receipt-block-value {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--color-primary-dark);
+      line-height: 1.35;
+    }
+
+    .receipt-block-sub {
+      font-size: 0.78rem;
+      color: #64748b;
+      margin-top: 0.15rem;
+    }
+
+    .confirmation-actions {
+      display: flex;
+      gap: var(--space-md);
+      flex-wrap: wrap;
+    }
+
+    /* Print styles */
+    @media print {
+      body * { visibility: hidden; }
+      .confirmation-view, .confirmation-view * { visibility: visible; }
+      .confirmation-view { position: absolute; left: 0; top: 0; width: 100%; border: none; }
+      .confirmation-actions, .utility-bar, .site-header, .site-footer { display: none !important; }
+    }
+
+    /* ==========================================================================
+       6. Site Footer (Solid Deep Black)
+       ========================================================================== */
+    .site-footer {
+      background-color: #0f1115;
+      color: #94a3b8;
+      padding: var(--space-3xl) 0 var(--space-lg);
+      border-top: 1px solid #1e293b;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1.2fr;
+      gap: var(--space-2xl);
+      margin-bottom: var(--space-2xl);
+    }
+
+    .footer-col h4 {
+      color: #ffffff;
+      font-size: 1.05rem;
+      margin-bottom: var(--space-md);
+      font-weight: 700;
+    }
+
+    .footer-links {
+      list-style: none;
+    }
+
+    .footer-links li {
+      margin-bottom: var(--space-xs);
+    }
+
+    .footer-links a {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.15s ease;
+    }
+
+    .footer-links a:hover {
+      color: #ffffff;
+      text-decoration: underline;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid #1e293b;
+      padding-top: var(--space-lg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+
+    /* ==========================================================================
+       7. Responsive Breakpoints
+       ========================================================================== */
+    @media (max-width: 992px) {
+      .booking-layout-grid {
+        grid-template-columns: 1fr;
+      }
+      .booking-sidebar {
+        position: static;
+      }
+      .slots-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .mobile-nav-toggle {
+        display: block;
+      }
+      .nav-menu {
+        position: absolute;
+        top: 74px;
+        left: 0;
+        right: 0;
+        background-color: var(--color-surface);
+        border-bottom: 2px solid var(--color-primary-dark);
+        flex-direction: column;
+        align-items: flex-start;
+        padding: var(--space-lg);
+        box-shadow: var(--shadow-md);
+        display: none;
+      }
+      .nav-menu.is-active {
+        display: flex;
+      }
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      .slots-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .receipt-grid {
+        grid-template-columns: 1fr;
+      }
+      .utility-bar .container {
+        flex-direction: column;
+        gap: var(--space-xs);
+        text-align: center;
+      }
+      .emergency-tag {
+        border-right: none;
+        padding-right: 0;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+      .footer-bottom {
+        flex-direction: column;
+        gap: var(--space-sm);
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .slots-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .booking-form-card {
+        padding: var(--space-lg);
+      }
+      .receipt-token-banner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Utility Bar: Urgent Access & Teammate's Staff Portal Link -->
+  <aside class="utility-bar" aria-label="Quick Access Bar">
+    <div class="container">
+      <div class="utility-emergency">
+        <span class="emergency-tag">Medical Emergency: Call 911 immediately</span>
+        <span>General Inquiry: (800) 555-0199</span>
+      </div>
+      <ul class="utility-links">
+        <li><a href="queue.html">Track Wait Time</a></li>
+        <li><a href="login.html">Patient Sign In</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- Primary Site Header & Navigation -->
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="brand" aria-label="Hopewell Health Care Home">
+        <div class="brand-icon" aria-hidden="true">+</div>
+        <div class="brand-text">
+          <span class="brand-name">Hopewell</span>
+          <span class="brand-sub">Health Care System</span>
+        </div>
+      </a>
+
+      <!-- Main Navigation Menu -->
+      <nav aria-label="Primary Navigation">
+        <ul class="nav-menu" id="primary-nav">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="doctors.html" class="nav-link">Find a Doctor</a></li>
+          <li><a href="departments.html" class="nav-link">Departments</a></li>
+          <li><a href="appointments.html" class="nav-link active">Book Appointment</a></li>
+          <li><a href="queue.html" class="nav-link">Live Queue</a></li>
+          <li><a href="about.html" class="nav-link">About</a></li>
+          <li><a href="contact.html" class="nav-link">Contact</a></li>
+        </ul>
+      </nav>
+
+      <!-- Action Button & Mobile Nav Trigger -->
+      <div class="nav-actions">
+        <a href="queue.html" class="btn btn-outline">Check Queue</a>
+        <button class="mobile-nav-toggle" id="mobile-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Toggle navigation menu">
+          &#9776;
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Booking Hero Banner -->
+    <section class="booking-hero">
+      <div class="container">
+        <span class="demo-pill">Outpatient Scheduling</span>
+        <h1 class="booking-title">Book an In-Person Consultation</h1>
+        <p class="booking-subtitle">
+          Select your specialty, physician, and preferred daytime consultation slot. Upon booking, you will receive an immediate reference token synced with our live outpatient queue.
+        </p>
+      </div>
+    </section>
+
+    <!-- Main Booking Section -->
+    <section class="booking-container">
+      <div class="container">
+        
+        <!-- Confirmation View (Shown after a successful backend booking) -->
+        <article class="confirmation-view" id="confirmation-view" aria-live="polite">
+          <div class="confirmation-header">
+            <div class="confirmation-icon" aria-hidden="true">&#10003;</div>
+            <div>
+              <h2>Consultation Confirmed</h2>
+              <p>Your appointment has been logged into the Hopewell outpatient queue system.</p>
+            </div>
+          </div>
+
+          <div class="receipt-token-banner">
+            <div>
+              <span class="token-label">Appointment Reference Token</span>
+              <div class="token-code" id="receipt-token">Generated after booking</div>
+            </div>
+            <div>
+              <span class="demo-pill">Queue Ready</span>
+            </div>
+          </div>
+
+          <div class="receipt-grid">
+            <div class="receipt-block">
+              <div class="receipt-block-title">Physician & Specialty</div>
+              <div class="receipt-block-value" id="receipt-doctor">Will appear after booking</div>
+              <div class="receipt-block-sub" id="receipt-dept">Department and suite</div>
+            </div>
+
+            <div class="receipt-block">
+              <div class="receipt-block-title">Date & Consultation Time</div>
+              <div class="receipt-block-value" id="receipt-datetime">Date and time</div>
+              <div class="receipt-block-sub">Please arrive 10 minutes prior for vital checks</div>
+            </div>
+
+            <div class="receipt-block">
+              <div class="receipt-block-title">Patient Details</div>
+              <div class="receipt-block-value" id="receipt-patient">Patient profile</div>
+              <div class="receipt-block-sub" id="receipt-contact">Contact details</div>
+            </div>
+
+            <div class="receipt-block">
+              <div class="receipt-block-title">Visit Reason & Notes</div>
+              <div class="receipt-block-value" id="receipt-reason">Visit reason</div>
+              <div class="receipt-block-sub" id="receipt-notes">Additional notes</div>
+            </div>
+          </div>
+
+          <div class="confirmation-actions">
+            <a href="queue.html" id="track-queue-link" class="btn btn-primary">Track Live Queue Position &rarr;</a>
+            <button type="button" class="btn btn-secondary" onclick="window.print()">Print Receipt</button>
+            <button type="button" class="btn btn-outline" id="book-another-btn">Book Another Visit</button>
+          </div>
+        </article>
+
+        <!-- Booking Form & Sidebar Grid -->
+        <div class="booking-layout-grid" id="booking-grid">
+          
+          <!-- Booking Form -->
+          <form class="booking-form-card" id="appointment-form" novalidate>
+
+            <!-- SECTION 1: Specialty & Physician Selection -->
+            <div class="form-section">
+              <div class="form-section-header">
+                <div class="section-badge">1</div>
+                <div>
+                  <h2 class="form-section-title">Specialty & Physician</h2>
+                  <p class="form-section-desc">Choose a department and doctor for your outpatient visit.</p>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="dept-select" class="form-label">
+                    <span>Clinical Department</span>
+                    <span class="form-label-required">*</span>
+                  </label>
+                  <select id="dept-select" class="form-select" required>
+                    <option value="">Select a department...</option>
+                    <option value="cardiology">Cardiovascular Medicine</option>
+                    <option value="neurology">Neurology & Neurosurgery</option>
+                    <option value="pediatrics">Pediatrics & Child Health</option>
+                    <option value="orthopedics">Orthopedic Surgery</option>
+                    <option value="internal">Internal & General Medicine</option>
+                    <option value="oncology">Clinical Oncology</option>
+                  </select>
+                  <span class="field-error" id="dept-error">Please select a clinical department.</span>
+                </div>
+
+                <div class="form-group">
+                  <label for="doctor-select" class="form-label">
+                    <span>Attending Physician</span>
+                    <span class="form-label-required">*</span>
+                  </label>
+                  <select id="doctor-select" class="form-select" required disabled>
+                    <option value="">Choose department first...</option>
+                  </select>
+                  <span class="field-error" id="doctor-error">Please select an attending doctor.</span>
+                </div>
+              </div>
+
+              <!-- Doctor Preview Spotlight (Appears when physician is chosen) -->
+              <div class="doctor-context-box" id="doctor-context-box" style="display: none;">
+                <img src="" alt="" class="doctor-context-avatar" id="doctor-context-img">
+                <div class="doctor-context-info">
+                  <h5 id="doctor-context-name">Doctor Name</h5>
+                  <p id="doctor-context-details">Specialty &bull; Clinic Suite &bull; Hours</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 2: Date & Consultation Time Selection -->
+            <div class="form-section">
+              <div class="form-section-header">
+                <div class="section-badge">2</div>
+                <div>
+                  <h2 class="form-section-title">Date & Consultation Time</h2>
+                  <p class="form-section-desc">Select an available clinic day and daytime check-in slot.</p>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="appointment-date" class="form-label">
+                    <span>Consultation Date</span>
+                    <span class="form-label-required">*</span>
+                  </label>
+                  <input type="date" id="appointment-date" class="form-input" required>
+                  <span class="field-hint">Bookings available Monday through Saturday.</span>
+                  <span class="field-error" id="date-error">Please choose a valid future date.</span>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">
+                    <span>Consultation Type</span>
+                  </label>
+                  <select id="visit-type" class="form-select">
+                    <option value="in-person">In-Person Outpatient Visit</option>
+                    <option value="followup">Follow-Up Consultation</option>
+                    <option value="diagnostic">Diagnostic Scans Review</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Available Time Slots -->
+              <div class="form-group" style="margin-top: var(--space-md);">
+                <span class="slots-label">Available Time Slots <span class="form-label-required">*</span></span>
+                <div class="slots-grid" id="slots-grid" role="radiogroup" aria-label="Available appointment times">
+                  <div class="slot-pill" data-time="08:30 AM" role="radio" aria-checked="false" tabindex="0">08:30 AM</div>
+                  <div class="slot-pill" data-time="09:15 AM" role="radio" aria-checked="false" tabindex="0">09:15 AM</div>
+                  <div class="slot-pill" data-time="10:00 AM" role="radio" aria-checked="false" tabindex="0">10:00 AM</div>
+                  <div class="slot-pill" data-time="10:45 AM" role="radio" aria-checked="false" tabindex="0">10:45 AM</div>
+                  <div class="slot-pill" data-time="11:30 AM" role="radio" aria-checked="false" tabindex="0">11:30 AM</div>
+                  <div class="slot-pill disabled" data-time="01:15 PM" title="Slot filled" aria-disabled="true">01:15 PM</div>
+                  <div class="slot-pill" data-time="02:00 PM" role="radio" aria-checked="false" tabindex="0">02:00 PM</div>
+                  <div class="slot-pill" data-time="02:45 PM" role="radio" aria-checked="false" tabindex="0">02:45 PM</div>
+                  <div class="slot-pill" data-time="03:30 PM" role="radio" aria-checked="false" tabindex="0">03:30 PM</div>
+                  <div class="slot-pill" data-time="04:15 PM" role="radio" aria-checked="false" tabindex="0">04:15 PM</div>
+                </div>
+                <input type="hidden" id="selected-time" name="selectedTime" required>
+                <span class="field-error" id="time-error">Please click to select an appointment time slot.</span>
+              </div>
+            </div>
+
+            <!-- SECTION 3: Patient Information -->
+            <div class="form-section">
+              <div class="form-section-header">
+                <div class="section-badge">3</div>
+                <div>
+                  <h2 class="form-section-title">Patient Contact Details</h2>
+                  <p class="form-section-desc">We will send your booking token and queue check-in alerts here.</p>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="patient-first-name" class="form-label">
+                    <span>First Name</span>
+                    <span class="form-label-required">*</span>
+                  </label>
+                  <input type="text" id="patient-first-name" class="form-input" placeholder="e.g. Arthur" required>
+                  <span class="field-error" id="first-name-error">First name is required.</span>
+                </div>
+
+                <div class="form-group">
+                  <label for="patient-last-name" class="form-label">
+                    <span>Last Name</span>
+                    <span class="form-label-required">*</span>
+                  </label>
+                  <input type="text" id="patient-last-name" class="form-input" placeholder="e.g. Morgan" required>
+                  <span class="field-error" id="last-name-error">Last name is required.</span>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="patient-email" class="form-label">
+                    <span>Email Address</span>
+                    <span class="form-label-required">*</span>
+                  </label>
+                  <input type="email" id="patient-email" class="form-input" placeholder="name@example.com" required>
+                  <span class="field-error" id="email-error">Please provide a valid email address.</span>
+                </div>
+
+                <div class="form-group">
+                  <label for="patient-phone" class="form-label">
+                    <span>Phone Number</span>
+                    <span class="form-label-required">*</span>
+                  </label>
+                  <input type="tel" id="patient-phone" class="form-input" placeholder="(555) 000-0000" required>
+                  <span class="field-error" id="phone-error">Please enter a valid phone number.</span>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="patient-dob" class="form-label">
+                    <span>Date of Birth</span>
+                    <span class="form-label-required">*</span>
+                  </label>
+                  <input type="date" id="patient-dob" class="form-input" required>
+                  <span class="field-error" id="dob-error">Date of birth is required.</span>
+                </div>
+
+                <div class="form-group">
+                  <label for="patient-gender" class="form-label">
+                    <span>Gender</span>
+                  </label>
+                  <select id="patient-gender" class="form-select">
+                    <option value="">Prefer not to state</option>
+                    <option value="female">Female</option>
+                    <option value="male">Male</option>
+                    <option value="nonbinary">Non-binary</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 4: Visit Context & Notes -->
+            <div class="form-section">
+              <div class="form-section-header">
+                <div class="section-badge">4</div>
+                <div>
+                  <h2 class="form-section-title">Clinical Notes & History</h2>
+                  <p class="form-section-desc">Provide brief symptoms to help our medical desk prepare.</p>
+                </div>
+              </div>
+
+              <div class="form-row full">
+                <div class="form-group">
+                  <label for="visit-reason" class="form-label">
+                    <span>Primary Reason for Visit</span>
+                    <span class="form-label-required">*</span>
+                  </label>
+                  <input type="text" id="visit-reason" class="form-input" placeholder="e.g. Chest tightness during exercise, knee pain check" required>
+                  <span class="field-error" id="reason-error">Please describe the reason for your visit.</span>
+                </div>
+              </div>
+
+              <div class="form-row full">
+                <div class="form-group">
+                  <label for="visit-notes" class="form-label">
+                    <span>Additional Symptoms or Medical Notes (Optional)</span>
+                  </label>
+                  <textarea id="visit-notes" class="form-textarea" rows="3" placeholder="List any medications, allergies, or previous test dates..."></textarea>
+                </div>
+              </div>
+
+              <label class="checkbox-group">
+                <input type="checkbox" id="prior-patient" name="priorPatient">
+                <span class="checkbox-text">
+                  I have been an outpatient or inpatient at Hopewell Health Care within the past 24 months.
+                </span>
+              </label>
+
+              <label class="checkbox-group">
+                <input type="checkbox" id="terms-consent" name="termsConsent" required>
+                <span class="checkbox-text">
+                  I understand this is an academic demonstration system (SIT 302). I confirm that my details are accurate for appointment simulation. <span class="form-label-required">*</span>
+                </span>
+              </label>
+              <span class="field-error" id="consent-error">You must check the confirmation box to proceed.</span>
+            </div>
+
+            <!-- Form Actions -->
+            <p class="field-error" id="appointment-api-error" role="alert"></p>
+            <div style="display: flex; gap: var(--space-md); align-items: center; justify-content: flex-end; margin-top: var(--space-xl);">
+              <button type="reset" class="btn btn-secondary" id="form-reset-btn">Clear Form</button>
+              <button type="submit" class="btn btn-primary" id="submit-btn" style="padding: 0.85rem 2rem;">
+                Confirm & Receive Queue Token &rarr;
+              </button>
+            </div>
+          </form>
+
+          <!-- Booking Summary Sticky Sidebar -->
+          <aside class="booking-sidebar" aria-label="Appointment Summary and Guidance">
+            
+            <div class="summary-card">
+              <h3 class="summary-title">Appointment Summary</h3>
+              <ul class="summary-list">
+                <li class="summary-item">
+                  <span class="summary-item-label">Department:</span>
+                  <span class="summary-item-value" id="summary-dept">Not selected</span>
+                </li>
+                <li class="summary-item">
+                  <span class="summary-item-label">Physician:</span>
+                  <span class="summary-item-value" id="summary-doctor">Not selected</span>
+                </li>
+                <li class="summary-item">
+                  <span class="summary-item-label">Date:</span>
+                  <span class="summary-item-value" id="summary-date">Select date</span>
+                </li>
+                <li class="summary-item">
+                  <span class="summary-item-label">Slot:</span>
+                  <span class="summary-item-value" id="summary-time">Select slot</span>
+                </li>
+                <li class="summary-item">
+                  <span class="summary-item-label">Consultation:</span>
+                  <span class="summary-item-value" id="summary-type">In-Person</span>
+                </li>
+              </ul>
+
+              <div class="summary-notice">
+                <strong>Queue reference:</strong> A unique reference is generated after the booking is saved.
+              </div>
+
+              <div style="font-size: 0.78rem; color: var(--color-text-muted);">
+                &bull; No prepayment required for scheduling<br>
+                &bull; Free cancellation up to 2 hours before<br>
+                &bull; Wheelchair accessible reception desks
+              </div>
+            </div>
+
+            <div class="summary-support-card">
+              <h4>Need Immediate Help?</h4>
+              <p>For acute chest pain, major fractures, or urgent trauma, do not wait for an outpatient appointment.</p>
+              <p style="margin-bottom: 0;">Emergency Plaza is open 24/7. Call <strong>911</strong> or (800) 555-0199.</p>
+            </div>
+
+          </aside>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Site Footer (Solid Deep Black) -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>Hopewell Health Care</h4>
+          <p>
+            An integrated academic healthcare management demonstration system, engineered for streamlined patient appointment access and live outpatient queue tracking.
+          </p>
+          <small class="text-muted">SIT 302 Demonstration System</small>
+        </div>
+
+        <div class="footer-col">
+          <h4>Patient Services</h4>
+          <ul class="footer-links">
+            <li><a href="appointments.html">Book Appointment</a></li>
+            <li><a href="queue.html">Check Queue Position</a></li>
+            <li><a href="doctors.html">Doctor Directory</a></li>
+            <li><a href="departments.html">Clinical Departments</a></li>
+            <li><a href="patient-dashboard.html">Patient Dashboard</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Hospital & Care</h4>
+          <ul class="footer-links">
+            <li><a href="about.html">About Hopewell</a></li>
+            <li><a href="contact.html">Hours & Directions</a></li>
+            <li><a href="contact.html">Send Inquiry</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Emergency & Contacts</h4>
+          <p>Emergency Department: <strong>Open 24/7</strong></p>
+          <p>General Reception: (800) 555-0199</p>
+          <p>Clinic Hours: 08:00 – 17:00 Mon–Sat</p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 Hopewell Health Care System. Built for academic/SIT 302 demonstration purposes.</p>
+        <p>Appointments are stored for signed-in patients; queue position is shown only when supported by current records.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/api.js"></script>
+  <script>
+    /**
+     * Shared Doctors Dataset (Mirrors doctors.html schema)
+     */
+    let DOCTOR_DATA = [];
+    let DEPARTMENT_DATA = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initMobileNavigation();
+      initAppointmentForm();
+    });
+
+    /**
+     * Mobile Menu Navigation Handler
+     */
+    function initMobileNavigation() {
+      const toggleBtn = document.getElementById('mobile-toggle');
+      const navMenu = document.getElementById('primary-nav');
+
+      if (!toggleBtn || !navMenu) return;
+
+      toggleBtn.addEventListener('click', () => {
+        const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+        toggleBtn.setAttribute('aria-expanded', String(!isExpanded));
+        navMenu.classList.toggle('is-active');
+      });
+
+      document.addEventListener('click', (event) => {
+        if (!toggleBtn.contains(event.target) && !navMenu.contains(event.target)) {
+          navMenu.classList.remove('is-active');
+          toggleBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+
+    /**
+     * Appointment Form Logic: Cascades, Availability, and Booking Confirmation
+     */
+    async function initAppointmentForm() {
+      const deptSelect = document.getElementById('dept-select');
+      const docSelect = document.getElementById('doctor-select');
+      const dateInput = document.getElementById('appointment-date');
+      const selectedTimeInput = document.getElementById('selected-time');
+      const visitTypeSelect = document.getElementById('visit-type');
+      const slotsContainer = document.getElementById('slots-grid');
+      const form = document.getElementById('appointment-form');
+      const formResetBtn = document.getElementById('form-reset-btn');
+      const bookAnotherBtn = document.getElementById('book-another-btn');
+      const apiError = document.getElementById('appointment-api-error');
+
+      // Set minimum date to tomorrow
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const minDateStr = HopewellAPI.localDateString(tomorrow);
+      dateInput.min = minDateStr;
+
+      try {
+        const [departments, doctors] = await Promise.all([
+          HopewellAPI.request('departments/index.php?bookable=1'),
+          HopewellAPI.request('doctors/index.php')
+        ]);
+        DEPARTMENT_DATA = departments;
+        DOCTOR_DATA = doctors;
+        deptSelect.innerHTML = '<option value="">Select a department...</option>' +
+          DEPARTMENT_DATA.map(dept =>
+            `<option value="${HopewellAPI.escapeHtml(dept.id)}">${HopewellAPI.escapeHtml(dept.name)}</option>`
+          ).join('');
+        const session = await HopewellAPI.request('auth/me.php');
+        if (session.authenticated) {
+          const patient = session.patient;
+          document.getElementById('patient-first-name').value = patient.first_name;
+          document.getElementById('patient-last-name').value = patient.last_name;
+          document.getElementById('patient-email').value = patient.email;
+          document.getElementById('patient-phone').value = patient.phone;
+          document.getElementById('patient-dob').value = patient.date_of_birth;
+          document.getElementById('patient-gender').value = patient.gender || '';
+        }
+      } catch (error) {
+        apiError.textContent = error.message;
+        apiError.classList.add('visible');
+      }
+
+      document.querySelectorAll('.slot-pill').forEach(slot => setSlotEnabled(slot, false));
+
+      // Check URL parameters for pre-selected doctor or department
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlDoc = urlParams.get('doctor');
+      const urlDept = urlParams.get('dept');
+
+      if (urlDoc) {
+        const targetDoc = DOCTOR_DATA.find(d => d.id === urlDoc);
+        if (targetDoc) {
+          deptSelect.value = targetDoc.department;
+          populateDoctors(targetDoc.department, targetDoc.id);
+          showDoctorSpotlight(targetDoc);
+          updateSummary('dept', targetDoc.departmentTitle);
+          updateSummary('doctor', targetDoc.name);
+        }
+      } else if (urlDept) {
+        deptSelect.value = urlDept;
+        populateDoctors(urlDept);
+        const opt = deptSelect.options[deptSelect.selectedIndex];
+        updateSummary('dept', opt ? opt.text : urlDept);
+      }
+
+      // Department Change Listener -> Cascade to Doctor dropdown
+      deptSelect.addEventListener('change', () => {
+        const selectedDept = deptSelect.value;
+        selectedTimeInput.value = '';
+        document.querySelectorAll('.slot-pill').forEach(slot => setSlotEnabled(slot, false));
+        const opt = deptSelect.options[deptSelect.selectedIndex];
+        updateSummary('dept', selectedDept ? opt.text : 'Not selected');
+        updateSummary('doctor', 'Not selected');
+        hideDoctorSpotlight();
+
+        if (!selectedDept) {
+          docSelect.innerHTML = '<option value="">Choose department first...</option>';
+          docSelect.disabled = true;
+          return;
+        }
+
+        populateDoctors(selectedDept);
+      });
+
+      // Doctor Change Listener -> Show Spotlight & Update Summary
+      docSelect.addEventListener('change', () => {
+        const docId = docSelect.value;
+        refreshAvailableSlots();
+        if (!docId) {
+          hideDoctorSpotlight();
+          updateSummary('doctor', 'Not selected');
+          return;
+        }
+
+        const foundDoc = DOCTOR_DATA.find(d => d.id === docId);
+        if (foundDoc) {
+          showDoctorSpotlight(foundDoc);
+          updateSummary('doctor', foundDoc.name);
+        }
+      });
+
+      // Date Input Listener
+      dateInput.addEventListener('change', () => {
+        if (!dateInput.value) {
+          updateSummary('date', 'Select date');
+          refreshAvailableSlots();
+          return;
+        }
+
+        // Format date nicely (e.g. Wed, Oct 21, 2026)
+        const parts = dateInput.value.split('-');
+        const d = new Date(parts[0], parts[1] - 1, parts[2]);
+        const formatted = d.toLocaleDateString('en-US', {
+          weekday: 'short',
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric'
+        });
+        updateSummary('date', formatted);
+        refreshAvailableSlots();
+      });
+
+      // Visit Type Listener
+      visitTypeSelect.addEventListener('change', () => {
+        const opt = visitTypeSelect.options[visitTypeSelect.selectedIndex];
+        updateSummary('type', opt ? opt.text : 'In-Person');
+      });
+
+      // Slot Picker Click Handlers
+      slotsContainer.addEventListener('click', (e) => {
+        const slot = e.target.closest('.slot-pill');
+        if (!slot || slot.classList.contains('disabled')) return;
+
+        // Deselect other slots
+        document.querySelectorAll('.slot-pill').forEach(s => {
+          s.classList.remove('active');
+          s.setAttribute('aria-checked', 'false');
+        });
+
+        // Select clicked slot
+        slot.classList.add('active');
+        slot.setAttribute('aria-checked', 'true');
+        const chosenTime = slot.getAttribute('data-time');
+        selectedTimeInput.value = chosenTime;
+        updateSummary('time', chosenTime);
+
+        // Clear time validation error if visible
+        document.getElementById('time-error').classList.remove('visible');
+      });
+
+      // Keyboard support for slots (Enter or Space)
+      slotsContainer.addEventListener('keydown', (e) => {
+        if (e.key === ' ' || e.key === 'Enter') {
+          const slot = e.target.closest('.slot-pill');
+          if (slot && !slot.classList.contains('disabled')) {
+            e.preventDefault();
+            slot.click();
+          }
+        }
+      });
+
+      // Form Reset Handler
+      formResetBtn.addEventListener('click', () => {
+        hideDoctorSpotlight();
+        docSelect.innerHTML = '<option value="">Choose department first...</option>';
+        docSelect.disabled = true;
+        document.querySelectorAll('.slot-pill').forEach(s => s.classList.remove('active'));
+        selectedTimeInput.value = '';
+        document.querySelectorAll('.slot-pill').forEach(slot => setSlotEnabled(slot, false));
+        clearValidationErrors();
+        updateSummary('dept', 'Not selected');
+        updateSummary('doctor', 'Not selected');
+        updateSummary('date', 'Select date');
+        updateSummary('time', 'Select slot');
+      });
+
+      // Book Another Button (resets from confirmation view)
+      bookAnotherBtn.addEventListener('click', () => {
+        document.getElementById('confirmation-view').style.display = 'none';
+        document.getElementById('booking-grid').style.display = 'grid';
+        form.reset();
+        formResetBtn.click();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      // Form Submit Handler (Simulated Booking)
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearValidationErrors();
+        apiError.classList.remove('visible');
+
+        const submitButton = document.getElementById('submit-btn');
+        submitButton.disabled = true;
+        try {
+          const session = await HopewellAPI.request('auth/me.php');
+          if (!session.authenticated) {
+            window.location.href = `login.html?next=appointments.html`;
+            return;
+          }
+
+          const isValid = validateBookingForm();
+          if (!isValid) return;
+
+          const result = await HopewellAPI.request('appointments/create.php', {
+            method: 'POST',
+            body: {
+              departmentId: deptSelect.value,
+              doctorId: docSelect.value,
+              date: dateInput.value,
+              time: selectedTimeInput.value,
+              visitType: visitTypeSelect.value,
+              reason: document.getElementById('visit-reason').value.trim(),
+              notes: document.getElementById('visit-notes').value.trim(),
+              termsConsent: document.getElementById('terms-consent').checked
+            }
+          });
+
+          const patient = session.patient;
+          const selectedDate = HopewellAPI.formatDate(result.appointmentDate, {
+            weekday: 'long', month: 'short', day: 'numeric', year: 'numeric'
+          });
+          document.getElementById('receipt-token').textContent = result.reference;
+          document.getElementById('receipt-doctor').textContent = result.doctor;
+          document.getElementById('receipt-dept').textContent = `${result.department} • ${result.room}`;
+          document.getElementById('receipt-datetime').textContent = `${selectedDate} at ${result.appointmentTime}`;
+          document.getElementById('receipt-patient').textContent = `${patient.first_name} ${patient.last_name}`;
+          document.getElementById('receipt-contact').textContent = `${patient.email} • ${patient.phone}`;
+          document.getElementById('receipt-reason').textContent = document.getElementById('visit-reason').value.trim();
+          document.getElementById('receipt-notes').textContent =
+            document.getElementById('visit-notes').value.trim() || 'No additional notes';
+
+          const queueLink = document.getElementById('track-queue-link');
+          queueLink.setAttribute('href', `queue.html?ref=${encodeURIComponent(result.reference)}`);
+
+          document.getElementById('booking-grid').style.display = 'none';
+          const confirmationView = document.getElementById('confirmation-view');
+          confirmationView.style.display = 'block';
+
+          confirmationView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } catch (error) {
+          apiError.textContent = error.message;
+          apiError.classList.add('visible');
+        } finally {
+          submitButton.disabled = false;
+        }
+      });
+    }
+
+    async function refreshAvailableSlots() {
+      const doctorId = document.getElementById('doctor-select').value;
+      const date = document.getElementById('appointment-date').value;
+      const selectedTime = document.getElementById('selected-time');
+      const timeError = document.getElementById('time-error');
+      selectedTime.value = '';
+      timeError.classList.remove('visible');
+      document.querySelectorAll('.slot-pill').forEach(slot => setSlotEnabled(slot, false));
+      if (!doctorId || !date) return;
+
+      try {
+        const result = await HopewellAPI.request(
+          `appointments/availability.php?doctor_id=${encodeURIComponent(doctorId)}&date=${encodeURIComponent(date)}`
+        );
+        if (!result.slots.length) {
+          timeError.textContent = 'No appointment times are available for this doctor on the selected date.';
+          timeError.classList.add('visible');
+          return;
+        }
+        timeError.textContent = 'Please click to select an appointment time slot.';
+        document.querySelectorAll('.slot-pill').forEach(slot => {
+          const available = result.slots.includes(slot.getAttribute('data-time'));
+          setSlotEnabled(slot, available);
+        });
+      } catch (error) {
+        timeError.classList.remove('visible');
+        const apiError = document.getElementById('appointment-api-error');
+        apiError.textContent = error.message;
+        apiError.classList.add('visible');
+      }
+    }
+
+    function setSlotEnabled(slot, enabled) {
+      slot.classList.toggle('disabled', !enabled);
+      slot.setAttribute('aria-disabled', String(!enabled));
+      slot.setAttribute('tabindex', enabled ? '0' : '-1');
+      if (!enabled) {
+        slot.classList.remove('active');
+        slot.setAttribute('aria-checked', 'false');
+      }
+    }
+
+    /**
+     * Populates the doctors dropdown based on selected department
+     */
+    function populateDoctors(deptKey, preSelectId = null) {
+      const docSelect = document.getElementById('doctor-select');
+      const filtered = DOCTOR_DATA.filter(doc => doc.department === deptKey);
+
+      if (filtered.length === 0) {
+        docSelect.innerHTML = '<option value="">No specialists found in this department</option>';
+        docSelect.disabled = true;
+        return;
+      }
+
+      let optionsHtml = '<option value="">Select a physician...</option>';
+      filtered.forEach(doc => {
+        const isSelected = (preSelectId && doc.id === preSelectId) ? 'selected' : '';
+        optionsHtml += `<option value="${HopewellAPI.escapeHtml(doc.id)}" ${isSelected}>${HopewellAPI.escapeHtml(doc.name)} (${HopewellAPI.escapeHtml(doc.room)})</option>`;
+      });
+
+      docSelect.innerHTML = optionsHtml;
+      docSelect.disabled = false;
+    }
+
+    /**
+     * Shows a compact preview box for the chosen physician
+     */
+    function showDoctorSpotlight(doc) {
+      const box = document.getElementById('doctor-context-box');
+      const img = document.getElementById('doctor-context-img');
+      const name = document.getElementById('doctor-context-name');
+      const details = document.getElementById('doctor-context-details');
+
+      img.src = /^https?:\/\//i.test(doc.image) ? doc.image : '';
+      img.alt = `Portrait of ${doc.name}`;
+      name.textContent = doc.name;
+      details.textContent = `${doc.departmentTitle} • ${doc.room} • ${doc.schedule}`;
+      box.style.display = 'flex';
+    }
+
+    function hideDoctorSpotlight() {
+      document.getElementById('doctor-context-box').style.display = 'none';
+    }
+
+    /**
+     * Updates text in the sticky booking summary panel
+     */
+    function updateSummary(field, value) {
+      const target = document.getElementById(`summary-${field}`);
+      if (target) {
+        target.textContent = value;
+      }
+    }
+
+    /**
+     * Validates required form inputs and displays inline error prompts
+     */
+    function validateBookingForm() {
+      let isValid = true;
+
+      // 1. Department
+      const dept = document.getElementById('dept-select');
+      if (!dept.value) {
+        showError('dept-error', dept);
+        isValid = false;
+      }
+
+      // 2. Doctor
+      const doc = document.getElementById('doctor-select');
+      if (!doc.value) {
+        showError('doctor-error', doc);
+        isValid = false;
+      }
+
+      // 3. Date
+      const date = document.getElementById('appointment-date');
+      if (!date.value) {
+        showError('date-error', date);
+        isValid = false;
+      }
+
+      // 4. Time slot
+      const time = document.getElementById('selected-time');
+      if (!time.value) {
+        document.getElementById('time-error').classList.add('visible');
+        isValid = false;
+      }
+
+      // 5. Patient First Name
+      const firstName = document.getElementById('patient-first-name');
+      if (!firstName.value.trim()) {
+        showError('first-name-error', firstName);
+        isValid = false;
+      }
+
+      // 6. Patient Last Name
+      const lastName = document.getElementById('patient-last-name');
+      if (!lastName.value.trim()) {
+        showError('last-name-error', lastName);
+        isValid = false;
+      }
+
+      // 7. Email
+      const email = document.getElementById('patient-email');
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email.value.trim() || !emailPattern.test(email.value.trim())) {
+        showError('email-error', email);
+        isValid = false;
+      }
+
+      // 8. Phone
+      const phone = document.getElementById('patient-phone');
+      if (!phone.value.trim() || phone.value.trim().length < 7) {
+        showError('phone-error', phone);
+        isValid = false;
+      }
+
+      // 9. DOB
+      const dob = document.getElementById('patient-dob');
+      if (!dob.value) {
+        showError('dob-error', dob);
+        isValid = false;
+      }
+
+      // 10. Reason for visit
+      const reason = document.getElementById('visit-reason');
+      if (!reason.value.trim()) {
+        showError('reason-error', reason);
+        isValid = false;
+      }
+
+      // 11. Demonstration Consent checkbox
+      const consent = document.getElementById('terms-consent');
+      if (!consent.checked) {
+        document.getElementById('consent-error').classList.add('visible');
+        isValid = false;
+      }
+
+      return isValid;
+    }
+
+    function showError(errorId, inputElement) {
+      const errEl = document.getElementById(errorId);
+      if (errEl) errEl.classList.add('visible');
+      if (inputElement) inputElement.classList.add('invalid');
+    }
+
+    function clearValidationErrors() {
+      document.querySelectorAll('.field-error').forEach(el => el.classList.remove('visible'));
+      document.querySelectorAll('.form-input, .form-select, .form-textarea').forEach(el => el.classList.remove('invalid'));
+    }
+  </script>
+</body>
+</html>
