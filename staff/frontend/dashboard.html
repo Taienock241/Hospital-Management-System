@@ -45,12 +45,12 @@
         <section class="dashboard-intro">
           <div>
             <span class="eyebrow">HOPEWELL HOSPITAL</span>
-            <h1>Good morning, <span id="dashboard-user-name">Administrator</span></h1>
+            <h1 id="dashboard-greeting">Good morning, Admin</h1>
             <p>Here is what is happening across your hospital today.</p>
           </div>
           <div class="dashboard-date">
             <span class="dashboard-date-icon">◷</span>
-            <div><strong id="dashboard-date">Today</strong><small>Live operational view</small></div>
+            <div><strong id="dashboard-date">Today</strong><small id="dashboard-clock">Live operational view</small></div>
           </div>
         </section>
 
@@ -137,11 +137,25 @@
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       if (!(await checkPageAccess())) return;
+      const user = getCurrentUser();
+      const updateDashboardGreeting = () => {
+        const now = new Date();
+        const hour = now.getHours();
+        const timeOfDay = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
+        const displayName = user?.role === 'admin'
+          ? 'Admin'
+          : (user?.name?.trim().split(/\s+/)[0] || 'there');
+        document.getElementById('dashboard-greeting').textContent = `Good ${timeOfDay}, ${displayName}`;
+        document.getElementById('dashboard-clock').textContent = now.toLocaleTimeString([], {
+          hour: 'numeric', minute: '2-digit'
+        });
+      };
+      updateDashboardGreeting();
+      window.setInterval(updateDashboardGreeting, 60_000);
       try {
       const data = await apiRequest('/dashboard');
       const stats = data.stats;
       const queue = data.queue;
-      const user = getCurrentUser();
       const today = data.today;
       const todayLabel = new Date(`${today}T00:00:00`).toLocaleDateString(undefined, {
         weekday: 'long', month: 'long', day: 'numeric'
@@ -154,7 +168,6 @@
       document.getElementById('kpi-appointments').innerText = stats.appointments;
       document.getElementById('kpi-waiting').innerText = waiting;
       document.getElementById('kpi-served').innerText = served;
-      document.getElementById('dashboard-user-name').textContent = user ? user.name.split(' ')[0] : 'Administrator';
       document.getElementById('dashboard-date').textContent = todayLabel;
       document.getElementById('legend-waiting').textContent = waiting;
       document.getElementById('legend-progress').textContent = progress;

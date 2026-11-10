@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact & Directions | Hopewell Health Care</title>
+
+  <style>
+    /* ==========================================================================
+       1. Design Tokens & CSS Variables (Matches Site-wide Soft Monochrome)
+       ========================================================================== */
+    :root {
+      --color-primary: #1f2428;
+      --color-primary-dark: #111417;
+      --color-primary-light: #424a52;
+      
+      --color-accent: #2d3339;
+      --color-accent-subtle: #f3f5f7;
+      --color-accent-border: #d0d5dd;
+      
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-text: #24292e;
+      --color-text-muted: #64748b;
+      --color-border: #e2e8f0;
+      --color-border-dark: #cbd5e1;
+      
+      --color-success: #059669;
+      --color-success-bg: #ecfdf5;
+      --color-success-border: #a7f3d0;
+
+      --color-danger: #b91c1c;
+      --color-danger-bg: #fef2f2;
+      --color-danger-border: #fecaca;
+
+      --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-family-heading: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2rem;
+      --space-2xl: 3rem;
+      --space-3xl: 4.5rem;
+
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
+
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-full: 9999px;
+
+      --container-max: 1200px;
+    }
+
+    /* Base Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-family-base);
+      color: var(--color-text);
+      background-color: var(--color-bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .container {
+      width: 100%;
+      max-width: var(--container-max);
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: var(--space-lg);
+      padding-right: var(--space-lg);
+    }
+
+    /* ==========================================================================
+       2. Reusable Buttons & Badges
+       ========================================================================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+      padding: 0.75rem 1.4rem;
+      font-size: 0.92rem;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.1s ease;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background-color: var(--color-primary-dark);
+      border-color: var(--color-primary-dark);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: #333a42;
+      border-color: #333a42;
+      color: #ffffff;
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border-color: var(--color-primary-dark);
+      color: var(--color-primary-dark);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--color-primary-dark);
+      color: #ffffff;
+    }
+
+    .demo-pill {
+      display: inline-block;
+      background-color: var(--color-accent-subtle);
+      color: var(--color-primary);
+      border: 1px solid var(--color-border);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-full);
+      margin-bottom: var(--space-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ==========================================================================
+       3. Utility Bar & Main Site Header
+       ========================================================================== */
+    .utility-bar {
+      background-color: #f1f4f8;
+      color: #475569;
+      font-size: 0.85rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .utility-bar .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .utility-links,
+    .utility-emergency {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      list-style: none;
+    }
+
+    .utility-bar a {
+      color: #334155;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.15s ease;
+    }
+
+    .utility-bar a:hover {
+      color: var(--color-primary-dark);
+      text-decoration: underline;
+    }
+
+    .emergency-tag {
+      color: #b91c1c;
+      font-weight: 700;
+      border-right: 1px solid var(--color-border);
+      padding-right: var(--space-md);
+    }
+
+    .site-header {
+      background-color: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .site-header .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 74px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background-color: var(--color-primary-dark);
+      color: #ffffff;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      font-weight: 800;
+    }
+
+    .brand-name {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-sub {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      letter-spacing: 0.05em;
+      font-weight: 600;
+      display: block;
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      list-style: none;
+    }
+
+    .nav-link {
+      position: relative;
+      font-weight: 600;
+      color: var(--color-text);
+      text-decoration: none;
+      font-size: 0.95rem;
+      padding: 0.55rem 0.85rem;
+      border-radius: var(--radius-sm);
+      transition: color 0.2s ease, background-color 0.2s ease, transform 0.15s ease;
+      display: inline-block;
+    }
+
+    .nav-link:hover {
+      color: var(--color-primary-dark);
+      background-color: #f1f5f9;
+      transform: translateY(-1px);
+    }
+
+    .nav-link::after {
+      content: "";
+      position: absolute;
+      bottom: 4px;
+      left: 0.85rem;
+      right: 0.85rem;
+      height: 2px;
+      background-color: var(--color-primary-dark);
+      border-radius: var(--radius-full);
+      transform: scaleX(0);
+      transform-origin: center;
+      transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-link:hover::after,
+    .nav-link.active::after {
+      transform: scaleX(1);
+    }
+
+    .nav-link.active {
+      color: var(--color-primary-dark);
+      background-color: #f8fafc;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .mobile-nav-toggle {
+      display: none;
+      background: transparent;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-size: 1.4rem;
+      color: var(--color-primary-dark);
+      cursor: pointer;
+      padding: 0.35rem 0.6rem;
+      line-height: 1;
+    }
+
+    /* ==========================================================================
+       4. Contact Page Grid & Form Controls
+       ========================================================================== */
+    .contact-banner {
+      background-color: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-2xl) 0 var(--space-xl);
+    }
+
+    .contact-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      letter-spacing: -0.02em;
+      margin-bottom: 0.4rem;
+    }
+
+    .contact-subtitle {
+      color: var(--color-text-muted);
+      font-size: 1.05rem;
+      max-width: 760px;
+    }
+
+    .contact-layout-section {
+      padding: var(--space-3xl) 0;
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: var(--space-2xl);
+      align-items: start;
+    }
+
+    .contact-form-card {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-2xl);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .contact-form-card h2 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      margin-bottom: 0.35rem;
+    }
+
+    .contact-form-card p {
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-xl);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-lg);
+      margin-bottom: var(--space-md);
+    }
+
+    .form-row.full {
+      grid-template-columns: 1fr;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .form-label {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--color-text);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .form-label-required {
+      color: var(--color-danger);
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 0.78rem 0.95rem;
+      font-size: 0.92rem;
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      background-color: #fafbfc;
+      color: var(--color-text);
+      font-family: inherit;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: var(--color-primary-dark);
+      background-color: #ffffff;
+      box-shadow: 0 0 0 3px rgba(31, 36, 40, 0.08);
+    }
+
+    .form-input.invalid,
+    .form-select.invalid,
+    .form-textarea.invalid {
+      border-color: var(--color-danger);
+      background-color: var(--color-danger-bg);
+    }
+
+    .field-error {
+      font-size: 0.78rem;
+      color: var(--color-danger);
+      font-weight: 600;
+      display: none;
+    }
+
+    .field-error.visible {
+      display: block;
+    }
+
+    /* Success Card */
+    .contact-success-box {
+      display: none;
+      background-color: var(--color-success-bg);
+      border: 1.5px solid var(--color-success-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-xl);
+      text-align: center;
+      animation: fadeIn 0.25s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .success-check-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background-color: var(--color-success);
+      color: #ffffff;
+      font-size: 1.5rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto var(--space-md);
+    }
+
+    /* Sidebar Campus Directory */
+    .campus-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-lg);
+    }
+
+    .emergency-callout-card {
+      background-color: #fef2f2;
+      border: 1.5px solid #fecaca;
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      font-size: 0.88rem;
+    }
+
+    .emergency-callout-card h4 {
+      color: #b91c1c;
+      font-size: 1rem;
+      font-weight: 800;
+      margin-bottom: 0.35rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .campus-info-card {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-xl);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .campus-info-card h3 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      margin-bottom: var(--space-md);
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: var(--space-sm);
+    }
+
+    .info-item-group {
+      margin-bottom: var(--space-md);
+    }
+
+    .info-item-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .info-label-muted {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      margin-bottom: 0.2rem;
+      display: block;
+    }
+
+    .info-val-strong {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--color-primary-dark);
+      line-height: 1.4;
+    }
+
+    .info-sub-text {
+      font-size: 0.82rem;
+      color: var(--color-text-muted);
+      line-height: 1.4;
+      margin-top: 0.15rem;
+    }
+
+    /* Campus Wing Locations List */
+    .wing-location-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      font-size: 0.82rem;
+      margin-top: 0.5rem;
+    }
+
+    .wing-location-list li {
+      padding: 0.35rem 0.5rem;
+      background-color: #fafbfc;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+
+    /* Map Mock View */
+    .map-mock-card {
+      background-color: #f1f5f9;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-xl) var(--space-lg);
+      text-align: center;
+      font-size: 0.88rem;
+      color: var(--color-text-muted);
+    }
+
+    .map-pin-icon {
+      font-size: 1.8rem;
+      color: var(--color-primary-dark);
+      margin-bottom: 0.35rem;
+    }
+
+    /* ==========================================================================
+       5. Site Footer (Solid Deep Black)
+       ========================================================================== */
+    .site-footer {
+      background-color: #0f1115;
+      color: #94a3b8;
+      padding: var(--space-3xl) 0 var(--space-lg);
+      border-top: 1px solid #1e293b;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1.2fr;
+      gap: var(--space-2xl);
+      margin-bottom: var(--space-2xl);
+    }
+
+    .footer-col h4 {
+      color: #ffffff;
+      font-size: 1.05rem;
+      margin-bottom: var(--space-md);
+      font-weight: 700;
+    }
+
+    .footer-links {
+      list-style: none;
+    }
+
+    .footer-links li {
+      margin-bottom: var(--space-xs);
+    }
+
+    .footer-links a {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.15s ease;
+    }
+
+    .footer-links a:hover {
+      color: #ffffff;
+      text-decoration: underline;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid #1e293b;
+      padding-top: var(--space-lg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+
+    /* ==========================================================================
+       6. Responsive Breakpoints
+       ========================================================================== */
+    @media (max-width: 992px) {
+      .contact-grid {
+        grid-template-columns: 1fr;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .mobile-nav-toggle {
+        display: block;
+      }
+      .nav-menu {
+        position: absolute;
+        top: 74px;
+        left: 0;
+        right: 0;
+        background-color: var(--color-surface);
+        border-bottom: 2px solid var(--color-primary-dark);
+        flex-direction: column;
+        align-items: flex-start;
+        padding: var(--space-lg);
+        box-shadow: var(--shadow-md);
+        display: none;
+      }
+      .nav-menu.is-active {
+        display: flex;
+      }
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      .utility-bar .container {
+        flex-direction: column;
+        gap: var(--space-xs);
+        text-align: center;
+      }
+      .emergency-tag {
+        border-right: none;
+        padding-right: 0;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+      .footer-bottom {
+        flex-direction: column;
+        gap: var(--space-sm);
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Utility Bar -->
+  <aside class="utility-bar" aria-label="Quick Access Bar">
+    <div class="container">
+      <div class="utility-emergency">
+        <span class="emergency-tag">Medical Emergency: Call 911 immediately</span>
+        <span>General Inquiry: (800) 555-0199</span>
+      </div>
+      <ul class="utility-links">
+        <li><a href="queue.html">Track Wait Time</a></li>
+        <li><a href="login.html">Patient Sign In</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- Primary Site Header & Navigation -->
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="brand" aria-label="Hopewell Health Care Home">
+        <div class="brand-icon" aria-hidden="true">+</div>
+        <div class="brand-text">
+          <span class="brand-name">Hopewell</span>
+          <span class="brand-sub">Health Care System</span>
+        </div>
+      </a>
+
+      <!-- Main Navigation Menu -->
+      <nav aria-label="Primary Navigation">
+        <ul class="nav-menu" id="primary-nav">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="doctors.html" class="nav-link">Find a Doctor</a></li>
+          <li><a href="departments.html" class="nav-link">Departments</a></li>
+          <li><a href="appointments.html" class="nav-link">Book Appointment</a></li>
+          <li><a href="queue.html" class="nav-link">Live Queue</a></li>
+          <li><a href="about.html" class="nav-link">About</a></li>
+          <li><a href="contact.html" class="nav-link active">Contact</a></li>
+        </ul>
+      </nav>
+
+      <!-- Action Button & Mobile Nav Trigger -->
+      <div class="nav-actions">
+        <a href="appointments.html" class="btn btn-primary">Book Now</a>
+        <button class="mobile-nav-toggle" id="mobile-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Toggle navigation menu">
+          &#9776;
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Contact Banner -->
+    <section class="contact-banner">
+      <div class="container">
+        <span class="demo-pill">Hospital Access & Inquiries</span>
+        <h1 class="contact-title">Contact & Campus Directions</h1>
+        <p class="contact-subtitle">
+          Connect with hospital reception, outpatient coordination, and administrative assistance. For acute emergencies, access the ground plaza ambulance bay directly.
+        </p>
+      </div>
+    </section>
+
+    <!-- Main Contact Layout -->
+    <section class="contact-layout-section">
+      <div class="container">
+        
+        <div class="contact-grid">
+          
+          <!-- LEFT COLUMN: Patient Inquiry Form -->
+          <div>
+            
+            <!-- Success Confirmation Card -->
+            <div class="contact-success-box" id="contact-success" aria-live="polite">
+              <div class="success-check-icon" aria-hidden="true">&#10003;</div>
+              <h3 style="font-size: 1.35rem; color: var(--color-primary-dark); margin-bottom: 0.35rem;">
+                Message Received
+              </h3>
+              <p style="color: var(--color-text-muted); font-size: 0.92rem; max-width: 480px; margin: 0 auto var(--space-lg);">
+                Thank you, <strong id="success-sender-name">Patient</strong>. Your inquiry has been routed to central triage. An outpatient coordinator will respond within 1 business day.
+              </p>
+              <button type="button" class="btn btn-outline btn-sm" id="send-another-btn">Send Another Message</button>
+            </div>
+
+            <!-- Contact Form Card -->
+            <form class="contact-form-card" id="contact-form" novalidate>
+              <h2>Send an Outpatient Inquiry</h2>
+              <p>Fill out the form below for general appointment questions, medical records, or department directions.</p>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="contact-name" class="form-label">
+                    <span>Full Name</span>
+                    <span class="form-label-required">*</span>
+                  </label>
+                  <input type="text" id="contact-name" class="form-input" placeholder="e.g. Arthur Morgan" required>
+                  <span class="field-error" id="name-error">Full name is required.</span>
+                </div>
+
+                <div class="form-group">
+                  <label for="contact-email" class="form-label">
+                    <span>Email Address</span>
+                    <span class="form-label-required">*</span>
+                  </label>
+                  <input type="email" id="contact-email" class="form-input" placeholder="name@example.com" required>
+                  <span class="field-error" id="email-error">Please enter a valid email address.</span>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="contact-phone" class="form-label">
+                    <span>Phone Number</span>
+                  </label>
+                  <input type="tel" id="contact-phone" class="form-input" placeholder="(555) 019-2834">
+                </div>
+
+                <div class="form-group">
+                  <label for="contact-dept" class="form-label">
+                    <span>Target Department</span>
+                    <span class="form-label-required">*</span>
+                  </label>
+                  <select id="contact-dept" class="form-select" required>
+                    <option value="">Select department...</option>
+                    <option value="general">General Reception / Intake</option>
+                    <option value="cardiology">Cardiovascular Medicine</option>
+                    <option value="neurology">Neurology & Neurosurgery</option>
+                    <option value="pediatrics">Pediatrics & Child Health</option>
+                    <option value="orthopedics">Orthopedic Surgery</option>
+                    <option value="records">Medical Records & Billing</option>
+                  </select>
+                  <span class="field-error" id="dept-error">Please select a department.</span>
+                </div>
+              </div>
+
+              <div class="form-row full">
+                <div class="form-group">
+                  <label for="contact-subject" class="form-label">
+                    <span>Subject</span>
+                    <span class="form-label-required">*</span>
+                  </label>
+                  <input type="text" id="contact-subject" class="form-input" placeholder="e.g. Preparing for stress test, clinic wing access" required>
+                  <span class="field-error" id="subject-error">Subject is required.</span>
+                </div>
+              </div>
+
+              <div class="form-row full">
+                <div class="form-group">
+                  <label for="contact-message" class="form-label">
+                    <span>Your Inquiry / Message</span>
+                    <span class="form-label-required">*</span>
+                  </label>
+                  <textarea id="contact-message" class="form-textarea" rows="4" placeholder="How can our clinical team assist you today?" required></textarea>
+                  <span class="field-error" id="message-error">Please provide message details.</span>
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end; gap: var(--space-md); margin-top: var(--space-lg);">
+                <button type="submit" class="btn btn-primary" style="padding: 0.85rem 2rem;">
+                  Submit Inquiry &rarr;
+                </button>
+              </div>
+            </form>
+
+          </div>
+
+          <!-- RIGHT COLUMN: Campus Directory & Facility Guidelines -->
+          <aside class="campus-sidebar" aria-label="Campus Directory and Location Information">
+            
+            <!-- Urgent Medical Notice -->
+            <div class="emergency-callout-card">
+              <h4>
+                <span aria-hidden="true">&#9888;</span>
+                Medical Emergencies
+              </h4>
+              <p style="margin-bottom: 0.35rem;">
+                If you are experiencing acute chest pressure, stroke symptoms, or severe trauma, do not submit an online form.
+              </p>
+              <p style="margin-bottom: 0; font-weight: 700;">
+                Call 911 or arrive at Ground Level Ambulance Plaza immediately (Open 24/7).
+              </p>
+            </div>
+
+            <!-- Campus Location & Operating Hours -->
+            <div class="campus-info-card">
+              <h3>Central Medical Campus</h3>
+
+              <div class="info-item-group">
+                <span class="info-label-muted">Campus Address:</span>
+                <div class="info-val-strong">742 Hopewell Health Boulevard</div>
+                <div class="info-sub-text">Rochester Medical Corridor, Suite 100</div>
+              </div>
+
+              <div class="info-item-group">
+                <span class="info-label-muted">General Reception:</span>
+                <div class="info-val-strong">(800) 555-0199 &bull; Ext. 100</div>
+                <div class="info-sub-text">Mon – Sat: 08:00 – 17:00</div>
+              </div>
+
+              <div class="info-item-group">
+                <span class="info-label-muted">Outpatient Clinical Wings:</span>
+                <ul class="wing-location-list">
+                  <li><strong>East Wing:</strong> Cardiology (L3) &bull; General Med (L1)</li>
+                  <li><strong>West Wing:</strong> Neurology (L4) &bull; Diagnostic MRI</li>
+                  <li><strong>North Pavilion:</strong> Pediatrics &bull; Child Wellness</li>
+                  <li><strong>South Wing:</strong> Orthopedic Surgery &bull; Physical Rehab</li>
+                </ul>
+              </div>
+
+              <div class="info-item-group">
+                <span class="info-label-muted">Visitor Parking & Transit:</span>
+                <div class="info-sub-text">
+                  Validated 2-hour parking available in <strong>Garage Structure B</strong>. Accessible wheelchair ramps located at Main Rotunda Intake.
+                </div>
+              </div>
+            </div>
+
+            <!-- Visual Map Simulation Card -->
+            <div class="map-mock-card">
+              <div class="map-pin-icon" aria-hidden="true">&#128205;</div>
+              <strong style="color: var(--color-primary-dark); display: block; margin-bottom: 0.2rem;">
+                Hopewell Central Rotunda
+              </strong>
+              <span>Intersection of Hopewell Blvd & Clinic Ave</span>
+              <div style="margin-top: var(--space-md);">
+                <a href="appointments.html" class="btn btn-outline btn-sm">Schedule Clinic Visit &rarr;</a>
+              </div>
+            </div>
+
+          </aside>
+
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Site Footer (Solid Deep Black) -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>Hopewell Health Care</h4>
+          <p>
+            An integrated healthcare management system engineered for streamlined patient appointment access, outpatient consultation routing, and real-time clinic queue tracking.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Patient Services</h4>
+          <ul class="footer-links">
+            <li><a href="appointments.html">Book Appointment</a></li>
+            <li><a href="queue.html">Check Queue Position</a></li>
+            <li><a href="doctors.html">Doctor Directory</a></li>
+            <li><a href="departments.html">Clinical Departments</a></li>
+            <li><a href="patient-dashboard.html">Patient Dashboard</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Hospital & Care</h4>
+          <ul class="footer-links">
+            <li><a href="about.html">About Hopewell</a></li>
+            <li><a href="contact.html">Hours & Directions</a></li>
+            <li><a href="contact.html">Send Inquiry</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Emergency & Contacts</h4>
+          <p>Emergency Department: <strong>Open 24/7</strong></p>
+          <p>General Reception: (800) 555-0199</p>
+          <p>Clinic Hours: 08:00 – 17:00 Mon–Sat</p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 Hopewell Health Care System. All rights reserved.</p>
+        <p>Providing trusted, patient-first clinical excellence across all outpatient centers.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /** Patient portal data loads through the shared PostgreSQL API. */
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initMobileNavigation();
+      initContactForm();
+    });
+
+    /**
+     * Mobile Menu Navigation Handler
+     */
+    function initMobileNavigation() {
+      const toggleBtn = document.getElementById('mobile-toggle');
+      const navMenu = document.getElementById('primary-nav');
+
+      if (!toggleBtn || !navMenu) return;
+
+      toggleBtn.addEventListener('click', () => {
+        const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+        toggleBtn.setAttribute('aria-expanded', String(!isExpanded));
+        navMenu.classList.toggle('is-active');
+      });
+
+      document.addEventListener('click', (event) => {
+        if (!toggleBtn.contains(event.target) && !navMenu.contains(event.target)) {
+          navMenu.classList.remove('is-active');
+          toggleBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+
+    /**
+     * Client-side validation and simulated inquiry submission
+     */
+    function initContactForm() {
+      const form = document.getElementById('contact-form');
+      const successBox = document.getElementById('contact-success');
+      const sendAnotherBtn = document.getElementById('send-another-btn');
+
+      if (!form) return;
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        clearErrors();
+
+        let isValid = true;
+
+        const nameInput = document.getElementById('contact-name');
+        if (!nameInput.value.trim()) {
+          showError('name-error', nameInput);
+          isValid = false;
+        }
+
+        const emailInput = document.getElementById('contact-email');
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailInput.value.trim() || !emailPattern.test(emailInput.value.trim())) {
+          showError('email-error', emailInput);
+          isValid = false;
+        }
+
+        const deptSelect = document.getElementById('contact-dept');
+        if (!deptSelect.value) {
+          showError('dept-error', deptSelect);
+          isValid = false;
+        }
+
+        const subjectInput = document.getElementById('contact-subject');
+        if (!subjectInput.value.trim()) {
+          showError('subject-error', subjectInput);
+          isValid = false;
+        }
+
+        const messageInput = document.getElementById('contact-message');
+        if (!messageInput.value.trim()) {
+          showError('message-error', messageInput);
+          isValid = false;
+        }
+
+        if (!isValid) return;
+
+        // Populate success message
+        document.getElementById('success-sender-name').textContent = nameInput.value.trim();
+
+        // Switch to confirmation view
+        form.style.display = 'none';
+        successBox.style.display = 'block';
+        successBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+
+      if (sendAnotherBtn) {
+        sendAnotherBtn.addEventListener('click', () => {
+          form.reset();
+          form.style.display = 'block';
+          successBox.style.display = 'none';
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
+    }
+
+    function showError(errorId, inputElement) {
+      const errEl = document.getElementById(errorId);
+      if (errEl) errEl.classList.add('visible');
+      if (inputElement) inputElement.classList.add('invalid');
+    }
+
+    function clearErrors() {
+      document.querySelectorAll('.field-error').forEach(el => el.classList.remove('visible'));
+      document.querySelectorAll('.form-input, .form-select, .form-textarea').forEach(el => el.classList.remove('invalid'));
+    }
+  </script>
+</body>
+</html>

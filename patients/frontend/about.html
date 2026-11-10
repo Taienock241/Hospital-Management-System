@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us | Hopewell Health Care</title>
+
+  <style>
+    /* ==========================================================================
+       1. Design Tokens & CSS Variables (Matches Site-wide Soft Monochrome)
+       ========================================================================== */
+    :root {
+      --color-primary: #1f2428;
+      --color-primary-dark: #111417;
+      --color-primary-light: #424a52;
+      
+      --color-accent: #2d3339;
+      --color-accent-subtle: #f3f5f7;
+      --color-accent-border: #d0d5dd;
+      
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-text: #24292e;
+      --color-text-muted: #64748b;
+      --color-border: #e2e8f0;
+      --color-border-dark: #cbd5e1;
+      
+      --color-success: #059669;
+      --color-success-bg: #ecfdf5;
+      --color-success-border: #a7f3d0;
+
+      --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-family-heading: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2rem;
+      --space-2xl: 3rem;
+      --space-3xl: 4.5rem;
+
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
+
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-full: 9999px;
+
+      --container-max: 1200px;
+    }
+
+    /* Base Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-family-base);
+      color: var(--color-text);
+      background-color: var(--color-bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .container {
+      width: 100%;
+      max-width: var(--container-max);
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: var(--space-lg);
+      padding-right: var(--space-lg);
+    }
+
+    /* ==========================================================================
+       2. Reusable Buttons & Badges
+       ========================================================================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+      padding: 0.75rem 1.4rem;
+      font-size: 0.92rem;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.1s ease;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background-color: var(--color-primary-dark);
+      border-color: var(--color-primary-dark);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: #333a42;
+      border-color: #333a42;
+      color: #ffffff;
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border-color: var(--color-primary-dark);
+      color: var(--color-primary-dark);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--color-primary-dark);
+      color: #ffffff;
+    }
+
+    .demo-pill {
+      display: inline-block;
+      background-color: var(--color-accent-subtle);
+      color: var(--color-primary);
+      border: 1px solid var(--color-border);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-full);
+      margin-bottom: var(--space-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ==========================================================================
+       3. Utility Bar & Main Site Header
+       ========================================================================== */
+    .utility-bar {
+      background-color: #f1f4f8;
+      color: #475569;
+      font-size: 0.85rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .utility-bar .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .utility-links,
+    .utility-emergency {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      list-style: none;
+    }
+
+    .utility-bar a {
+      color: #334155;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.15s ease;
+    }
+
+    .utility-bar a:hover {
+      color: var(--color-primary-dark);
+      text-decoration: underline;
+    }
+
+    .emergency-tag {
+      color: #b91c1c;
+      font-weight: 700;
+      border-right: 1px solid var(--color-border);
+      padding-right: var(--space-md);
+    }
+
+    .site-header {
+      background-color: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .site-header .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 74px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background-color: var(--color-primary-dark);
+      color: #ffffff;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      font-weight: 800;
+    }
+
+    .brand-name {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-sub {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      letter-spacing: 0.05em;
+      font-weight: 600;
+      display: block;
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      list-style: none;
+    }
+
+    .nav-link {
+      position: relative;
+      font-weight: 600;
+      color: var(--color-text);
+      text-decoration: none;
+      font-size: 0.95rem;
+      padding: 0.55rem 0.85rem;
+      border-radius: var(--radius-sm);
+      transition: color 0.2s ease, background-color 0.2s ease, transform 0.15s ease;
+      display: inline-block;
+    }
+
+    .nav-link:hover {
+      color: var(--color-primary-dark);
+      background-color: #f1f5f9;
+      transform: translateY(-1px);
+    }
+
+    .nav-link::after {
+      content: "";
+      position: absolute;
+      bottom: 4px;
+      left: 0.85rem;
+      right: 0.85rem;
+      height: 2px;
+      background-color: var(--color-primary-dark);
+      border-radius: var(--radius-full);
+      transform: scaleX(0);
+      transform-origin: center;
+      transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-link:hover::after,
+    .nav-link.active::after {
+      transform: scaleX(1);
+    }
+
+    .nav-link.active {
+      color: var(--color-primary-dark);
+      background-color: #f8fafc;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .mobile-nav-toggle {
+      display: none;
+      background: transparent;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-size: 1.4rem;
+      color: var(--color-primary-dark);
+      cursor: pointer;
+      padding: 0.35rem 0.6rem;
+      line-height: 1;
+    }
+
+    /* ==========================================================================
+       4. About Page Sections
+       ========================================================================== */
+    .about-hero {
+      background-color: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-3xl) 0 var(--space-2xl);
+    }
+
+    .about-hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: var(--space-2xl);
+      align-items: center;
+    }
+
+    .about-hero h1 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: var(--space-md);
+    }
+
+    .about-hero p {
+      color: var(--color-text-muted);
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: var(--space-lg);
+    }
+
+    .hero-stat-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-md);
+      background-color: #f8fafc;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-md) var(--space-lg);
+    }
+
+    .hero-stat-num {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      line-height: 1;
+    }
+
+    .hero-stat-text {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      line-height: 1.35;
+    }
+
+    .about-hero-img-wrap {
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-md);
+      position: relative;
+    }
+
+    .about-hero-img {
+      width: 100%;
+      height: 340px;
+      object-fit: cover;
+    }
+
+    /* Mission, Vision & Values */
+    .mission-section {
+      padding: var(--space-3xl) 0;
+      background-color: var(--color-bg);
+    }
+
+    .mission-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-xl);
+    }
+
+    .mission-card {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-xl);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+
+    .mission-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--color-primary-dark);
+    }
+
+    .mission-card-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-xs);
+    }
+
+    .mission-card h3 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      margin-bottom: var(--space-sm);
+    }
+
+    .mission-card p {
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+      line-height: 1.55;
+      margin-bottom: 0;
+    }
+
+    /* Core Clinical Heritage Strip */
+    .heritage-section {
+      background-color: var(--color-surface);
+      border-top: 1px solid var(--color-border);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-3xl) 0;
+    }
+
+    .heritage-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-2xl);
+      align-items: center;
+    }
+
+    .heritage-content h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      letter-spacing: -0.02em;
+      margin-bottom: var(--space-md);
+    }
+
+    .heritage-content p {
+      font-size: 0.95rem;
+      color: var(--color-text-muted);
+      line-height: 1.6;
+      margin-bottom: var(--space-md);
+    }
+
+    .timeline-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+      margin-top: var(--space-lg);
+    }
+
+    .timeline-item {
+      display: flex;
+      gap: var(--space-md);
+      align-items: flex-start;
+    }
+
+    .timeline-year {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      background-color: #f1f5f9;
+      border: 1px solid var(--color-border);
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-sm);
+      min-width: 65px;
+      text-align: center;
+    }
+
+    .timeline-desc h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--color-primary-dark);
+      margin-bottom: 0.15rem;
+    }
+
+    .timeline-desc p {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      line-height: 1.4;
+      margin-bottom: 0;
+    }
+
+    /* Leadership Team */
+    .leadership-section {
+      padding: var(--space-3xl) 0;
+      background-color: var(--color-bg);
+    }
+
+    .section-center-head {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto var(--space-2xl);
+    }
+
+    .section-center-head h2 {
+      font-size: 1.95rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      margin-bottom: 0.35rem;
+    }
+
+    .section-center-head p {
+      color: var(--color-text-muted);
+      font-size: 0.95rem;
+    }
+
+    .leadership-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-xl);
+    }
+
+    .leader-card {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .leader-img-wrapper {
+      width: 100%;
+      height: 220px;
+      overflow: hidden;
+      background-color: #f1f5f9;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .leader-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 20%;
+    }
+
+    .leader-body {
+      padding: var(--space-lg);
+    }
+
+    .leader-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      margin-bottom: 0.2rem;
+    }
+
+    .leader-name {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      margin-bottom: 0.4rem;
+    }
+
+    .leader-bio {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      line-height: 1.5;
+      margin-bottom: 0;
+    }
+
+    /* Facility Quality & Patient Rights Strip */
+    .quality-banner {
+      background-color: #ffffff;
+      border-top: 1px solid var(--color-border);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-2xl) 0;
+    }
+
+    .quality-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-lg);
+      text-align: center;
+    }
+
+    .quality-item h4 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      margin-bottom: 0.2rem;
+    }
+
+    .quality-item p {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0;
+    }
+
+    /* ==========================================================================
+       5. Site Footer (Solid Deep Black)
+       ========================================================================== */
+    .site-footer {
+      background-color: #0f1115;
+      color: #94a3b8;
+      padding: var(--space-3xl) 0 var(--space-lg);
+      border-top: 1px solid #1e293b;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1.2fr;
+      gap: var(--space-2xl);
+      margin-bottom: var(--space-2xl);
+    }
+
+    .footer-col h4 {
+      color: #ffffff;
+      font-size: 1.05rem;
+      margin-bottom: var(--space-md);
+      font-weight: 700;
+    }
+
+    .footer-links {
+      list-style: none;
+    }
+
+    .footer-links li {
+      margin-bottom: var(--space-xs);
+    }
+
+    .footer-links a {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.15s ease;
+    }
+
+    .footer-links a:hover {
+      color: #ffffff;
+      text-decoration: underline;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid #1e293b;
+      padding-top: var(--space-lg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+
+    /* ==========================================================================
+       6. Responsive Breakpoints
+       ========================================================================== */
+    @media (max-width: 992px) {
+      .about-hero-grid,
+      .heritage-grid {
+        grid-template-columns: 1fr;
+      }
+      .mission-grid,
+      .leadership-cards-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .quality-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-xl);
+      }
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .mobile-nav-toggle {
+        display: block;
+      }
+      .nav-menu {
+        position: absolute;
+        top: 74px;
+        left: 0;
+        right: 0;
+        background-color: var(--color-surface);
+        border-bottom: 2px solid var(--color-primary-dark);
+        flex-direction: column;
+        align-items: flex-start;
+        padding: var(--space-lg);
+        box-shadow: var(--shadow-md);
+        display: none;
+      }
+      .nav-menu.is-active {
+        display: flex;
+      }
+      .mission-grid,
+      .leadership-cards-grid {
+        grid-template-columns: 1fr;
+      }
+      .utility-bar .container {
+        flex-direction: column;
+        gap: var(--space-xs);
+        text-align: center;
+      }
+      .emergency-tag {
+        border-right: none;
+        padding-right: 0;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+      .footer-bottom {
+        flex-direction: column;
+        gap: var(--space-sm);
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Utility Bar -->
+  <aside class="utility-bar" aria-label="Quick Access Bar">
+    <div class="container">
+      <div class="utility-emergency">
+        <span class="emergency-tag">Medical Emergency: Call 911 immediately</span>
+        <span>General Inquiry: (800) 555-0199</span>
+      </div>
+      <ul class="utility-links">
+        <li><a href="queue.html">Track Wait Time</a></li>
+        <li><a href="login.html">Patient Sign In</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- Primary Site Header & Navigation -->
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="brand" aria-label="Hopewell Health Care Home">
+        <div class="brand-icon" aria-hidden="true">+</div>
+        <div class="brand-text">
+          <span class="brand-name">Hopewell</span>
+          <span class="brand-sub">Health Care System</span>
+        </div>
+      </a>
+
+      <!-- Main Navigation Menu -->
+      <nav aria-label="Primary Navigation">
+        <ul class="nav-menu" id="primary-nav">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="doctors.html" class="nav-link">Find a Doctor</a></li>
+          <li><a href="departments.html" class="nav-link">Departments</a></li>
+          <li><a href="appointments.html" class="nav-link">Book Appointment</a></li>
+          <li><a href="queue.html" class="nav-link">Live Queue</a></li>
+          <li><a href="about.html" class="nav-link active">About</a></li>
+          <li><a href="contact.html" class="nav-link">Contact</a></li>
+        </ul>
+      </nav>
+
+      <!-- Action Button & Mobile Nav Trigger -->
+      <div class="nav-actions">
+        <a href="appointments.html" class="btn btn-primary">Book Now</a>
+        <button class="mobile-nav-toggle" id="mobile-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Toggle navigation menu">
+          &#9776;
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- About Hero Section -->
+    <section class="about-hero">
+      <div class="container">
+        <div class="about-hero-grid">
+          <div>
+            <span class="demo-pill">About Hopewell Health Care</span>
+            <h1>Dedicated to patient-centered clinical excellence.</h1>
+            <p>
+              Hopewell Health Care brings together board-certified medical specialists, integrated diagnostic facilities, and transparent queue tracking technology to ensure timely, dignified medical consultations.
+            </p>
+            <div class="hero-stat-badge">
+              <span class="hero-stat-num">40+</span>
+              <span class="hero-stat-text">Years of combined academic research and multidisciplinary patient advocacy across our regional centers.</span>
+            </div>
+          </div>
+
+          <div class="about-hero-img-wrap">
+            <img 
+              src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=800&q=80" 
+              alt="Hopewell Health Care hospital rotunda and modern outpatient care facilities"
+              class="about-hero-img">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mission, Vision & Core Values -->
+    <section class="mission-section" aria-label="Mission, Vision and Core Values">
+      <div class="container">
+        <div class="mission-grid">
+          
+          <article class="mission-card">
+            <div>
+              <span class="mission-card-badge">Our Mission</span>
+              <h3>Evidence-Based Patient Care</h3>
+              <p>
+                To provide compassionate, scientifically grounded outpatient and specialty care where patient time is respected and every diagnostic decision is guided by clinical rigor.
+              </p>
+            </div>
+          </article>
+
+          <article class="mission-card">
+            <div>
+              <span class="mission-card-badge">Our Vision</span>
+              <h3>Transparent Healthcare Flow</h3>
+              <p>
+                To eliminate archaic hospital waiting rooms through digital queue synchronization, seamless doctor scheduling, and collaborative medical team consultations.
+              </p>
+            </div>
+          </article>
+
+          <article class="mission-card">
+            <div>
+              <span class="mission-card-badge">Our Pledge</span>
+              <h3>Multidisciplinary Integrity</h3>
+              <p>
+                To ensure complex diagnoses are reviewed across departments—combining cardiology, neurology, surgery, and diagnostics for unified patient wellness.
+              </p>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Institutional Milestones & Heritage -->
+    <section class="heritage-section" aria-label="Hospital Heritage and Evolution">
+      <div class="container">
+        <div class="heritage-grid">
+          <div class="heritage-content">
+            <span class="demo-pill">Our Clinical Heritage</span>
+            <h2>Grounded in clinical innovation and continuous improvement.</h2>
+            <p>
+              From our beginnings as a community outpatient pavilion to our current standing as an integrated healthcare network, Hopewell has maintained a single standard: prioritize the patient's well-being above administrative complexity.
+            </p>
+            <p>
+              Today, our medical center coordinates over 14,000 outpatient consultations annually with real-time queue tracking and immediate digital appointment access.
+            </p>
+
+            <ul class="timeline-list">
+              <li class="timeline-item">
+                <span class="timeline-year">1986</span>
+                <div class="timeline-desc">
+                  <h4>Foundation as East Pavilion Clinic</h4>
+                  <p>Established with primary internal medicine and diagnostic cardiac wellness programs.</p>
+                </div>
+              </li>
+              <li class="timeline-item">
+                <span class="timeline-year">2008</span>
+                <div class="timeline-desc">
+                  <h4>Expansion into Surgical & Neurological Centers</h4>
+                  <p>Inaugurated dedicated suites for orthopedic arthroscopy and advanced neurology therapies.</p>
+                </div>
+              </li>
+              <li class="timeline-item">
+                <span class="timeline-year">2026</span>
+                <div class="timeline-desc">
+                  <h4>Live Outpatient Queue System Launch</h4>
+                  <p>Pioneered transparent real-time wait tracking and unified online appointment management.</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <div style="border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--color-border); box-shadow: var(--shadow-sm);">
+              <img 
+                src="https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=800&q=80" 
+                alt="Hopewell clinical wing exterior and emergency plaza">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Clinical Leadership Team -->
+    <section class="leadership-section" aria-label="Hospital Clinical Leadership">
+      <div class="container">
+        <div class="section-center-head">
+          <span class="demo-pill">Executive Medical Leadership</span>
+          <h2>Guided by experienced clinicians and researchers</h2>
+          <p>Meet the department leaders who guide our clinical protocols and standards of patient care.</p>
+        </div>
+
+        <div class="leadership-cards-grid">
+          
+          <article class="leader-card">
+            <div class="leader-img-wrapper">
+              <img 
+                src="https://images.unsplash.com/photo-1666886573681-a8fbe983a3fd?auto=format&fit=crop&w=400&q=80" 
+                alt="Dr. Eleanor Kim, Chief Medical Officer"
+                class="leader-img">
+            </div>
+            <div class="leader-body">
+              <div class="leader-title">Chief Medical Officer &bull; Cardiology</div>
+              <h3 class="leader-name">Dr. Eleanor Kim, MD, FACC</h3>
+              <p class="leader-bio">
+                Harvard Medical School alumna with 14 years in preventative cardiology and outpatient system design.
+              </p>
+            </div>
+          </article>
+
+          <article class="leader-card">
+            <div class="leader-img-wrapper">
+              <img 
+                src="https://images.unsplash.com/photo-1666886573681-a8fbe983a3fd?auto=format&fit=crop&w=400&q=80" 
+                alt="Dr. Marcus Reynolds, Director of Clinical Neurosciences"
+                class="leader-img">
+            </div>
+            <div class="leader-body">
+              <div class="leader-title">Director of Clinical Neurosciences</div>
+              <h3 class="leader-name">Dr. Marcus Reynolds, MD</h3>
+              <p class="leader-bio">
+                Johns Hopkins fellow focused on acute neurological management and multidisciplinary rehabilitation care.
+              </p>
+            </div>
+          </article>
+
+          <article class="leader-card">
+            <div class="leader-img-wrapper">
+              <img 
+                src="https://images.unsplash.com/photo-1536064479547-7ee40b74b807?auto=format&fit=crop&w=400&q=80" 
+                alt="Dr. Aisha Patel, Head of Pediatric Care"
+                class="leader-img">
+            </div>
+            <div class="leader-body">
+              <div class="leader-title">Chair of Pediatric Medicine</div>
+              <h3 class="leader-name">Dr. Aisha Patel, MBBS</h3>
+              <p class="leader-bio">
+                King’s College London graduate championing family-first pediatric care and early childhood wellness.
+              </p>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Hospital Quality & Standards Trust Strip -->
+    <section class="quality-banner" aria-label="Clinical Metrics and Quality Accreditations">
+      <div class="container">
+        <div class="quality-grid">
+          <div class="quality-item">
+            <h4>100%</h4>
+            <p>Board-Certified Physicians</p>
+          </div>
+          <div class="quality-item">
+            <h4>18 min</h4>
+            <p>Average Clinic Wait Window</p>
+          </div>
+          <div class="quality-item">
+            <h4>99.4%</h4>
+            <p>Reported Patient Care Rating</p>
+          </div>
+          <div class="quality-item">
+            <h4>24/7</h4>
+            <p>Continuous Emergency Intake</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Site Footer (Solid Deep Black) -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>Hopewell Health Care</h4>
+          <p>
+            An integrated healthcare management system engineered for streamlined patient appointment access, outpatient consultation routing, and real-time clinic queue tracking.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Patient Services</h4>
+          <ul class="footer-links">
+            <li><a href="appointments.html">Book Appointment</a></li>
+            <li><a href="queue.html">Check Queue Position</a></li>
+            <li><a href="doctors.html">Doctor Directory</a></li>
+            <li><a href="departments.html">Clinical Departments</a></li>
+            <li><a href="patient-dashboard.html">Patient Dashboard</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Hospital & Care</h4>
+          <ul class="footer-links">
+            <li><a href="about.html">About Hopewell</a></li>
+            <li><a href="contact.html">Hours & Directions</a></li>
+            <li><a href="contact.html">Send Inquiry</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Emergency & Contacts</h4>
+          <p>Emergency Department: <strong>Open 24/7</strong></p>
+          <p>General Reception: (800) 555-0199</p>
+          <p>Clinic Hours: 08:00 – 17:00 Mon–Sat</p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 Hopewell Health Care System. All rights reserved.</p>
+        <p>Providing trusted, patient-first clinical excellence across all outpatient centers.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initMobileNavigation();
+    });
+
+    /**
+     * Mobile Menu Navigation Handler
+     */
+    function initMobileNavigation() {
+      const toggleBtn = document.getElementById('mobile-toggle');
+      const navMenu = document.getElementById('primary-nav');
+
+      if (!toggleBtn || !navMenu) return;
+
+      toggleBtn.addEventListener('click', () => {
+        const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+        toggleBtn.setAttribute('aria-expanded', String(!isExpanded));
+        navMenu.classList.toggle('is-active');
+      });
+
+      document.addEventListener('click', (event) => {
+        if (!toggleBtn.contains(event.target) && !navMenu.contains(event.target)) {
+          navMenu.classList.remove('is-active');
+          toggleBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+  </script>
+</body>
+</html>

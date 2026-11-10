@@ -274,12 +274,13 @@ try {
         $name = requiredString($input, 'full_name', 160);
         $phone = requiredString($input, 'phone', 30);
         $gender = strtolower(trim((string)($input['gender'] ?? 'unspecified')));
-        if (!in_array($gender, ['female', 'male', 'other', 'unspecified'], true)) respond(422, ['error' => 'Choose a valid gender value.']);
+        if (!in_array($gender, ['female', 'male', 'nonbinary', 'other', 'unspecified'], true)) respond(422, ['error' => 'Choose a valid gender value.']);
         $dob = trim((string)($input['date_of_birth'] ?? '')) ?: null;
         $blood = strtoupper(trim((string)($input['blood_group'] ?? ''))) ?: null;
         $number = 'P-' . strtoupper(bin2hex(random_bytes(4)));
-        $stmt = $db->prepare('INSERT INTO patients (patient_number, full_name, phone, gender, date_of_birth, blood_group) VALUES (?, ?, ?, ?, ?, ?) RETURNING patient_id, patient_number, full_name, phone, gender, date_of_birth::text AS date_of_birth, blood_group');
-        $stmt->execute([$number, $name, $phone, $gender, $dob, $blood]);
+        [$firstName, $lastName] = array_pad(preg_split('/\s+/', $name, 2) ?: [$name], 2, '');
+        $stmt = $db->prepare('INSERT INTO patients (patient_number, full_name, first_name, last_name, phone, gender, date_of_birth, blood_group) VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING patient_id, patient_number, full_name, phone, gender, date_of_birth::text AS date_of_birth, blood_group');
+        $stmt->execute([$number, $name, $firstName, $lastName, $phone, $gender, $dob, $blood]);
         $patient = $stmt->fetch();
         audit($db, (int)$user['id'], 'create', 'patient', (int)$patient['patient_id'], null, $patient);
         respond(201, ['item' => $patient]);
@@ -458,15 +459,28 @@ try {
         $check->execute([(int)($input['department_id'] ?? 0), (int)($input['patient_id'] ?? 0)]);
         if (!$check->fetchColumn()) respond(422, ['error' => 'Choose an active patient and department.']);
         if (!empty($input['doctor_staff_id'])) {
+            $db->beginTransaction();
+            $doctorLock = $db->prepare('SELECT staff_id FROM staff_profiles WHERE staff_id = ? FOR UPDATE');
+            $doctorLock->execute([(int)$input['doctor_staff_id']]);
             $doctorCheck = $db->prepare("SELECT 1 FROM staff_profiles s JOIN users u USING (user_id) JOIN roles r USING (role_id) WHERE s.staff_id = ? AND s.department_id = ? AND s.availability = 'on_duty' AND u.is_active AND r.role_name = 'doctor'");
             $doctorCheck->execute([(int)$input['doctor_staff_id'], (int)$input['department_id']]);
-            if (!$doctorCheck->fetchColumn()) respond(422, ['error' => 'Choose an on-duty doctor from the selected department.']);
+            if (!$doctorCheck->fetchColumn()) {
+                $db->rollBack();
+                respond(422, ['error' => 'Choose an on-duty doctor from the selected department.']);
+            }
+            $conflict = $db->prepare("SELECT appointment_id FROM appointments WHERE doctor_staff_id = ? AND scheduled_at = ?::timestamptz AND status IN ('pending', 'confirmed') LIMIT 1");
+            $conflict->execute([(int)$input['doctor_staff_id'], $scheduled]);
+            if ($conflict->fetchColumn()) {
+                $db->rollBack();
+                respond(409, ['error' => 'That appointment time is already booked.']);
+            }
         }
         $number = 'APT-' . strtoupper(bin2hex(random_bytes(4)));
         $stmt = $db->prepare("INSERT INTO appointments (appointment_number, patient_id, department_id, doctor_staff_id, scheduled_at, status, created_by) VALUES (?, ?, ?, ?, ?::timestamptz, 'pending', ?) RETURNING appointment_id, appointment_number, status");
         $stmt->execute([$number, (int)($input['patient_id'] ?? 0), (int)($input['department_id'] ?? 0), !empty($input['doctor_staff_id']) ? (int)$input['doctor_staff_id'] : null, $scheduled, $user['id']]);
         $item = $stmt->fetch();
         audit($db, (int)$user['id'], 'create', 'appointment', (int)$item['appointment_id'], null, $item);
+        if (!empty($input['doctor_staff_id'])) $db->commit();
         respond(201, ['item' => $item]);
     }
 
@@ -476,11 +490,29 @@ try {
         $id = idParam($segments[1]);
         $status = strtolower((string)(body()['status'] ?? ''));
         if (!in_array($status, ['pending', 'confirmed', 'completed', 'cancelled', 'no_show'], true)) respond(422, ['error' => 'Invalid appointment status.']);
+        $db->beginTransaction();
+        $previous = $db->prepare('SELECT status FROM appointments WHERE appointment_id = ? FOR UPDATE');
+        $previous->execute([$id]);
+        $oldStatus = $previous->fetchColumn();
+        if ($oldStatus === false) { $db->rollBack(); respond(404, ['error' => 'Appointment not found.']); }
         $stmt = $db->prepare('UPDATE appointments SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE appointment_id = ? RETURNING appointment_id, status');
         $stmt->execute([$status, $id]);
         $item = $stmt->fetch();
-        if (!$item) respond(404, ['error' => 'Appointment not found.']);
+        if (!$item) { $db->rollBack(); respond(404, ['error' => 'Appointment not found.']); }
+        $queueStatus = match ($status) { 'completed' => 'served', 'cancelled' => 'cancelled', 'no_show' => 'no_show', default => null };
+        if ($queueStatus !== null) {
+            $queueFind = $db->prepare('SELECT queue_ticket_id, status FROM queue_tickets WHERE appointment_id = ? FOR UPDATE');
+            $queueFind->execute([$id]);
+            $ticket = $queueFind->fetch();
+            if ($ticket) {
+                $queueUpdate = $db->prepare('UPDATE queue_tickets SET status = ?, updated_at = CURRENT_TIMESTAMP, served_at = CASE WHEN ? = \'served\' THEN CURRENT_TIMESTAMP ELSE served_at END WHERE queue_ticket_id = ?');
+                $queueUpdate->execute([$queueStatus, $queueStatus, $ticket['queue_ticket_id']]);
+                $event = $db->prepare('INSERT INTO queue_ticket_events (queue_ticket_id, old_status, new_status, changed_by, note) VALUES (?, ?, ?, ?, ?)');
+                $event->execute([$ticket['queue_ticket_id'], $ticket['status'], $queueStatus, $user['id'], 'Appointment status changed by staff']);
+            }
+        }
         audit($db, (int)$user['id'], 'update_status', 'appointment', $id, null, $item);
+        $db->commit();
         respond(200, ['item' => $item]);
     }
 
@@ -543,10 +575,11 @@ try {
         if (!in_array($status, $valid, true)) respond(422, ['error' => 'Invalid queue status.']);
         $db->beginTransaction();
         try {
-            $find = $db->prepare('SELECT status FROM queue_tickets WHERE queue_ticket_id = ? FOR UPDATE');
+            $find = $db->prepare('SELECT status, appointment_id FROM queue_tickets WHERE queue_ticket_id = ? FOR UPDATE');
             $find->execute([$id]);
-            $oldStatus = $find->fetchColumn();
-            if ($oldStatus === false) { $db->rollBack(); respond(404, ['error' => 'Queue ticket not found.']); }
+            $ticketBefore = $find->fetch();
+            if (!$ticketBefore) { $db->rollBack(); respond(404, ['error' => 'Queue ticket not found.']); }
+            $oldStatus = $ticketBefore['status'];
             $timeColumn = match ($status) {
                 'called' => 'called_at',
                 'in_consultation' => 'service_started_at',
@@ -561,6 +594,12 @@ try {
             $item = $update->fetch();
             $event = $db->prepare('INSERT INTO queue_ticket_events (queue_ticket_id, old_status, new_status, changed_by) VALUES (?, ?, ?, ?)');
             $event->execute([$id, $oldStatus, $status, $user['id']]);
+            if ($ticketBefore['appointment_id'] !== null) {
+                $appointmentStatus = match ($status) { 'served' => 'completed', 'cancelled' => 'cancelled', 'no_show' => 'no_show', default => null };
+                if ($appointmentStatus !== null) {
+                    $db->prepare('UPDATE appointments SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE appointment_id = ?')->execute([$appointmentStatus, $ticketBefore['appointment_id']]);
+                }
+            }
             audit($db, (int)$user['id'], 'update_status', 'queue_ticket', $id, ['status' => $oldStatus], ['status' => $status]);
             $db->commit();
             respond(200, ['item' => $item]);

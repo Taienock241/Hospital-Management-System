@@ -6,7 +6,7 @@
 **/secrets.*
 **/*secret*
 **/*credential*
-backend/scripts/hash-password.php
+**/scripts/hash-password.php
 **/*password-hash*
 *.pgpass
 pgpass.conf
@@ -20,7 +20,7 @@ pgpass.conf
 *.local
 *.local.*
 
-# Database scripts, exports, and backups (keep these out of Git)
+# Database scripts, exports, and backups (kept out of Git by project choice)
 *.sql
 *.sql.gz
 *.dump

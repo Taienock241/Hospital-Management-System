@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Find a Doctor & Specialists | Hopewell Health Care</title>
+  
+  <style>
+    /* ==========================================================================
+       1. Design Tokens & CSS Variables (Matches index.html Soft Monochrome)
+       ========================================================================== */
+    :root {
+      --color-primary: #1f2428;
+      --color-primary-dark: #111417;
+      --color-primary-light: #424a52;
+      
+      --color-accent: #2d3339;
+      --color-accent-subtle: #f3f5f7;
+      --color-accent-border: #d0d5dd;
+      
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-text: #24292e;
+      --color-text-muted: #64748b;
+      --color-border: #e2e8f0;
+      --color-border-dark: #cbd5e1;
+      
+      --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-family-heading: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2rem;
+      --space-2xl: 3rem;
+      --space-3xl: 4.5rem;
+
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
+
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-full: 9999px;
+
+      --container-max: 1200px;
+    }
+
+    /* Base Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-family-base);
+      color: var(--color-text);
+      background-color: var(--color-bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .container {
+      width: 100%;
+      max-width: var(--container-max);
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: var(--space-lg);
+      padding-right: var(--space-lg);
+    }
+
+    /* ==========================================================================
+       2. Reusable Buttons & Badges
+       ========================================================================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+      padding: 0.7rem 1.25rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.1s ease;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background-color: var(--color-primary-dark);
+      border-color: var(--color-primary-dark);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: #333a42;
+      border-color: #333a42;
+      color: #ffffff;
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border-color: var(--color-primary-dark);
+      color: var(--color-primary-dark);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--color-primary-dark);
+      color: #ffffff;
+    }
+
+    .demo-pill {
+      display: inline-block;
+      background-color: var(--color-accent-subtle);
+      color: var(--color-primary);
+      border: 1px solid var(--color-border);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-full);
+      margin-bottom: var(--space-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ==========================================================================
+       3. Header & Utility Bar
+       ========================================================================== */
+    .utility-bar {
+      background-color: #f1f4f8;
+      color: #475569;
+      font-size: 0.85rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .utility-bar .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .utility-links,
+    .utility-emergency {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      list-style: none;
+    }
+
+    .utility-bar a {
+      color: #334155;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.15s ease;
+    }
+
+    .utility-bar a:hover {
+      color: var(--color-primary-dark);
+      text-decoration: underline;
+    }
+
+    .emergency-tag {
+      color: #b91c1c;
+      font-weight: 700;
+      border-right: 1px solid var(--color-border);
+      padding-right: var(--space-md);
+    }
+
+    .site-header {
+      background-color: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .site-header .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 74px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background-color: var(--color-primary-dark);
+      color: #ffffff;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      font-weight: 800;
+    }
+
+    .brand-name {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-sub {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      letter-spacing: 0.05em;
+      font-weight: 600;
+      display: block;
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      list-style: none;
+    }
+
+    .nav-link {
+      position: relative;
+      font-weight: 600;
+      color: var(--color-text);
+      text-decoration: none;
+      font-size: 0.95rem;
+      padding: 0.55rem 0.85rem;
+      border-radius: var(--radius-sm);
+      transition: color 0.2s ease, background-color 0.2s ease, transform 0.15s ease;
+      display: inline-block;
+    }
+
+    .nav-link:hover {
+      color: var(--color-primary-dark);
+      background-color: #f1f5f9;
+      transform: translateY(-1px);
+    }
+
+    .nav-link::after {
+      content: "";
+      position: absolute;
+      bottom: 4px;
+      left: 0.85rem;
+      right: 0.85rem;
+      height: 2px;
+      background-color: var(--color-primary-dark);
+      border-radius: var(--radius-full);
+      transform: scaleX(0);
+      transform-origin: center;
+      transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-link:hover::after,
+    .nav-link.active::after {
+      transform: scaleX(1);
+    }
+
+    .nav-link.active {
+      color: var(--color-primary-dark);
+      background-color: #f8fafc;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .mobile-nav-toggle {
+      display: none;
+      background: transparent;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-size: 1.4rem;
+      color: var(--color-primary-dark);
+      cursor: pointer;
+      padding: 0.35rem 0.6rem;
+      line-height: 1;
+    }
+
+    /* ==========================================================================
+       4. Page Banner & Search / Filter Controls
+       ========================================================================== */
+    .page-banner {
+      background-color: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-2xl) 0 var(--space-xl);
+    }
+
+    .page-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+      color: var(--color-text-muted);
+      font-size: 1.05rem;
+      max-width: 720px;
+      margin-bottom: var(--space-lg);
+    }
+
+    .directory-search-wrapper {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .search-row {
+      display: flex;
+      gap: var(--space-md);
+      flex-wrap: wrap;
+    }
+
+    .search-input-box {
+      flex: 2;
+      min-width: 280px;
+      position: relative;
+    }
+
+    .search-input-box input {
+      width: 100%;
+      padding: 0.85rem 1rem 0.85rem 2.5rem;
+      font-size: 0.95rem;
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      background-color: #fafafa;
+      color: var(--color-text);
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+
+    .search-input-box input:focus {
+      outline: none;
+      border-color: var(--color-primary-dark);
+      background-color: #ffffff;
+    }
+
+    .search-icon-symbol {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-text-muted);
+      font-size: 1rem;
+      pointer-events: none;
+    }
+
+    .filter-select-box {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .filter-select-box select {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      font-size: 0.95rem;
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      background-color: #fafafa;
+      color: var(--color-text);
+      cursor: pointer;
+    }
+
+    .filter-select-box select:focus {
+      outline: none;
+      border-color: var(--color-primary-dark);
+      background-color: #ffffff;
+    }
+
+    /* Category Filter Pills */
+    .filter-pills-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: var(--space-md);
+      overflow-x: auto;
+      padding-bottom: 0.25rem;
+    }
+
+    .filter-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      margin-right: 0.25rem;
+    }
+
+    .filter-pill-btn {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      color: var(--color-text);
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 0.4rem 0.85rem;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .filter-pill-btn:hover {
+      background-color: #f1f5f9;
+      border-color: var(--color-border-dark);
+    }
+
+    .filter-pill-btn.active {
+      background-color: var(--color-primary-dark);
+      border-color: var(--color-primary-dark);
+      color: #ffffff;
+    }
+
+    /* ==========================================================================
+       5. Doctor Directory Grid & Cards (Compact, Neat Style)
+       ========================================================================== */
+    .directory-meta-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: var(--space-xl) 0 var(--space-md);
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+    }
+
+    .doctor-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.25rem;
+      margin-bottom: var(--space-3xl);
+    }
+
+    .doctor-card {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .doctor-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--color-primary-dark);
+      box-shadow: var(--shadow-md);
+    }
+
+    .doctor-card-photo-wrapper {
+      position: relative;
+      width: 100%;
+      height: 145px;
+      overflow: hidden;
+      background-color: #f1f5f9;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .doctor-card-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 20%;
+    }
+
+    .doctor-card-badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background-color: rgba(255, 255, 255, 0.96);
+      color: #059669;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: var(--radius-full);
+      border: 1px solid #d1fae5;
+    }
+
+    .doctor-card-room {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background-color: rgba(17, 20, 23, 0.85);
+      color: #ffffff;
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 0.15rem 0.45rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .doctor-card-body {
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .doctor-specialty {
+      color: var(--color-primary-dark);
+      font-weight: 700;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.2rem;
+    }
+
+    .doctor-card-body h3 {
+      font-size: 1.05rem;
+      line-height: 1.25;
+      margin-bottom: 0.2rem;
+      color: var(--color-primary-dark);
+    }
+
+    .doctor-experience {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0.45rem;
+    }
+
+    .doctor-focus {
+      font-size: 0.75rem;
+      color: #475569;
+      margin-bottom: 0.65rem;
+      line-height: 1.35;
+    }
+
+    .doctor-availability {
+      font-size: 0.72rem;
+      color: var(--color-text);
+      background-color: var(--color-accent-subtle);
+      padding: 0.4rem 0.55rem;
+      border-radius: var(--radius-sm);
+      margin-bottom: 0.85rem;
+      border-left: 2px solid var(--color-primary-dark);
+      line-height: 1.35;
+    }
+
+    .doctor-card-actions {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .doctor-card-actions .btn {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.82rem;
+    }
+
+    /* ==========================================================================
+       Clinical Excellence & Trust Highlights (New Rich Content)
+       ========================================================================== */
+    .clinical-highlights {
+      background-color: var(--color-surface);
+      border-top: 1px solid var(--color-border);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-2xl) 0;
+      margin-bottom: var(--space-3xl);
+    }
+
+    .highlights-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-xl);
+      text-align: center;
+    }
+
+    .highlight-card {
+      padding: var(--space-md);
+    }
+
+    .highlight-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto var(--space-sm);
+      background-color: #f1f5f9;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      color: var(--color-primary-dark);
+      font-weight: 800;
+    }
+
+    .highlight-stat {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      line-height: 1.1;
+      margin-bottom: 0.25rem;
+    }
+
+    .highlight-label {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: 0.25rem;
+    }
+
+    .highlight-desc {
+      font-size: 0.78rem;
+      color: var(--color-text-muted);
+      line-height: 1.4;
+      margin-bottom: 0;
+    }
+
+    /* Why Hopewell Physicians Lead Care Section */
+    .leadership-section {
+      padding: var(--space-3xl) 0;
+      background-color: #f8fafc;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .leadership-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-2xl);
+      align-items: center;
+    }
+
+    .leadership-content h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      line-height: 1.2;
+      margin-bottom: var(--space-md);
+      letter-spacing: -0.02em;
+    }
+
+    .leadership-content p {
+      color: var(--color-text-muted);
+      font-size: 0.98rem;
+      line-height: 1.65;
+      margin-bottom: var(--space-lg);
+    }
+
+    .pillar-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    .pillar-item {
+      display: flex;
+      gap: var(--space-md);
+      align-items: flex-start;
+    }
+
+    .pillar-bullet {
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+      background-color: var(--color-primary-dark);
+      color: #ffffff;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    .pillar-text h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--color-primary-dark);
+      margin-bottom: 0.2rem;
+    }
+
+    .pillar-text p {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      line-height: 1.45;
+      margin-bottom: 0;
+    }
+
+    .leadership-card-quote {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-xl);
+      box-shadow: var(--shadow-md);
+      position: relative;
+    }
+
+    .quote-badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-sm);
+    }
+
+    .quote-text {
+      font-size: 1.05rem;
+      font-style: italic;
+      color: var(--color-primary-dark);
+      line-height: 1.55;
+      margin-bottom: var(--space-lg);
+    }
+
+    .quote-author {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border-top: 1px solid var(--color-border);
+      padding-top: var(--space-md);
+    }
+
+    .quote-author img {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .quote-author-info h5 {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--color-primary-dark);
+      margin-bottom: 0.1rem;
+    }
+
+    .quote-author-info span {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+    }
+
+    /* Patient Testimonials Strip */
+    .patient-voices-section {
+      padding: var(--space-3xl) 0;
+      background-color: var(--color-surface);
+    }
+
+    .voices-header {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto var(--space-2xl);
+    }
+
+    .voices-header h2 {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      margin-bottom: 0.35rem;
+    }
+
+    .voices-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-lg);
+    }
+
+    .voice-card {
+      background-color: #fafbfc;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .voice-stars {
+      color: #eab308;
+      font-size: 0.95rem;
+      margin-bottom: var(--space-sm);
+      letter-spacing: 2px;
+    }
+
+    .voice-body {
+      font-size: 0.88rem;
+      color: var(--color-text);
+      line-height: 1.5;
+      margin-bottom: var(--space-md);
+    }
+
+    .voice-meta {
+      border-top: 1px solid var(--color-border);
+      padding-top: var(--space-sm);
+      font-size: 0.78rem;
+      color: var(--color-text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .voice-patient {
+      font-weight: 700;
+      color: var(--color-primary-dark);
+    }
+
+    /* Frequently Asked Questions Strip */
+    .faq-section {
+      padding: var(--space-3xl) 0;
+      background-color: #f8fafc;
+      border-top: 1px solid var(--color-border);
+    }
+
+    .faq-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-lg);
+      margin-top: var(--space-xl);
+    }
+
+    .faq-card {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-lg);
+    }
+
+    .faq-card h4 {
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: var(--color-primary-dark);
+      margin-bottom: 0.35rem;
+    }
+
+    .faq-card p {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      line-height: 1.5;
+      margin-bottom: 0;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: var(--space-3xl) var(--space-lg);
+      background-color: var(--color-surface);
+      border: 1px dashed var(--color-border);
+      border-radius: var(--radius-md);
+      grid-column: 1 / -1;
+      display: none;
+    }
+
+    .empty-state h3 {
+      font-size: 1.25rem;
+      color: var(--color-primary-dark);
+      margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+      color: var(--color-text-muted);
+      font-size: 0.95rem;
+      margin-bottom: var(--space-md);
+    }
+
+    /* ==========================================================================
+       6. Site Footer (Solid Deep Black)
+       ========================================================================== */
+    .site-footer {
+      background-color: #0f1115;
+      color: #94a3b8;
+      padding: var(--space-3xl) 0 var(--space-lg);
+      border-top: 1px solid #1e293b;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1.2fr;
+      gap: var(--space-2xl);
+      margin-bottom: var(--space-2xl);
+    }
+
+    .footer-col h4 {
+      color: #ffffff;
+      font-size: 1.05rem;
+      margin-bottom: var(--space-md);
+      font-weight: 700;
+    }
+
+    .footer-links {
+      list-style: none;
+    }
+
+    .footer-links li {
+      margin-bottom: var(--space-xs);
+    }
+
+    .footer-links a {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.15s ease;
+    }
+
+    .footer-links a:hover {
+      color: #ffffff;
+      text-decoration: underline;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid #1e293b;
+      padding-top: var(--space-lg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+
+    /* ==========================================================================
+       7. Responsive Breakpoints
+       ========================================================================== */
+    @media (max-width: 1024px) {
+      .doctor-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .highlights-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .leadership-grid {
+        grid-template-columns: 1fr;
+      }
+      .voices-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .mobile-nav-toggle {
+        display: block;
+      }
+      .nav-menu {
+        position: absolute;
+        top: 74px;
+        left: 0;
+        right: 0;
+        background-color: var(--color-surface);
+        border-bottom: 2px solid var(--color-primary-dark);
+        flex-direction: column;
+        align-items: flex-start;
+        padding: var(--space-lg);
+        box-shadow: var(--shadow-md);
+        display: none;
+      }
+      .nav-menu.is-active {
+        display: flex;
+      }
+      .doctor-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .highlights-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .voices-grid,
+      .faq-grid {
+        grid-template-columns: 1fr;
+      }
+      .utility-bar .container {
+        flex-direction: column;
+        gap: var(--space-xs);
+        text-align: center;
+      }
+      .emergency-tag {
+        border-right: none;
+        padding-right: 0;
+      }
+      .directory-meta-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+    }
+
+    @media (max-width: 540px) {
+      .doctor-grid {
+        grid-template-columns: 1fr;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+      .footer-bottom {
+        flex-direction: column;
+        gap: var(--space-sm);
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Utility Bar -->
+  <aside class="utility-bar" aria-label="Quick Access Bar">
+    <div class="container">
+      <div class="utility-emergency">
+        <span class="emergency-tag">Medical Emergency: Call 911 immediately</span>
+        <span>General Inquiry: (800) 555-0199</span>
+      </div>
+      <ul class="utility-links">
+        <li><a href="queue.html">Track Wait Time</a></li>
+        <li><a href="login.html">Patient Sign In</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- Primary Site Header & Navigation -->
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="brand" aria-label="Hopewell Health Care Home">
+        <div class="brand-icon" aria-hidden="true">+</div>
+        <div class="brand-text">
+          <span class="brand-name">Hopewell</span>
+          <span class="brand-sub">Health Care System</span>
+        </div>
+      </a>
+
+      <!-- Main Navigation Menu -->
+      <nav aria-label="Primary Navigation">
+        <ul class="nav-menu" id="primary-nav">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="doctors.html" class="nav-link active">Find a Doctor</a></li>
+          <li><a href="departments.html" class="nav-link">Departments</a></li>
+          <li><a href="appointments.html" class="nav-link">Book Appointment</a></li>
+          <li><a href="queue.html" class="nav-link">Live Queue</a></li>
+          <li><a href="about.html" class="nav-link">About</a></li>
+          <li><a href="contact.html" class="nav-link">Contact</a></li>
+        </ul>
+      </nav>
+
+      <!-- Action Button & Mobile Nav Trigger -->
+      <div class="nav-actions">
+        <a href="appointments.html" class="btn btn-primary">Book Now</a>
+        <button class="mobile-nav-toggle" id="mobile-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Toggle navigation menu">
+          &#9776;
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Page Header Banner -->
+    <section class="page-banner">
+      <div class="container">
+        <span class="demo-pill">Physician Directory</span>
+        <h1 class="page-title">Find a Doctor or Specialist</h1>
+        <p class="page-subtitle">
+          Search our team of board-certified clinicians by specialty, medical condition, or clinical department. Schedule an in-person outpatient consultation directly.
+        </p>
+
+        <!-- Search and Filter Controls -->
+        <div class="directory-search-wrapper">
+          <div class="search-row">
+            <div class="search-input-box">
+              <span class="search-icon-symbol" aria-hidden="true">&#128269;</span>
+              <input type="text" id="doctor-search" placeholder="Search by doctor name, specialty, or condition..." aria-label="Search doctors by keyword">
+            </div>
+
+            <div class="filter-select-box">
+              <select id="department-select" aria-label="Filter by department">
+                <option value="all">All Departments</option>
+                <option value="cardiology">Cardiovascular Medicine</option>
+                <option value="neurology">Neurology & Neurosurgery</option>
+                <option value="pediatrics">Pediatrics & Child Health</option>
+                <option value="orthopedics">Orthopedic Surgery</option>
+                <option value="internal">Internal & General Medicine</option>
+                <option value="oncology">Clinical Oncology</option>
+              </select>
+            </div>
+
+            <div class="filter-select-box">
+              <select id="sort-select" aria-label="Sort doctor directory">
+                <option value="default">Sort: Recommended</option>
+                <option value="experience">Most Experienced</option>
+                <option value="name">Name (A &rarr; Z)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Quick Department Pills -->
+          <div class="filter-pills-row" id="pills-container" role="tablist" aria-label="Filter by specialty">
+            <span class="filter-label">Quick Filter:</span>
+            <button type="button" class="filter-pill-btn active" data-dept="all">All Specialties</button>
+            <button type="button" class="filter-pill-btn" data-dept="cardiology">Cardiology</button>
+            <button type="button" class="filter-pill-btn" data-dept="neurology">Neurology</button>
+            <button type="button" class="filter-pill-btn" data-dept="pediatrics">Pediatrics</button>
+            <button type="button" class="filter-pill-btn" data-dept="orthopedics">Orthopedics</button>
+            <button type="button" class="filter-pill-btn" data-dept="internal">Internal Med</button>
+            <button type="button" class="filter-pill-btn" data-dept="oncology">Oncology</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Doctor Cards Directory Section -->
+    <section class="container">
+      <div class="directory-meta-bar">
+        <div>
+          Showing <strong id="doctor-count">8</strong> specialists available for outpatient consultation
+        </div>
+        <div id="active-filter-indicator"></div>
+      </div>
+
+      <!-- Doctor Cards Grid -->
+      <div class="doctor-grid" id="doctor-grid">
+        <!-- Cards will be populated and filtered via JavaScript below -->
+      </div>
+
+      <!-- Empty State (Shown when search has no matches) -->
+      <div class="empty-state" id="empty-state">
+        <h3>No matching doctors found</h3>
+        <p>Try adjusting your search terms or clearing selected department filters.</p>
+        <button type="button" class="btn btn-primary" id="reset-filters-btn">Reset All Filters</button>
+      </div>
+    </section>
+
+    <!-- Clinical Excellence & Accreditation Banner -->
+    <section class="clinical-highlights" aria-label="Physician Quality & Accreditation Standards">
+      <div class="container">
+        <div class="highlights-grid">
+          <div class="highlight-card">
+            <div class="highlight-icon" aria-hidden="true">★</div>
+            <div class="highlight-stat">100%</div>
+            <div class="highlight-label">Board Certified</div>
+            <p class="highlight-desc">Every physician has undergone advanced fellowship training and certified credentialing.</p>
+          </div>
+
+          <div class="highlight-card">
+            <div class="highlight-icon" aria-hidden="true">⏱</div>
+            <div class="highlight-stat">18 min</div>
+            <div class="highlight-label">Real-Time Queue Tracking</div>
+            <p class="highlight-desc">Live digital wait times so patients spend less time sitting in waiting rooms.</p>
+          </div>
+
+          <div class="highlight-card">
+            <div class="highlight-icon" aria-hidden="true">🤝</div>
+            <div class="highlight-stat">1 : 1</div>
+            <div class="highlight-label">Collaborative Care</div>
+            <p class="highlight-desc">Specialists consult directly across disciplines on complex diagnoses and plans.</p>
+          </div>
+
+          <div class="highlight-card">
+            <div class="highlight-icon" aria-hidden="true">✓</div>
+            <div class="highlight-stat">4.9 / 5</div>
+            <div class="highlight-label">Patient Trust Index</div>
+            <p class="highlight-desc">Rated exceptionally by over 14,000 outpatient visits across all hospital centers.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Why Hopewell Physicians Lead Section -->
+    <section class="leadership-section" aria-label="Our Clinical Standards">
+      <div class="container">
+        <div class="leadership-grid">
+          <div class="leadership-content">
+            <span class="demo-pill">The Hopewell Standard</span>
+            <h2>Care grounded in science, delivered with dignity.</h2>
+            <p>
+              At Hopewell, our medical staff brings together faculty researchers, seasoned department chairs, and dedicated clinical fellows. We reject rushed five-minute checkups in favor of comprehensive consultations where patient symptoms are thoroughly evaluated.
+            </p>
+
+            <div class="pillar-list">
+              <div class="pillar-item">
+                <div class="pillar-bullet">1</div>
+                <div class="pillar-text">
+                  <h4>Integrated Multidisciplinary Consultations</h4>
+                  <p>When you consult a Hopewell cardiologist or neurologist, your case is reviewed across relevant laboratory and radiology departments for an accurate diagnosis.</p>
+                </div>
+              </div>
+
+              <div class="pillar-item">
+                <div class="pillar-bullet">2</div>
+                <div class="pillar-text">
+                  <h4>Active Research & Academic Faculty</h4>
+                  <p>Our specialists publish in peer-reviewed clinical journals and introduce the latest evidence-based treatment regimens directly to the outpatient clinic.</p>
+                </div>
+              </div>
+
+              <div class="pillar-item">
+                <div class="pillar-bullet">3</div>
+                <div class="pillar-text">
+                  <h4>Transparent Time & Queue Management</h4>
+                  <p>Paired with our live queue tracking technology, doctors stay synchronized with their daily patient caseload to minimize patient waiting.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Featured Physician Quote / Credibility Card -->
+          <div class="leadership-card-quote">
+            <span class="quote-badge">Chief of Clinical Medicine</span>
+            <blockquote class="quote-text">
+              "We believe modern medicine must be two things: clinically rigorous and respectful of the patient’s time. Our digital scheduling and team-oriented diagnosis model allows us to focus entirely on patient recovery."
+            </blockquote>
+            <div class="quote-author">
+              <img 
+                src="https://images.unsplash.com/photo-1666886573681-a8fbe983a3fd?auto=format&fit=crop&w=150&q=80" 
+                alt="Portrait of Dr. Eleanor Kim">
+              <div class="quote-author-info">
+                <h5>Dr. Eleanor Kim, MD, FACC</h5>
+                <span>Chief of Cardiovascular Medicine &bull; Harvard Medical School</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Patient Voices & Experiences Strip -->
+    <section class="patient-voices-section" aria-label="Verified Patient Testimonials">
+      <div class="container">
+        <div class="voices-header">
+          <span class="demo-pill">Patient Experiences</span>
+          <h2>What patients say about our specialists</h2>
+          <p class="text-muted">Honest reviews from outpatients who booked and tracked their visits through Hopewell Health Care.</p>
+        </div>
+
+        <div class="voices-grid">
+          <article class="voice-card">
+            <div>
+              <div class="voice-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <p class="voice-body">
+                "Dr. Eleanor Kim took the time to explain my cardiac tests in plain language. Tracking my place in the live queue from home meant I waited only 12 minutes before entering Suite 302."
+              </p>
+            </div>
+            <div class="voice-meta">
+              <span class="voice-patient">Arthur M.</span>
+              <span>Cardiology Patient</span>
+            </div>
+          </article>
+
+          <article class="voice-card">
+            <div>
+              <div class="voice-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <p class="voice-body">
+                "Dr. Patel’s gentle approach put my daughter immediately at ease during our pediatric follow-up. Her diagnosis was accurate and the entire outpatient desk was prompt and courteous."
+              </p>
+            </div>
+            <div class="voice-meta">
+              <span class="voice-patient">Samantha D.</span>
+              <span>Pediatrics Patient</span>
+            </div>
+          </article>
+
+          <article class="voice-card">
+            <div>
+              <div class="voice-stars" aria-label="5 out of 5 stars">★★★★★</div>
+              <p class="voice-body">
+                "Following my meniscus repair with Dr. Jonathan Chen, his rehabilitation regimen had me walking comfortably weeks ahead of expectations. Outstanding surgical communication."
+              </p>
+            </div>
+            <div class="voice-meta">
+              <span class="voice-patient">Gerald K.</span>
+              <span>Orthopedics Patient</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Patient Questions / Consultation FAQs -->
+    <section class="faq-section" aria-label="Doctor Directory Frequently Asked Questions">
+      <div class="container">
+        <div class="section-header text-center">
+          <span class="demo-pill">Guidance & Support</span>
+          <h2>Consultation Guidelines & FAQs</h2>
+          <p class="text-muted">Answers to common questions regarding specialist visits, booking handoffs, and queue check-in.</p>
+        </div>
+
+        <div class="faq-grid">
+          <div class="faq-card">
+            <h4>Do I need a physician referral to book an appointment?</h4>
+            <p>Most outpatient clinics (including Internal Medicine and Pediatrics) do not require a referral. Specific sub-specialties like Neurosurgery or Oncology may request prior laboratory or primary physician records.</p>
+          </div>
+
+          <div class="faq-card">
+            <h4>How does the live queue integration work with my booking?</h4>
+            <p>After a successful booking, use the generated reference while signed in to view queue information on the appointment day. Wait estimates are not shown unless supported by current clinic data.</p>
+          </div>
+
+          <div class="faq-card">
+            <h4>What should I bring to my initial consultation?</h4>
+            <p>Please bring a valid photo identification card, a list of current prescription medications, previous diagnostic scans or lab results, and your appointment confirmation code.</p>
+          </div>
+
+          <div class="faq-card">
+            <h4>Can I request a virtual telehealth consultation instead?</h4>
+            <p>Yes. Several specialists support video-based triage and follow-up consultations. Select the "Virtual Consult" option on any qualifying doctor card during the booking step.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Site Footer (Solid Deep Black) -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>Hopewell Health Care</h4>
+          <p>
+            An integrated academic healthcare management demonstration system, engineered for streamlined patient appointment access and live outpatient queue tracking.
+          </p>
+          <small class="text-muted">SIT 302 Demonstration System</small>
+        </div>
+
+        <div class="footer-col">
+          <h4>Patient Services</h4>
+          <ul class="footer-links">
+            <li><a href="appointments.html">Book Appointment</a></li>
+            <li><a href="queue.html">Check Queue Position</a></li>
+            <li><a href="doctors.html">Doctor Directory</a></li>
+            <li><a href="departments.html">Clinical Departments</a></li>
+            <li><a href="patient-dashboard.html">Patient Dashboard</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Hospital & Care</h4>
+          <ul class="footer-links">
+            <li><a href="about.html">About Hopewell</a></li>
+            <li><a href="contact.html">Hours & Directions</a></li>
+            <li><a href="contact.html">Send Inquiry</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Emergency & Contacts</h4>
+          <p>Emergency Department: <strong>Open 24/7</strong></p>
+          <p>General Reception: (800) 555-0199</p>
+          <p>Clinic Hours: 08:00 – 17:00 Mon–Sat</p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 Hopewell Health Care System. Built for academic/SIT 302 demonstration purposes.</p>
+        <p>Doctor directory information is loaded from active backend records.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/api.js"></script>
+  <script>
+    /** Patient portal data loads through the shared PostgreSQL API. */
+
+    /**
+     * Simulated Doctor Dataset for Frontend Demonstration Stage
+     * Schema matches the SQL column names shown above for seamless replacement.
+     */
+    const DOCTOR_DATA = [
+      {
+        id: "eleanor-kim",
+        name: "Dr. Eleanor Kim, MD",
+        department: "cardiology",
+        departmentTitle: "Cardiovascular Medicine",
+        experienceYears: 14,
+        almaMater: "Harvard Medical School",
+        focus: "Arrhythmia, coronary artery disease, preventative heart health.",
+        schedule: "Mon, Wed, Fri (08:30 – 16:00)",
+        room: "Suite 302",
+        available: true,
+        image: "https://images.unsplash.com/photo-1666886573681-a8fbe983a3fd?auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        id: "marcus-reynolds",
+        name: "Dr. Marcus Reynolds, MD",
+        department: "neurology",
+        departmentTitle: "Neurology & Neurosurgery",
+        experienceYears: 11,
+        almaMater: "Johns Hopkins University",
+        focus: "Migraine management, epilepsy, stroke rehabilitation.",
+        schedule: "Tue, Thu, Sat (09:00 – 15:30)",
+        room: "Suite 410",
+        available: true,
+        image: "https://images.unsplash.com/photo-1666886573681-a8fbe983a3fd?auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        id: "aisha-patel",
+        name: "Dr. Aisha Patel, MBBS",
+        department: "pediatrics",
+        departmentTitle: "Pediatrics & Child Health",
+        experienceYears: 9,
+        almaMater: "King's College London",
+        focus: "General infant wellness, childhood asthma, adolescent medicine.",
+        schedule: "Mon – Fri (08:00 – 14:00)",
+        room: "Suite 108",
+        available: true,
+        image: "https://images.unsplash.com/photo-1536064479547-7ee40b74b807?auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        id: "jonathan-chen",
+        name: "Dr. Jonathan Chen, MD",
+        department: "orthopedics",
+        departmentTitle: "Orthopedic Surgery",
+        experienceYears: 16,
+        almaMater: "Stanford University",
+        focus: "Joint preservation, knee arthroscopy, sports trauma rehabilitation.",
+        schedule: "Tue, Wed, Fri (09:30 – 16:30)",
+        room: "Suite 215",
+        available: true,
+        image: "https://images.unsplash.com/photo-1569830904560-2afd7062213c?auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        id: "sarah-alvarez",
+        name: "Dr. Sarah Alvarez, MD",
+        department: "internal",
+        departmentTitle: "Internal & General Medicine",
+        experienceYears: 12,
+        almaMater: "Columbia University",
+        focus: "Hypertension, type 2 diabetes management, annual adult wellness.",
+        schedule: "Mon – Thu (08:00 – 15:00)",
+        room: "Suite 104",
+        available: true,
+        image: "https://images.unsplash.com/photo-1536064479547-7ee40b74b807?auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        id: "david-mwangi",
+        name: "Dr. David Mwangi, MBChB",
+        department: "cardiology",
+        departmentTitle: "Cardiovascular Medicine",
+        experienceYears: 15,
+        almaMater: "University of Edinburgh",
+        focus: "Echocardiography, heart failure therapy, cardiac rehabilitation.",
+        schedule: "Mon, Tue, Thu (09:00 – 16:00)",
+        room: "Suite 305",
+        available: true,
+        image: "https://images.unsplash.com/photo-1569830904560-2afd7062213c?auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        id: "helen-vance",
+        name: "Dr. Helen Vance, MD",
+        department: "oncology",
+        departmentTitle: "Clinical Oncology",
+        experienceYears: 18,
+        almaMater: "Oxford University",
+        focus: "Solid tumor oncology, targeted biologic therapies, survivorship.",
+        schedule: "Wed, Thu, Fri (09:00 – 14:30)",
+        room: "Suite 501",
+        available: true,
+        image: "https://images.unsplash.com/photo-1569830904560-2afd7062213c?auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        id: "tariq-mansoor",
+        name: "Dr. Tariq Mansoor, MD",
+        department: "orthopedics",
+        departmentTitle: "Orthopedic Surgery",
+        experienceYears: 8,
+        almaMater: "McGill University",
+        focus: "Hand & wrist microsurgery, fracture treatment, tendon repair.",
+        schedule: "Mon, Wed, Sat (08:30 – 13:30)",
+        room: "Suite 218",
+        available: true,
+        image: "https://images.unsplash.com/photo-1666886573681-a8fbe983a3fd?auto=format&fit=crop&w=400&q=80"
+      }
+    ];
+
+    let DATABASE_DOCTOR_DATA = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      initMobileNavigation();
+      await initDoctorDirectory();
+    });
+
+    /**
+     * Mobile Menu Navigation Handler
+     */
+    function initMobileNavigation() {
+      const toggleBtn = document.getElementById('mobile-toggle');
+      const navMenu = document.getElementById('primary-nav');
+
+      if (!toggleBtn || !navMenu) return;
+
+      toggleBtn.addEventListener('click', () => {
+        const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+        toggleBtn.setAttribute('aria-expanded', String(!isExpanded));
+        navMenu.classList.toggle('is-active');
+      });
+
+      document.addEventListener('click', (event) => {
+        if (!toggleBtn.contains(event.target) && !navMenu.contains(event.target)) {
+          navMenu.classList.remove('is-active');
+          toggleBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+
+    /**
+     * Doctor Directory Filter, Search, and Sorting Logic
+     */
+    async function initDoctorDirectory() {
+      const searchInput = document.getElementById('doctor-search');
+      const deptSelect = document.getElementById('department-select');
+      const sortSelect = document.getElementById('sort-select');
+      const pillsContainer = document.getElementById('pills-container');
+      const resetBtn = document.getElementById('reset-filters-btn');
+
+      // Check URL query parameters (e.g. ?dept=cardiology from homepage links)
+      const urlParams = new URLSearchParams(window.location.search);
+      const initialDept = urlParams.get('dept');
+      if (initialDept) {
+        deptSelect.value = initialDept;
+        updatePillsUI(initialDept);
+      }
+
+      // Search input handler
+      searchInput.addEventListener('input', () => {
+        renderDoctors();
+      });
+
+      // Department dropdown change
+      deptSelect.addEventListener('change', () => {
+        const selectedDept = deptSelect.value;
+        updatePillsUI(selectedDept);
+        renderDoctors();
+      });
+
+      // Quick filter pills click
+      pillsContainer.addEventListener('click', (e) => {
+        const pill = e.target.closest('.filter-pill-btn');
+        if (!pill) return;
+        const dept = pill.getAttribute('data-dept');
+        deptSelect.value = dept;
+        updatePillsUI(dept);
+        renderDoctors();
+      });
+
+      // Sorting dropdown handler
+      sortSelect.addEventListener('change', () => {
+        renderDoctors();
+      });
+
+      // Reset filters button
+      resetBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        deptSelect.value = 'all';
+        sortSelect.value = 'default';
+        updatePillsUI('all');
+        renderDoctors();
+      });
+
+      try {
+        DATABASE_DOCTOR_DATA = await HopewellAPI.request('doctors/index.php');
+        renderDoctors();
+      } catch (error) {
+        const emptyState = document.getElementById('empty-state');
+        emptyState.style.display = 'block';
+        emptyState.querySelector('h3').textContent = 'Doctor directory unavailable';
+        emptyState.querySelector('p').textContent = error.message;
+      }
+    }
+
+    /**
+     * Updates visual active states on the quick-filter pills
+     */
+    function updatePillsUI(activeDept) {
+      const pills = document.querySelectorAll('.filter-pill-btn');
+      pills.forEach(pill => {
+        if (pill.getAttribute('data-dept') === activeDept) {
+          pill.classList.add('active');
+        } else {
+          pill.classList.remove('active');
+        }
+      });
+    }
+
+    /**
+     * Filters, sorts, and renders the doctor cards into the DOM
+     */
+    function renderDoctors() {
+      const searchInput = document.getElementById('doctor-search');
+      const deptSelect = document.getElementById('department-select');
+      const sortSelect = document.getElementById('sort-select');
+      const grid = document.getElementById('doctor-grid');
+      const emptyState = document.getElementById('empty-state');
+      const countEl = document.getElementById('doctor-count');
+
+      const searchTerm = searchInput.value.trim().toLowerCase();
+      const selectedDept = deptSelect.value;
+      const sortBy = sortSelect.value;
+
+      // Filter dataset
+      let filtered = DATABASE_DOCTOR_DATA.filter(doc => {
+        const matchesDept = (selectedDept === 'all') || (doc.department === selectedDept);
+        const matchesSearch = !searchTerm || (
+          doc.name.toLowerCase().includes(searchTerm) ||
+          doc.departmentTitle.toLowerCase().includes(searchTerm) ||
+          doc.focus.toLowerCase().includes(searchTerm) ||
+          doc.almaMater.toLowerCase().includes(searchTerm)
+        );
+        return matchesDept && matchesSearch;
+      });
+
+      // Sort dataset
+      if (sortBy === 'experience') {
+        filtered.sort((a, b) => b.experienceYears - a.experienceYears);
+      } else if (sortBy === 'name') {
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
+      }
+
+      // Update counters
+      countEl.textContent = filtered.length;
+
+      // Check for empty state
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+
+      // Generate HTML for cards
+      grid.innerHTML = filtered.map(doc => {
+        const safe = HopewellAPI.escapeHtml;
+        const image = /^https?:\/\//i.test(doc.image) ? safe(doc.image) : '';
+        return `
+        <article class="doctor-card" data-id="${safe(doc.id)}">
+          <div class="doctor-card-photo-wrapper">
+            <span class="doctor-card-badge">Accepting Patients</span>
+            <span class="doctor-card-room">${safe(doc.room)}</span>
+            <img 
+              src="${image}" 
+              alt="Portrait of ${safe(doc.name)}" 
+              class="doctor-card-img" 
+              loading="lazy">
+          </div>
+          <div class="doctor-card-body">
+            <p class="doctor-specialty">${safe(doc.departmentTitle)}</p>
+            <h3>${safe(doc.name)}</h3>
+            <p class="doctor-experience">${safe(doc.almaMater)} &bull; ${safe(doc.experienceYears)} Yrs Exp</p>
+            <p class="doctor-focus">${safe(doc.focus)}</p>
+            <div class="doctor-availability">
+              <strong>Clinic Hours:</strong><br>${safe(doc.schedule)}
+            </div>
+            <div class="doctor-card-actions">
+              <a href="appointments.html?doctor=${encodeURIComponent(doc.id)}" class="btn btn-primary">Book Appointment</a>
+            </div>
+          </div>
+        </article>
+      `;
+      }).join('');
+    }
+  </script>
+</body>
+</html>

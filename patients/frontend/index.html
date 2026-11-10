@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hopewell Health Care | Hospital Queue & Appointment System</title>
+  
+  <style>
+    /* ==========================================================================
+       1. Design Tokens & CSS Variables (Soft Monochrome / Clean White Scheme)
+       ========================================================================== */
+    :root {
+      /* Softened Charcoal & Slate Tones (No harsh pitch blacks) */
+      --color-primary: #1f2428;        /* Refined deep slate/charcoal */
+      --color-primary-dark: #111417;   /* Rich charcoal for primary actions */
+      --color-primary-light: #424a52;  /* Medium slate for secondary elements */
+      
+      /* Accent & Subtle Neutral Tones */
+      --color-accent: #2d3339;         /* Neutral slate */
+      --color-accent-subtle: #f3f5f7;  /* Soft porcelain wash */
+      --color-accent-border: #d0d5dd;  /* Clean neutral borders */
+      
+      /* Clean Surface & Body Palette */
+      --color-bg: #f8fafc;             /* Bright, airy off-white background */
+      --color-surface: #ffffff;        /* Pure white container cards */
+      --color-text: #24292e;           /* High-contrast readable body slate */
+      --color-text-muted: #64748b;     /* Accessible slate gray for metadata */
+      --color-border: #e2e8f0;         /* Soft structural divider lines */
+      --color-border-dark: #cbd5e1;    /* Subtle card border definition */
+      
+      /* Typography */
+      --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-family-heading: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      
+      /* Spacing Scale */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2rem;
+      --space-2xl: 3rem;
+      --space-3xl: 4.5rem;
+
+      /* Elevation Shadows */
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
+
+      /* Border Radii */
+      --radius-sm: 3px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-full: 9999px;
+
+      /* Layout Constraints */
+      --container-max: 1200px;
+    }
+
+    /* ==========================================================================
+       3. Reusable Buttons & Badges (Clean Soft Palette)
+       ========================================================================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+      padding: 0.8rem 1.45rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.1s ease;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background-color: var(--color-primary-dark);
+      border-color: var(--color-primary-dark);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: #333a42;
+      border-color: #333a42;
+      color: #ffffff;
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border-color: var(--color-primary-dark);
+      color: var(--color-primary-dark);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--color-primary-dark);
+      color: #ffffff;
+    }
+
+    .btn-white {
+      background-color: #ffffff;
+      border-color: var(--color-border);
+      color: var(--color-primary-dark);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-white:hover {
+      background-color: var(--color-accent-subtle);
+      border-color: var(--color-border-dark);
+      color: var(--color-primary-dark);
+    }
+
+    .demo-pill {
+      display: inline-block;
+      background-color: var(--color-accent-subtle);
+      color: var(--color-primary);
+      border: 1px solid var(--color-border);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-full);
+      margin-bottom: var(--space-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .demo-pill-inverted {
+      background-color: #ffffff;
+      color: var(--color-primary-dark);
+      border: 1px solid var(--color-border);
+    }
+
+    /* ==========================================================================
+       4. Header, Utility Bar & Navigation
+       ========================================================================== */
+    .utility-bar {
+      background-color: #f1f4f8;
+      color: #475569;
+      font-size: 0.85rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .utility-bar .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .utility-links,
+    .utility-emergency {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      list-style: none;
+    }
+
+    .utility-bar a {
+      color: #334155;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.15s ease;
+    }
+
+    .utility-bar a:hover {
+      color: var(--color-primary-dark);
+      text-decoration: underline;
+    }
+
+    .emergency-tag {
+      color: #b91c1c;
+      font-weight: 700;
+      border-right: 1px solid var(--color-border);
+      padding-right: var(--space-md);
+    }
+
+    .site-header {
+      background-color: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .site-header .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 74px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background-color: var(--color-primary-dark);
+      color: #ffffff;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      font-weight: 800;
+    }
+
+    .brand-name {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-sub {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      letter-spacing: 0.05em;
+      font-weight: 600;
+      display: block;
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      list-style: none;
+    }
+
+    .nav-link {
+      position: relative;
+      font-weight: 600;
+      color: var(--color-text);
+      text-decoration: none;
+      font-size: 0.95rem;
+      padding: 0.55rem 0.85rem;
+      border-radius: var(--radius-sm);
+      transition: color 0.2s ease, background-color 0.2s ease, transform 0.15s ease;
+      display: inline-block;
+    }
+
+    /* Subtle background wash & lift on hover */
+    .nav-link:hover {
+      color: var(--color-primary-dark);
+      background-color: #f1f5f9;
+      transform: translateY(-1px);
+    }
+
+    /* Animated accent indicator line */
+    .nav-link::after {
+      content: "";
+      position: absolute;
+      bottom: 4px;
+      left: 0.85rem;
+      right: 0.85rem;
+      height: 2px;
+      background-color: var(--color-primary-dark);
+      border-radius: var(--radius-full);
+      transform: scaleX(0);
+      transform-origin: center;
+      transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-link:hover::after,
+    .nav-link.active::after {
+      transform: scaleX(1);
+    }
+
+    .nav-link.active {
+      color: var(--color-primary-dark);
+      background-color: #f8fafc;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .mobile-nav-toggle {
+      display: none;
+      background: transparent;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-size: 1.4rem;
+      color: var(--color-primary-dark);
+      cursor: pointer;
+      padding: 0.35rem 0.6rem;
+      line-height: 1;
+    }
+
+    /* ==========================================================================
+       5. Hero Section & Interactive Queue Status Card
+       ========================================================================== */
+    .hero-section {
+      background-color: #f8fafc;
+      background-image: 
+        linear-gradient(90deg, rgba(255, 255, 255, 0.94) 0%, rgba(255, 255, 255, 0.82) 42%, rgba(255, 255, 255, 0.35) 75%, rgba(255, 255, 255, 0.15) 100%),
+        url("https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=2400&q=95");
+      background-size: cover;
+      background-position: center 30%;
+      background-repeat: no-repeat;
+      color: var(--color-text);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-3xl) 0 calc(var(--space-3xl) + 2rem);
+      position: relative;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: var(--space-2xl);
+      align-items: center;
+    }
+
+    .hero-content h1 {
+      color: var(--color-primary-dark);
+      font-size: 2.6rem;
+      line-height: 1.15;
+      margin-bottom: var(--space-md);
+      letter-spacing: -0.03em;
+    }
+
+    .hero-content p {
+      color: var(--color-text-muted);
+      font-size: 1.15rem;
+      line-height: 1.6;
+      margin-bottom: var(--space-xl);
+    }
+
+    .hero-cta-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+    }
+
+    .hero-card {
+      background: #ffffff;
+      color: var(--color-text);
+      border-radius: var(--radius-md);
+      padding: var(--space-xl);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--color-border);
+    }
+
+    .hero-card h3 {
+      color: var(--color-primary-dark);
+      margin-bottom: 0.35rem;
+    }
+
+    .hero-card p {
+      font-size: 0.9rem;
+      margin-bottom: var(--space-md);
+    }
+
+    .lookup-form {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .lookup-input-group {
+      display: flex;
+      gap: var(--space-xs);
+    }
+
+    .lookup-input-group input {
+      flex: 1;
+      padding: 0.75rem 0.9rem;
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      background-color: #fafafa;
+      color: var(--color-text);
+      transition: border-color 0.15s ease;
+    }
+
+    .lookup-input-group input:focus {
+      border-color: var(--color-primary-dark);
+      background-color: #ffffff;
+    }
+
+    /* ==========================================================================
+       6. Quick Action Tiles & Department Grids
+       ========================================================================== */
+    .quick-actions-bar {
+      margin-top: -2.5rem;
+      position: relative;
+      z-index: 10;
+    }
+
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-md);
+    }
+
+    .action-card {
+      background-color: var(--color-surface);
+      border-radius: var(--radius-sm);
+      padding: var(--space-lg);
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--color-border);
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .action-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--color-primary-dark);
+    }
+
+    .action-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-sm);
+      background-color: #f1f5f9;
+      color: var(--color-primary-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: var(--space-md);
+      border: 1px solid var(--color-border);
+    }
+
+    .action-card h3 {
+      font-size: 1.15rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .action-card p {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-sm);
+    }
+
+    .action-card-link {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--color-primary-dark);
+      display: inline-block;
+      text-decoration: none;
+    }
+
+    .action-card:hover .action-card-link {
+      text-decoration: underline;
+    }
+
+    .section-header {
+      margin-bottom: var(--space-2xl);
+    }
+
+    .department-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-lg);
+    }
+
+    .dept-card {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-xl);
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .dept-card:hover {
+      border-color: var(--color-primary-dark);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .dept-badge {
+      color: var(--color-text-muted);
+      font-weight: 700;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-xs);
+      display: block;
+    }
+
+    .dept-card h3 {
+      font-size: 1.25rem;
+      margin-bottom: var(--space-sm);
+    }
+
+    .doctor-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.15rem;
+    }
+
+    .doctor-card {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .doctor-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--color-primary-dark);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Compact image banner */
+    .doctor-card-photo-wrapper {
+      position: relative;
+      width: 100%;
+      height: 140px;
+      overflow: hidden;
+      background-color: #f1f5f9;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .doctor-card-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 18%;
+    }
+
+    .doctor-card-badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background-color: rgba(255, 255, 255, 0.95);
+      color: #059669;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.15rem 0.45rem;
+      border-radius: var(--radius-full);
+      border: 1px solid #d1fae5;
+      backdrop-filter: blur(2px);
+    }
+
+    .doctor-card-body {
+      padding: 0.9rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .doctor-card-body h3 {
+      font-size: 0.98rem;
+      line-height: 1.25;
+      margin-bottom: 0.15rem;
+    }
+
+    .doctor-specialty {
+      color: var(--color-primary-dark);
+      font-weight: 700;
+      font-size: 0.78rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .doctor-experience {
+      font-size: 0.73rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0.45rem;
+    }
+
+    .doctor-availability {
+      font-size: 0.72rem;
+      color: var(--color-text);
+      background-color: var(--color-accent-subtle);
+      padding: 0.3rem 0.5rem;
+      border-radius: var(--radius-sm);
+      margin-bottom: 0.75rem;
+      border-left: 2px solid var(--color-primary-dark);
+      line-height: 1.35;
+    }
+
+    .doctor-card-body .btn {
+      margin-top: auto;
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    /* Trust banner section */
+    .trust-banner {
+      background-color: #ffffff;
+      border-top: 1px solid var(--color-border);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-2xl) 0;
+    }
+
+    .trust-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-lg);
+      text-align: center;
+    }
+
+    .trust-item h4 {
+      font-size: 1.85rem;
+      font-weight: 800;
+      margin-bottom: 0.2rem;
+    }
+
+    .trust-item p {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0;
+    }
+
+    /* ==========================================================================
+       8. Healthcare Portal Footer (Soft Studio Gray Tone)
+       ========================================================================== */
+    .site-footer {
+      background-color: #0f1115;
+      color: #94a3b8;
+      padding: var(--space-3xl) 0 var(--space-lg);
+      border-top: 1px solid #1e293b;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1.2fr;
+      gap: var(--space-2xl);
+      margin-bottom: var(--space-2xl);
+    }
+
+    .footer-col h4 {
+      color: #ffffff;
+      font-size: 1.05rem;
+      margin-bottom: var(--space-md);
+      font-weight: 700;
+    }
+
+    .footer-links {
+      list-style: none;
+    }
+
+    .footer-links li {
+      margin-bottom: var(--space-xs);
+    }
+
+    .footer-links a {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.15s ease;
+    }
+
+    .footer-links a:hover {
+      color: #ffffff;
+      text-decoration: underline;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid #1e293b;
+      padding-top: var(--space-lg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+
+    /* ==========================================================================
+       9. Responsive Media Queries
+       ========================================================================== */
+    @media (max-width: 992px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+      .action-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .department-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .doctor-preview-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .trust-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-xl);
+      }
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .mobile-nav-toggle {
+        display: block;
+      }
+      .nav-menu {
+        position: absolute;
+        top: 74px;
+        left: 0;
+        right: 0;
+        background-color: var(--color-surface);
+        border-bottom: 2px solid var(--color-primary-dark);
+        flex-direction: column;
+        align-items: flex-start;
+        padding: var(--space-lg);
+        box-shadow: var(--shadow-md);
+        display: none;
+      }
+      .nav-menu.is-active {
+        display: flex;
+      }
+      .action-grid,
+      .department-grid,
+      .doctor-preview-grid {
+        grid-template-columns: 1fr;
+      }
+      .trust-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .utility-bar .container {
+        flex-direction: column;
+        gap: var(--space-xs);
+        text-align: center;
+      }
+      .emergency-tag {
+        border-right: none;
+        padding-right: 0;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+      .footer-bottom {
+        flex-direction: column;
+        gap: var(--space-sm);
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Utility Bar: Urgent Access & Teammate's Staff Portal Link -->
+  <aside class="utility-bar" aria-label="Quick Access Bar">
+    <div class="container">
+      <div class="utility-emergency">
+        <span class="emergency-tag">Medical Emergency: Call 911 immediately</span>
+        <span>General Inquiry: (800) 555-0199</span>
+      </div>
+      <ul class="utility-links">
+        <li><a href="queue.html">Track Wait Time</a></li>
+        <li><a href="login.html">Patient Sign In</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- Primary Site Header & Navigation -->
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="brand" aria-label="Hopewell Health Care Home">
+        <div class="brand-icon" aria-hidden="true">+</div>
+        <div class="brand-text">
+          <span class="brand-name">Hopewell</span>
+          <span class="brand-sub">Health Care System</span>
+        </div>
+      </a>
+
+      <!-- Main Navigation Menu -->
+      <nav aria-label="Primary Navigation">
+        <ul class="nav-menu" id="primary-nav">
+          <li><a href="index.html" class="nav-link active">Home</a></li>
+          <li><a href="doctors.html" class="nav-link">Find a Doctor</a></li>
+          <li><a href="departments.html" class="nav-link">Departments</a></li>
+          <li><a href="appointments.html" class="nav-link">Book Appointment</a></li>
+          <li><a href="queue.html" class="nav-link">Live Queue</a></li>
+          <li><a href="about.html" class="nav-link">About</a></li>
+          <li><a href="contact.html" class="nav-link">Contact</a></li>
+        </ul>
+      </nav>
+
+      <!-- Action Button & Mobile Nav Trigger -->
+      <div class="nav-actions">
+        <a href="appointments.html" class="btn btn-primary">Book Now</a>
+        <button class="mobile-nav-toggle" id="mobile-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Toggle navigation menu">
+          &#9776;
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Task-Driven Hero Section -->
+    <section class="hero-section">
+      <div class="container hero-grid">
+        <div class="hero-content">
+          
+          <h1>Expert clinical care, organized around your time.</h1>
+          <p>
+            Schedule appointments with database-listed physicians, discover clinic services, and review queue information on the day of your visit.
+          </p>
+          <div class="hero-cta-group">
+            <a href="appointments.html" class="btn btn-primary">Book an Appointment</a>
+            <a href="doctors.html" class="btn btn-outline">Browse All Doctors</a>
+          </div>
+        </div>
+
+        <!-- Quick Live Queue Lookup Card -->
+        <div class="hero-card">
+          <span class="demo-pill">Patient Queue Lookup</span>
+          <h3>Check Your Queue Status</h3>
+          <p class="text-muted">Sign in to view queue information for an appointment on its scheduled day.</p>
+          
+          <form class="lookup-form" action="queue.html" method="GET">
+            <div class="lookup-input-group">
+              <input type="text" name="ref" placeholder="Appointment reference" required aria-label="Appointment Reference Code">
+              <button type="submit" class="btn btn-primary">Check</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Action Cards (Mayo-Inspired Wayfinding) -->
+    <section class="quick-actions-bar" aria-label="Core Patient Services">
+      <div class="container">
+        <div class="action-grid">
+          <a href="doctors.html" class="action-card">
+            <div>
+              <div class="action-icon" aria-hidden="true">Dr</div>
+              <h3>Find a Doctor</h3>
+              <p>Search specialists by medical condition, department, or availability.</p>
+            </div>
+            <span class="action-card-link">Search directory &rarr;</span>
+          </a>
+
+          <a href="appointments.html" class="action-card">
+            <div>
+              <div class="action-icon" aria-hidden="true">Cal</div>
+              <h3>Schedule Visit</h3>
+              <p>Select your preferred specialist and time slot with immediate confirmation.</p>
+            </div>
+            <span class="action-card-link">Start booking &rarr;</span>
+          </a>
+
+          <a href="queue.html" class="action-card">
+            <div>
+              <div class="action-icon" aria-hidden="true">Q</div>
+              <h3>Queue Tracker</h3>
+              <p>View your protected queue details when your appointment day arrives.</p>
+            </div>
+            <span class="action-card-link">View queue &rarr;</span>
+          </a>
+
+          <a href="departments.html" class="action-card">
+            <div>
+              <div class="action-icon" aria-hidden="true">Dept</div>
+              <h3>Specialty Care</h3>
+              <p>Explore specialized departments ranging from Cardiology to Pediatrics.</p>
+            </div>
+            <span class="action-card-link">View departments &rarr;</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Clinical Stats Trust Banner -->
+    <section class="trust-banner" aria-label="Hospital Statistics and Care Metrics">
+      <div class="container">
+        <div class="trust-grid">
+          <div class="trust-item">
+            <h4 id="home-doctor-count">—</h4>
+            <p>Specialist Physicians</p>
+          </div>
+          <div class="trust-item">
+            <h4 id="home-department-count">—</h4>
+            <p>Clinical Departments</p>
+          </div>
+          <div class="trust-item">
+            <h4 id="home-queue-count">—</h4>
+            <p>Active Queue Entries Today</p>
+          </div>
+          <div class="trust-item">
+            <h4>Not estimated</h4>
+            <p>Wait Times</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Medical Departments Overview -->
+    <section class="section section-bg-surface">
+      <div class="container">
+        <div class="section-header text-center">
+          <h2>Clinical Departments & Centers</h2>
+          <p class="lead">Providing specialized, interdisciplinary care across dedicated health centers.</p>
+        </div>
+
+        <div class="department-grid" id="home-department-grid">
+          <article class="dept-card">
+            <span class="dept-badge">Specialty 01</span>
+            <h3>Cardiovascular Medicine</h3>
+            <p class="text-muted">Comprehensive heart care, outpatient diagnostic monitoring, and non-invasive surgical consultations.</p>
+            <a href="doctors.html?dept=cardiology" class="action-card-link">View Cardiologists &rarr;</a>
+          </article>
+
+          <article class="dept-card">
+            <span class="dept-badge">Specialty 02</span>
+            <h3>Neurology & Neurosurgery</h3>
+            <p class="text-muted">Dedicated consultation and therapy management for acute and chronic neurological conditions.</p>
+            <a href="doctors.html?dept=neurology" class="action-card-link">View Neurologists &rarr;</a>
+          </article>
+
+          <article class="dept-card">
+            <span class="dept-badge">Specialty 03</span>
+            <h3>Pediatrics & Child Health</h3>
+            <p class="text-muted">Compassionate primary and specialty pediatric services tailored for infants, children, and teens.</p>
+            <a href="doctors.html?dept=pediatrics" class="action-card-link">View Pediatricians &rarr;</a>
+          </article>
+
+          <article class="dept-card">
+            <span class="dept-badge">Specialty 04</span>
+            <h3>Orthopedic Surgery</h3>
+            <p class="text-muted">Joint health, sports injury rehabilitation, and minimally invasive bone and joint surgery.</p>
+            <a href="doctors.html?dept=orthopedics" class="action-card-link">View Specialists &rarr;</a>
+          </article>
+
+          <article class="dept-card">
+            <span class="dept-badge">Specialty 05</span>
+            <h3>General & Internal Medicine</h3>
+            <p class="text-muted">Routine wellness health checks, acute sickness diagnosis, and chronic condition plans.</p>
+            <a href="doctors.html?dept=internal" class="action-card-link">View Physicians &rarr;</a>
+          </article>
+
+          <article class="dept-card">
+            <span class="dept-badge">Specialty 06</span>
+            <h3>Emergency Medicine</h3>
+            <p class="text-muted">24/7 urgent medical triage, rapid trauma intervention, and immediate stabilization units.</p>
+            <a href="departments.html" class="action-card-link">Department details &rarr;</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Doctors Preview with Real Photography -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header text-center">
+          <h2>Consult Our Medical Specialists</h2>
+          <p class="lead">Board-certified physicians available for direct outpatient consultation and queue-managed booking.</p>
+        </div>
+
+        <div class="doctor-preview-grid" id="home-doctor-grid">
+          <!-- Doctor 1: Dr. Eleanor Kim -->
+          <article class="doctor-card">
+            <div class="doctor-card-photo-wrapper">
+              <span class="doctor-card-badge">Available</span>
+              <img 
+                src="https://images.unsplash.com/photo-1666886573681-a8fbe983a3fd?auto=format&fit=crop&w=400&q=80" 
+                alt="Portrait of Dr. Eleanor Kim, Cardiologist" 
+                class="doctor-card-img"
+                loading="lazy">
+            </div>
+            <div class="doctor-card-body">
+              <p class="doctor-specialty">Cardiovascular Medicine</p>
+              <h3>Dr. Eleanor Kim, MD</h3>
+              <p class="doctor-experience">Harvard Med &bull; 14 Yrs Exp</p>
+              <div class="doctor-availability">
+                Mon, Wed, Fri (08:30 – 16:00)
+              </div>
+              <a href="appointments.html?doctor=eleanor-kim" class="btn btn-outline">Book Visit</a>
+            </div>
+          </article>
+
+          <!-- Doctor 2: Dr. Marcus Reynolds -->
+          <article class="doctor-card">
+            <div class="doctor-card-photo-wrapper">
+              <span class="doctor-card-badge">Available</span>
+              <img 
+                src="https://images.unsplash.com/photo-1666886573681-a8fbe983a3fd?auto=format&fit=crop&w=400&q=80" 
+                alt="Portrait of Dr. Marcus Reynolds, Neurologist" 
+                class="doctor-card-img"
+                loading="lazy">
+            </div>
+            <div class="doctor-card-body">
+              <p class="doctor-specialty">Neurology & Neuro.</p>
+              <h3>Dr. Marcus Reynolds, MD</h3>
+              <p class="doctor-experience">Johns Hopkins &bull; 11 Yrs Exp</p>
+              <div class="doctor-availability">
+                Tue, Thu, Sat (09:00 – 15:30)
+              </div>
+              <a href="appointments.html?doctor=marcus-reynolds" class="btn btn-outline">Book Visit</a>
+            </div>
+          </article>
+
+          <!-- Doctor 3: Dr. Aisha Patel -->
+          <article class="doctor-card">
+            <div class="doctor-card-photo-wrapper">
+              <span class="doctor-card-badge">Available</span>
+              <img 
+                src="https://images.unsplash.com/photo-1536064479547-7ee40b74b807?auto=format&fit=crop&w=400&q=80" 
+                alt="Portrait of Dr. Aisha Patel, Pediatrician" 
+                class="doctor-card-img"
+                loading="lazy">
+            </div>
+            <div class="doctor-card-body">
+              <p class="doctor-specialty">Pediatrics Care</p>
+              <h3>Dr. Aisha Patel, MBBS</h3>
+              <p class="doctor-experience">King's College &bull; 9 Yrs Exp</p>
+              <div class="doctor-availability">
+                Mon – Fri (08:00 – 14:00)
+              </div>
+              <a href="appointments.html?doctor=aisha-patel" class="btn btn-outline">Book Visit</a>
+            </div>
+          </article>
+
+          <!-- Doctor 4: Dr. Jonathan Chen -->
+          <article class="doctor-card">
+            <div class="doctor-card-photo-wrapper">
+              <span class="doctor-card-badge">Available</span>
+              <img 
+                src="https://images.unsplash.com/photo-1569830904560-2afd7062213c?auto=format&fit=crop&w=400&q=80" 
+                alt="Portrait of Dr. Jonathan Chen, Orthopedic Surgeon" 
+                class="doctor-card-img"
+                loading="lazy">
+            </div>
+            <div class="doctor-card-body">
+              <p class="doctor-specialty">Orthopedic Surgery</p>
+              <h3>Dr. Jonathan Chen, MD</h3>
+              <p class="doctor-experience">Stanford Med &bull; 12 Yrs Exp</p>
+              <div class="doctor-availability">
+                Tue, Wed, Fri (09:30 – 16:30)
+              </div>
+              <a href="appointments.html?doctor=jonathan-chen" class="btn btn-outline">Book Visit</a>
+            </div>
+          </article>
+        </div>
+
+        <div class="text-center" style="margin-top: var(--space-xl);">
+          <a href="doctors.html" class="btn btn-primary">Browse All Specialists &rarr;</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Comprehensive Healthcare Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>Hopewell Health Care</h4>
+          <p>
+            An integrated academic healthcare management demonstration system, engineered for streamlined patient appointment access and live outpatient queue tracking.
+          </p>
+          <small class="text-muted">SIT 302 Demonstration System</small>
+        </div>
+
+        <div class="footer-col">
+          <h4>Patient Services</h4>
+          <ul class="footer-links">
+            <li><a href="appointments.html">Book Appointment</a></li>
+            <li><a href="queue.html">Check Queue Position</a></li>
+            <li><a href="doctors.html">Doctor Directory</a></li>
+            <li><a href="departments.html">Clinical Departments</a></li>
+            <li><a href="patient-dashboard.html">Patient Dashboard</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Hospital & Care</h4>
+          <ul class="footer-links">
+            <li><a href="about.html">About Hopewell</a></li>
+            <li><a href="contact.html">Hours & Directions</a></li>
+            <li><a href="contact.html">Send Inquiry</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Emergency & Contacts</h4>
+          <p>Emergency Department: <strong>Open 24/7</strong></p>
+          <p>General Reception: (800) 555-0199</p>
+          <p>Clinic Hours: 08:00 – 17:00 Mon–Sat</p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 Hopewell Health Care System.</p>
+        
+      </div>
+    </div>
+  </footer>
+
+  <!-- Interactive Client-side Script -->
+  <script src="../assets/js/api.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initMobileNavigation();
+      loadHomeDirectories();
+    });
+
+    async function loadHomeDirectories() {
+      const departmentGrid = document.getElementById('home-department-grid');
+      const doctorGrid = document.getElementById('home-doctor-grid');
+      departmentGrid.replaceChildren();
+      doctorGrid.replaceChildren();
+      try {
+        const [departments, doctors, queues] = await Promise.all([
+          HopewellAPI.request('departments/index.php?bookable=1'),
+          HopewellAPI.request('doctors/index.php'),
+          HopewellAPI.request('queue/board.php')
+        ]);
+        const safe = HopewellAPI.escapeHtml;
+        document.getElementById('home-doctor-count').textContent = doctors.length;
+        document.getElementById('home-department-count').textContent = departments.length;
+        document.getElementById('home-queue-count').textContent =
+          queues.reduce((total, item) => total + item.active_count, 0);
+
+        departmentGrid.innerHTML = departments.slice(0, 6).map((department, index) => `
+          <article class="dept-card">
+            <span class="dept-badge">Specialty ${String(index + 1).padStart(2, '0')}</span>
+            <h3>${safe(department.name)}</h3>
+            <p class="text-muted">${safe(department.description)}</p>
+            <a href="doctors.html?dept=${encodeURIComponent(department.id)}" class="action-card-link">View Specialists &rarr;</a>
+          </article>
+        `).join('');
+        doctorGrid.innerHTML = doctors.slice(0, 4).map(doctor => {
+          const image = /^https?:\/\//i.test(doctor.image) ? safe(doctor.image) : '';
+          return `
+            <article class="doctor-card">
+              <div class="doctor-card-photo-wrapper">
+                <span class="doctor-card-badge">Accepting Patients</span>
+                <img src="${image}" alt="Portrait of ${safe(doctor.name)}" class="doctor-card-img" loading="lazy">
+              </div>
+              <div class="doctor-card-body">
+                <p class="doctor-specialty">${safe(doctor.departmentTitle)}</p>
+                <h3>${safe(doctor.name)}</h3>
+                <p class="doctor-experience">${safe(doctor.almaMater)} &bull; ${safe(doctor.experienceYears)} Yrs Exp</p>
+                <div class="doctor-availability">${safe(doctor.schedule)}</div>
+                <a href="appointments.html?doctor=${encodeURIComponent(doctor.id)}" class="btn btn-outline">Book Visit</a>
+              </div>
+            </article>
+          `;
+        }).join('');
+      } catch (error) {
+        departmentGrid.textContent = error.message;
+        doctorGrid.textContent = error.message;
+        document.getElementById('home-doctor-count').textContent = 'Unavailable';
+        document.getElementById('home-department-count').textContent = 'Unavailable';
+        document.getElementById('home-queue-count').textContent = 'Unavailable';
+      }
+    }
+
+    /**
+     * Handles mobile hamburger menu toggle and accessibility states
+     */
+    function initMobileNavigation() {
+      const toggleBtn = document.getElementById('mobile-toggle');
+      const navMenu = document.getElementById('primary-nav');
+
+      if (!toggleBtn || !navMenu) return;
+
+      toggleBtn.addEventListener('click', () => {
+        const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+        toggleBtn.setAttribute('aria-expanded', String(!isExpanded));
+        navMenu.classList.toggle('is-active');
+      });
+
+      // Dismiss menu when clicking outside on mobile viewports
+      document.addEventListener('click', (event) => {
+        if (!toggleBtn.contains(event.target) && !navMenu.contains(event.target)) {
+          navMenu.classList.remove('is-active');
+          toggleBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+  </script>
+</body>
+</html>

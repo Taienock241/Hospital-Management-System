@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Registration & Portal Access | Hopewell Health Care</title>
+
+  <style>
+    /* ==========================================================================
+       1. Design Tokens & CSS Variables (Matches Site-wide Soft Monochrome)
+       ========================================================================== */
+    :root {
+      --color-primary: #1f2428;
+      --color-primary-dark: #111417;
+      --color-primary-light: #424a52;
+      
+      --color-accent: #2d3339;
+      --color-accent-subtle: #f3f5f7;
+      --color-accent-border: #d0d5dd;
+      
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-text: #24292e;
+      --color-text-muted: #64748b;
+      --color-border: #e2e8f0;
+      --color-border-dark: #cbd5e1;
+      
+      --color-success: #059669;
+      --color-success-bg: #ecfdf5;
+      --color-success-border: #a7f3d0;
+
+      --color-warning: #d97706;
+      --color-warning-bg: #fffbeb;
+      --color-warning-border: #fde68a;
+
+      --color-danger: #b91c1c;
+      --color-danger-bg: #fef2f2;
+      --color-danger-border: #fecaca;
+
+      --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-family-heading: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2rem;
+      --space-2xl: 3rem;
+      --space-3xl: 4.5rem;
+
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
+
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-full: 9999px;
+
+      --container-max: 1200px;
+    }
+
+    /* Base Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-family-base);
+      color: var(--color-text);
+      background-color: var(--color-bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .container {
+      width: 100%;
+      max-width: var(--container-max);
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: var(--space-lg);
+      padding-right: var(--space-lg);
+    }
+
+    /* ==========================================================================
+       2. Reusable Buttons & Badges
+       ========================================================================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+      padding: 0.75rem 1.4rem;
+      font-size: 0.92rem;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.1s ease;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background-color: var(--color-primary-dark);
+      border-color: var(--color-primary-dark);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: #333a42;
+      border-color: #333a42;
+      color: #ffffff;
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border-color: var(--color-primary-dark);
+      color: var(--color-primary-dark);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--color-primary-dark);
+      color: #ffffff;
+    }
+
+    .btn-secondary {
+      background-color: #f1f5f9;
+      border-color: var(--color-border);
+      color: var(--color-text);
+    }
+
+    .btn-secondary:hover {
+      background-color: #e2e8f0;
+      border-color: var(--color-border-dark);
+    }
+
+    /* Google OAuth Button & Divider */
+    .btn-google {
+      width: 100%;
+      background-color: #ffffff;
+      color: #1f2428;
+      border: 1.5px solid var(--color-border);
+      font-weight: 600;
+      font-size: 0.92rem;
+      padding: 0.78rem 1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+      margin-bottom: var(--space-lg);
+    }
+
+    .btn-google:hover {
+      background-color: #f8fafc;
+      border-color: var(--color-border-dark);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-google svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 0 0 var(--space-xl);
+      color: var(--color-text-muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .auth-divider:not(:empty)::before {
+      margin-right: var(--space-md);
+    }
+
+    .auth-divider:not(:empty)::after {
+      margin-left: var(--space-md);
+    }
+
+    .demo-pill {
+      display: inline-block;
+      background-color: var(--color-accent-subtle);
+      color: var(--color-primary);
+      border: 1px solid var(--color-border);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-full);
+      margin-bottom: var(--space-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ==========================================================================
+       3. Utility Bar & Main Site Header
+       ========================================================================== */
+    .utility-bar {
+      background-color: #f1f4f8;
+      color: #475569;
+      font-size: 0.85rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .utility-bar .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .utility-links,
+    .utility-emergency {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      list-style: none;
+    }
+
+    .utility-bar a {
+      color: #334155;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.15s ease;
+    }
+
+    .utility-bar a:hover {
+      color: var(--color-primary-dark);
+      text-decoration: underline;
+    }
+
+    .emergency-tag {
+      color: #b91c1c;
+      font-weight: 700;
+      border-right: 1px solid var(--color-border);
+      padding-right: var(--space-md);
+    }
+
+    .site-header {
+      background-color: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .site-header .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 74px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background-color: var(--color-primary-dark);
+      color: #ffffff;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      font-weight: 800;
+    }
+
+    .brand-name {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-sub {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      letter-spacing: 0.05em;
+      font-weight: 600;
+      display: block;
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      list-style: none;
+    }
+
+    .nav-link {
+      position: relative;
+      font-weight: 600;
+      color: var(--color-text);
+      text-decoration: none;
+      font-size: 0.95rem;
+      padding: 0.55rem 0.85rem;
+      border-radius: var(--radius-sm);
+      transition: color 0.2s ease, background-color 0.2s ease, transform 0.15s ease;
+      display: inline-block;
+    }
+
+    .nav-link:hover {
+      color: var(--color-primary-dark);
+      background-color: #f1f5f9;
+      transform: translateY(-1px);
+    }
+
+    .nav-link::after {
+      content: "";
+      position: absolute;
+      bottom: 4px;
+      left: 0.85rem;
+      right: 0.85rem;
+      height: 2px;
+      background-color: var(--color-primary-dark);
+      border-radius: var(--radius-full);
+      transform: scaleX(0);
+      transform-origin: center;
+      transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-link:hover::after,
+    .nav-link.active::after {
+      transform: scaleX(1);
+    }
+
+    .nav-link.active {
+      color: var(--color-primary-dark);
+      background-color: #f8fafc;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .mobile-nav-toggle {
+      display: none;
+      background: transparent;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-size: 1.4rem;
+      color: var(--color-primary-dark);
+      cursor: pointer;
+      padding: 0.35rem 0.6rem;
+      line-height: 1;
+    }
+
+    /* ==========================================================================
+       4. Registration Page Layout & Form Elements
+       ========================================================================== */
+    .auth-section {
+      padding: var(--space-3xl) 0;
+    }
+
+    .auth-layout-grid {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: var(--space-2xl);
+      align-items: start;
+    }
+
+    .auth-card {
+      background-color: var(--color-surface);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-2xl);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .auth-header {
+      margin-bottom: var(--space-xl);
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: var(--space-lg);
+    }
+
+    .auth-header h1 {
+      font-size: 1.95rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      letter-spacing: -0.02em;
+      margin-bottom: 0.35rem;
+    }
+
+    .auth-header p {
+      color: var(--color-text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 0;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-lg);
+      margin-bottom: var(--space-md);
+    }
+
+    .form-row.full {
+      grid-template-columns: 1fr;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      position: relative;
+    }
+
+    .form-label {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--color-text);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .form-label-required {
+      color: var(--color-danger);
+      font-size: 0.85rem;
+    }
+
+    .form-input,
+    .form-select {
+      width: 100%;
+      padding: 0.78rem 0.95rem;
+      font-size: 0.92rem;
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      background-color: #fafbfc;
+      color: var(--color-text);
+      font-family: inherit;
+      transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+      outline: none;
+      border-color: var(--color-primary-dark);
+      background-color: #ffffff;
+      box-shadow: 0 0 0 3px rgba(31, 36, 40, 0.08);
+    }
+
+    .form-input.invalid,
+    .form-select.invalid {
+      border-color: var(--color-danger);
+      background-color: var(--color-danger-bg);
+    }
+
+    .password-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .password-input-wrapper input {
+      padding-right: 3rem;
+    }
+
+    .toggle-password-btn {
+      position: absolute;
+      right: 0.65rem;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      padding: 0.25rem 0.4rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .toggle-password-btn:hover {
+      color: var(--color-primary-dark);
+    }
+
+    /* Password Strength Meter */
+    .password-meter-wrap {
+      margin-top: 0.35rem;
+    }
+
+    .meter-track {
+      width: 100%;
+      height: 4px;
+      background-color: #e2e8f0;
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-bottom: 0.25rem;
+    }
+
+    .meter-fill {
+      height: 100%;
+      width: 0%;
+      background-color: #cbd5e1;
+      transition: width 0.25s ease, background-color 0.25s ease;
+    }
+
+    .meter-fill.weak { width: 33%; background-color: var(--color-danger); }
+    .meter-fill.medium { width: 66%; background-color: var(--color-warning); }
+    .meter-fill.strong { width: 100%; background-color: var(--color-success); }
+
+    .meter-label {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .field-hint {
+      font-size: 0.78rem;
+      color: var(--color-text-muted);
+      margin-top: 0.2rem;
+    }
+
+    .field-error {
+      font-size: 0.78rem;
+      color: var(--color-danger);
+      font-weight: 600;
+      margin-top: 0.2rem;
+      display: none;
+    }
+
+    .field-error.visible {
+      display: block;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      margin-top: var(--space-md);
+      cursor: pointer;
+    }
+
+    .checkbox-group input {
+      margin-top: 3px;
+      cursor: pointer;
+    }
+
+    .checkbox-text {
+      font-size: 0.85rem;
+      color: var(--color-text);
+      line-height: 1.45;
+    }
+
+    /* Success Prompt View */
+    .registration-success-card {
+      display: none;
+      background-color: var(--color-surface);
+      border: 1.5px solid var(--color-success);
+      border-radius: var(--radius-md);
+      padding: var(--space-2xl);
+      text-align: center;
+      animation: fadeIn 0.25s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .success-icon-badge {
+      width: 54px;
+      height: 54px;
+      background-color: var(--color-success-bg);
+      color: var(--color-success);
+      border: 1.5px solid var(--color-success-border);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.7rem;
+      font-weight: 800;
+      margin-bottom: var(--space-md);
+    }
+
+    .registration-success-card h2 {
+      font-size: 1.7rem;
+      color: var(--color-primary-dark);
+      margin-bottom: 0.4rem;
+    }
+
+    .registration-success-card p {
+      color: var(--color-text-muted);
+      max-width: 540px;
+      margin: 0 auto var(--space-xl);
+    }
+
+    /* Informational Sidebar */
+    .auth-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-lg);
+    }
+
+    .benefit-card {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-xl);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .benefit-card h3 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      margin-bottom: var(--space-md);
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: var(--space-sm);
+    }
+
+    .benefit-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    .benefit-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+    }
+
+    .benefit-icon {
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      font-size: 1rem;
+      line-height: 1.3;
+    }
+
+    .benefit-text h4 {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--color-primary-dark);
+      margin-bottom: 0.15rem;
+    }
+
+    .benefit-text p {
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      line-height: 1.4;
+      margin-bottom: 0;
+    }
+
+    .already-card {
+      background-color: #fafbfc;
+      border: 1px dashed var(--color-border-dark);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .already-card p {
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-sm);
+    }
+
+    /* ==========================================================================
+       5. Site Footer (Solid Deep Black)
+       ========================================================================== */
+    .site-footer {
+      background-color: #0f1115;
+      color: #94a3b8;
+      padding: var(--space-3xl) 0 var(--space-lg);
+      border-top: 1px solid #1e293b;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1.2fr;
+      gap: var(--space-2xl);
+      margin-bottom: var(--space-2xl);
+    }
+
+    .footer-col h4 {
+      color: #ffffff;
+      font-size: 1.05rem;
+      margin-bottom: var(--space-md);
+      font-weight: 700;
+    }
+
+    .footer-links {
+      list-style: none;
+    }
+
+    .footer-links li {
+      margin-bottom: var(--space-xs);
+    }
+
+    .footer-links a {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.15s ease;
+    }
+
+    .footer-links a:hover {
+      color: #ffffff;
+      text-decoration: underline;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid #1e293b;
+      padding-top: var(--space-lg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+
+    /* ==========================================================================
+       6. Responsive Breakpoints
+       ========================================================================== */
+    @media (max-width: 992px) {
+      .auth-layout-grid {
+        grid-template-columns: 1fr;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .mobile-nav-toggle {
+        display: block;
+      }
+      .nav-menu {
+        position: absolute;
+        top: 74px;
+        left: 0;
+        right: 0;
+        background-color: var(--color-surface);
+        border-bottom: 2px solid var(--color-primary-dark);
+        flex-direction: column;
+        align-items: flex-start;
+        padding: var(--space-lg);
+        box-shadow: var(--shadow-md);
+        display: none;
+      }
+      .nav-menu.is-active {
+        display: flex;
+      }
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      .utility-bar .container {
+        flex-direction: column;
+        gap: var(--space-xs);
+        text-align: center;
+      }
+      .emergency-tag {
+        border-right: none;
+        padding-right: 0;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+      .footer-bottom {
+        flex-direction: column;
+        gap: var(--space-sm);
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Utility Bar -->
+  <aside class="utility-bar" aria-label="Quick Access Bar">
+    <div class="container">
+      <div class="utility-emergency">
+        <span class="emergency-tag">Medical Emergency: Call 911 immediately</span>
+        <span>General Inquiry: (800) 555-0199</span>
+      </div>
+      <ul class="utility-links">
+        <li><a href="queue.html">Track Wait Time</a></li>
+        <li><a href="login.html">Patient Sign In</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- Primary Site Header & Navigation -->
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="brand" aria-label="Hopewell Health Care Home">
+        <div class="brand-icon" aria-hidden="true">+</div>
+        <div class="brand-text">
+          <span class="brand-name">Hopewell</span>
+          <span class="brand-sub">Health Care System</span>
+        </div>
+      </a>
+
+      <!-- Main Navigation Menu -->
+      <nav aria-label="Primary Navigation">
+        <ul class="nav-menu" id="primary-nav">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="doctors.html" class="nav-link">Find a Doctor</a></li>
+          <li><a href="departments.html" class="nav-link">Departments</a></li>
+          <li><a href="appointments.html" class="nav-link">Book Appointment</a></li>
+          <li><a href="queue.html" class="nav-link">Live Queue</a></li>
+          <li><a href="about.html" class="nav-link">About</a></li>
+          <li><a href="contact.html" class="nav-link">Contact</a></li>
+        </ul>
+      </nav>
+
+      <!-- Action Button & Mobile Nav Trigger -->
+      <div class="nav-actions">
+        <a href="login.html" class="btn btn-outline">Sign In</a>
+        <button class="mobile-nav-toggle" id="mobile-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Toggle navigation menu">
+          &#9776;
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="auth-section">
+      <div class="container">
+
+        <!-- Success Confirmation Card (Shown after backend registration) -->
+        <article class="registration-success-card" id="success-card" aria-live="polite">
+          <div class="success-icon-badge" aria-hidden="true">&#10003;</div>
+          <h2>Registration Successful</h2>
+          <p id="success-message">
+            Your patient account profile has been registered. You can now log into your patient portal to manage bookings and live queue tracking.
+          </p>
+          <div style="display: flex; gap: var(--space-md); justify-content: center; flex-wrap: wrap;">
+            <a href="login.html" class="btn btn-primary" id="proceed-login-btn">Proceed to Patient Sign In &rarr;</a>
+            <a href="patient-dashboard.html" class="btn btn-outline">Open Patient Dashboard</a>
+          </div>
+        </article>
+
+        <!-- Main Form Grid -->
+        <div class="auth-layout-grid" id="registration-grid">
+          
+          <form class="auth-card" id="register-form" novalidate>
+            <div class="auth-header">
+              <span class="demo-pill">Patient Portal Access</span>
+              <h1>Create Patient Profile</h1>
+              <p>Register to manage outpatient appointments, view consultation tickets, and track clinic queues.</p>
+            </div>
+            <p class="field-error" id="register-server-error" role="alert"></p>
+
+            <!-- Google One-Click Registration -->
+            <button type="button" class="btn-google" id="google-signup-btn" aria-label="Google sign-up unavailable" disabled>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+                <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+              </svg>
+              <span>Google sign-up unavailable</span>
+            </button>
+
+            <!-- Divider -->
+            <div class="auth-divider">or register with email</div>
+
+            <!-- Demographics -->
+            <div class="form-row">
+              <div class="form-group">
+                <label for="first-name" class="form-label">
+                  <span>First Name</span>
+                  <span class="form-label-required">*</span>
+                </label>
+                <input type="text" id="first-name" class="form-input" placeholder="e.g. Arthur" required>
+                <span class="field-error" id="first-name-error">First name is required.</span>
+              </div>
+
+              <div class="form-group">
+                <label for="last-name" class="form-label">
+                  <span>Last Name</span>
+                  <span class="form-label-required">*</span>
+                </label>
+                <input type="text" id="last-name" class="form-input" placeholder="e.g. Morgan" required>
+                <span class="field-error" id="last-name-error">Last name is required.</span>
+              </div>
+            </div>
+
+            <!-- Contacts -->
+            <div class="form-row">
+              <div class="form-group">
+                <label for="reg-email" class="form-label">
+                  <span>Email Address</span>
+                  <span class="form-label-required">*</span>
+                </label>
+                <input type="email" id="reg-email" class="form-input" placeholder="arthur.morgan@example.com" required>
+                <span class="field-error" id="email-error">Please enter a valid email address.</span>
+              </div>
+
+              <div class="form-group">
+                <label for="reg-phone" class="form-label">
+                  <span>Phone Number</span>
+                  <span class="form-label-required">*</span>
+                </label>
+                <input type="tel" id="reg-phone" class="form-input" placeholder="(555) 019-2834" required>
+                <span class="field-error" id="phone-error">Please provide a valid contact number.</span>
+              </div>
+            </div>
+
+            <!-- Date of Birth & Gender -->
+            <div class="form-row">
+              <div class="form-group">
+                <label for="reg-dob" class="form-label">
+                  <span>Date of Birth</span>
+                  <span class="form-label-required">*</span>
+                </label>
+                <input type="date" id="reg-dob" class="form-input" required>
+                <span class="field-error" id="dob-error">Date of birth is required.</span>
+              </div>
+
+              <div class="form-group">
+                <label for="reg-gender" class="form-label">
+                  <span>Gender</span>
+                </label>
+                <select id="reg-gender" class="form-select">
+                  <option value="">Prefer not to state</option>
+                  <option value="female">Female</option>
+                  <option value="male">Male</option>
+                  <option value="nonbinary">Non-binary</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Password Fields with Toggle & Strength Meter -->
+            <div class="form-row">
+              <div class="form-group">
+                <label for="reg-password" class="form-label">
+                  <span>Create Password</span>
+                  <span class="form-label-required">*</span>
+                </label>
+                <div class="password-input-wrapper">
+                  <input type="password" id="reg-password" class="form-input" placeholder="At least 8 characters" required>
+                  <button type="button" class="toggle-password-btn" data-target="reg-password" aria-label="Show password">Show</button>
+                </div>
+                
+                <!-- Password Strength Visual Indicator -->
+                <div class="password-meter-wrap">
+                  <div class="meter-track" aria-hidden="true">
+                    <div class="meter-fill" id="meter-fill"></div>
+                  </div>
+                  <div class="meter-label">
+                    <span>Password strength:</span>
+                    <strong id="meter-text">Too short</strong>
+                  </div>
+                </div>
+                <span class="field-error" id="password-error">Password must be at least 8 characters long.</span>
+              </div>
+
+              <div class="form-group">
+                <label for="reg-confirm-password" class="form-label">
+                  <span>Confirm Password</span>
+                  <span class="form-label-required">*</span>
+                </label>
+                <div class="password-input-wrapper">
+                  <input type="password" id="reg-confirm-password" class="form-input" placeholder="Re-type password" required>
+                  <button type="button" class="toggle-password-btn" data-target="reg-confirm-password" aria-label="Show confirmation password">Show</button>
+                </div>
+                <span class="field-error" id="confirm-password-error">Passwords do not match.</span>
+              </div>
+            </div>
+
+            <!-- Checkbox Terms -->
+            <label class="checkbox-group">
+              <input type="checkbox" id="terms-accept" required>
+              <span class="checkbox-text">
+                I agree to the Hopewell Health Care Patient Portal Terms of Service and Privacy Policy. <span class="form-label-required">*</span>
+              </span>
+            </label>
+            <span class="field-error" id="terms-error">You must accept the terms of service to proceed.</span>
+
+            <div style="margin-top: var(--space-xl); display: flex; justify-content: flex-end; gap: var(--space-md); align-items: center;">
+              <a href="login.html" class="btn btn-secondary">Cancel</a>
+              <button type="submit" class="btn btn-primary" id="submit-btn" style="padding: 0.85rem 2rem;">
+                Create Patient Account &rarr;
+              </button>
+            </div>
+          </form>
+
+          <!-- Sidebar Context Cards -->
+          <aside class="auth-sidebar" aria-label="Patient Portal Benefits">
+            
+            <div class="benefit-card">
+              <h3>Portal Benefits</h3>
+              <ul class="benefit-list">
+                <li class="benefit-item">
+                  <span class="benefit-icon" aria-hidden="true">&#10003;</span>
+                  <div class="benefit-text">
+                    <h4>Direct Appointment Oversight</h4>
+                    <p>Review past and upcoming specialist consultations across all Hopewell clinics.</p>
+                  </div>
+                </li>
+                <li class="benefit-item">
+                  <span class="benefit-icon" aria-hidden="true">&#10003;</span>
+                  <div class="benefit-text">
+                    <h4>Live Queue Synchronization</h4>
+                    <p>Your confirmed tickets automatically link with your account for faster check-ins.</p>
+                  </div>
+                </li>
+                <li class="benefit-item">
+                  <span class="benefit-icon" aria-hidden="true">&#10003;</span>
+                  <div class="benefit-text">
+                    <h4>Pre-Filled Booking Data</h4>
+                    <p>Schedule future appointments without having to repeatedly type demographic information.</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <div class="already-card">
+              <p>Already have a Hopewell patient account?</p>
+              <a href="login.html" class="btn btn-outline" style="width: 100%;">Sign In to Your Account</a>
+            </div>
+
+            <div style="font-size: 0.8rem; color: var(--color-text-muted); line-height: 1.5; padding: 0 0.5rem;">
+            </div>
+
+          </aside>
+
+        </div>
+      </div>
+    </section>
+  </main>
+    <!-- Site Footer (Solid Deep Black) -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>Hopewell Health Care</h4>
+          <p>
+            An integrated healthcare management system engineered for streamlined patient appointment access, outpatient consultation routing, and real-time clinic queue tracking.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Patient Services</h4>
+          <ul class="footer-links">
+            <li><a href="appointments.html">Book Appointment</a></li>
+            <li><a href="queue.html">Check Queue Position</a></li>
+            <li><a href="doctors.html">Doctor Directory</a></li>
+            <li><a href="departments.html">Clinical Departments</a></li>
+            <li><a href="patient-dashboard.html">Patient Dashboard</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Hospital & Care</h4>
+          <ul class="footer-links">
+            <li><a href="about.html">About Hopewell</a></li>
+            <li><a href="contact.html">Hours & Directions</a></li>
+            <li><a href="contact.html">Send Inquiry</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Emergency & Contacts</h4>
+          <p>Emergency Department: <strong>Open 24/7</strong></p>
+          <p>General Reception: (800) 555-0199</p>
+          <p>Clinic Hours: 08:00 – 17:00 Mon–Sat</p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 Hopewell Health Care System. All rights reserved.</p>
+        <p>Providing trusted, patient-first clinical excellence across all outpatient centers.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/api.js"></script>
+  <script>
+    /** Patient portal data loads through the shared PostgreSQL API. */
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initMobileNavigation();
+      initRegistrationForm();
+    });
+
+    /**
+     * Mobile Menu Navigation Handler
+     */
+    function initMobileNavigation() {
+      const toggleBtn = document.getElementById('mobile-toggle');
+      const navMenu = document.getElementById('primary-nav');
+
+      if (!toggleBtn || !navMenu) return;
+
+      toggleBtn.addEventListener('click', () => {
+        const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+        toggleBtn.setAttribute('aria-expanded', String(!isExpanded));
+        navMenu.classList.toggle('is-active');
+      });
+
+      document.addEventListener('click', (event) => {
+        if (!toggleBtn.contains(event.target) && !navMenu.contains(event.target)) {
+          navMenu.classList.remove('is-active');
+          toggleBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+
+    /**
+     * Registration Form Client-Side Validation and Password Strength Meter
+     */
+    function initRegistrationForm() {
+      const form = document.getElementById('register-form');
+      const passwordInput = document.getElementById('reg-password');
+      const confirmInput = document.getElementById('reg-confirm-password');
+      const toggleBtns = document.querySelectorAll('.toggle-password-btn');
+      const meterFill = document.getElementById('meter-fill');
+      const meterText = document.getElementById('meter-text');
+      // 1. Show/Hide Password Toggle
+      toggleBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const targetId = btn.getAttribute('data-target');
+          const targetInput = document.getElementById(targetId);
+          if (!targetInput) return;
+
+          const isPassword = targetInput.getAttribute('type') === 'password';
+          targetInput.setAttribute('type', isPassword ? 'text' : 'password');
+          btn.textContent = isPassword ? 'Hide' : 'Show';
+          btn.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+        });
+      });
+
+      // 2. Real-time Password Strength Meter
+      passwordInput.addEventListener('input', () => {
+        const val = passwordInput.value;
+        let score = 0;
+
+        if (val.length >= 8) score++;
+        if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score++;
+        if (/[0-9]/.test(val) || /[^A-Za-z0-9]/.test(val)) score++;
+
+        meterFill.className = 'meter-fill';
+
+        if (val.length === 0) {
+          meterFill.style.width = '0%';
+          meterText.textContent = 'Too short';
+          meterText.style.color = 'var(--color-text-muted)';
+        } else if (val.length < 8) {
+          meterFill.classList.add('weak');
+          meterText.textContent = 'Weak (min 8 chars)';
+          meterText.style.color = 'var(--color-danger)';
+        } else if (score === 2) {
+          meterFill.classList.add('medium');
+          meterText.textContent = 'Moderate';
+          meterText.style.color = 'var(--color-warning)';
+        } else {
+          meterFill.classList.add('strong');
+          meterText.textContent = 'Strong';
+          meterText.style.color = 'var(--color-success)';
+        }
+      });
+
+      // 3. Submit registration to the backend
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearErrors();
+        document.getElementById('register-server-error').classList.remove('visible');
+
+        const isValid = validateForm();
+        if (!isValid) return;
+
+        const submitButton = document.getElementById('submit-btn');
+        submitButton.disabled = true;
+        const email = document.getElementById('reg-email').value.trim().toLowerCase();
+        try {
+          await HopewellAPI.request('auth/register.php', {
+            method: 'POST',
+            body: {
+              firstName: document.getElementById('first-name').value.trim(),
+              lastName: document.getElementById('last-name').value.trim(),
+              email,
+              phone: document.getElementById('reg-phone').value.trim(),
+              dateOfBirth: document.getElementById('reg-dob').value,
+              gender: document.getElementById('reg-gender').value,
+              password: passwordInput.value,
+              termsConsent: document.getElementById('terms-accept').checked
+            }
+          });
+          document.getElementById('proceed-login-btn').href =
+            `login.html?registered=true&email=${encodeURIComponent(email)}`;
+          document.getElementById('registration-grid').style.display = 'none';
+          const successCard = document.getElementById('success-card');
+          successCard.style.display = 'block';
+          successCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } catch (error) {
+          const fieldIds = {
+            firstName: 'first-name-error',
+            lastName: 'last-name-error',
+            email: 'email-error',
+            phone: 'phone-error',
+            dateOfBirth: 'dob-error',
+            password: 'password-error',
+            gender: 'register-server-error',
+            termsConsent: 'terms-error'
+          };
+          const firstIssue = Object.entries(error.errors || {})[0];
+          if (firstIssue && fieldIds[firstIssue[0]]) {
+            const errorElement = document.getElementById(fieldIds[firstIssue[0]]);
+            errorElement.textContent = firstIssue[1];
+            errorElement.classList.add('visible');
+          } else {
+            const errorElement = document.getElementById('register-server-error');
+            errorElement.textContent = error.message;
+            errorElement.classList.add('visible');
+          }
+        } finally {
+          submitButton.disabled = false;
+        }
+      });
+    }
+
+    /**
+     * Validates input fields and shows inline errors
+     */
+    function validateForm() {
+      let valid = true;
+
+      const firstName = document.getElementById('first-name');
+      if (!firstName.value.trim()) {
+        showError('first-name-error', firstName);
+        valid = false;
+      }
+
+      const lastName = document.getElementById('last-name');
+      if (!lastName.value.trim()) {
+        showError('last-name-error', lastName);
+        valid = false;
+      }
+
+      const email = document.getElementById('reg-email');
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email.value.trim() || !emailPattern.test(email.value.trim())) {
+        showError('email-error', email);
+        valid = false;
+      }
+
+      const phone = document.getElementById('reg-phone');
+      if (!phone.value.trim() || phone.value.trim().length < 7) {
+        showError('phone-error', phone);
+        valid = false;
+      }
+
+      const dob = document.getElementById('reg-dob');
+      if (!dob.value) {
+        showError('dob-error', dob);
+        valid = false;
+      }
+
+      const password = document.getElementById('reg-password');
+      if (password.value.length < 8) {
+        showError('password-error', password);
+        valid = false;
+      }
+
+      const confirm = document.getElementById('reg-confirm-password');
+      if (confirm.value !== password.value) {
+        showError('confirm-password-error', confirm);
+        valid = false;
+      }
+
+      const terms = document.getElementById('terms-accept');
+      if (!terms.checked) {
+        document.getElementById('terms-error').classList.add('visible');
+        valid = false;
+      }
+
+      return valid;
+    }
+
+    function showError(errorId, inputElement) {
+      const errEl = document.getElementById(errorId);
+      if (errEl) errEl.classList.add('visible');
+      if (inputElement) inputElement.classList.add('invalid');
+    }
+
+    function clearErrors() {
+      document.querySelectorAll('.field-error').forEach(el => el.classList.remove('visible'));
+      document.querySelectorAll('.form-input, .form-select').forEach(el => el.classList.remove('invalid'));
+    }
+  </script>
+</body>
+</html>

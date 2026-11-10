@@ -90,12 +90,16 @@ async function checkPageAccess() {
     return false;
   }
 
-  const initials = (currentUser.name || 'Hopewell').split(/\s+/).map(part => part[0]).join('').substring(0, 2).toUpperCase();
+  const initials = currentUser.role === 'admin'
+    ? 'AD'
+    : (currentUser.name || 'Hopewell').split(/\s+/).map(part => part[0]).join('').substring(0, 2).toUpperCase();
   const avatar = document.querySelector('.user-avatar');
   const name = document.querySelector('.user-profile div strong');
   const dept = document.querySelector('.user-profile div small');
   if (avatar) avatar.textContent = initials;
-  if (name) name.textContent = `${currentUser.name} (${currentUser.role.toUpperCase()})`;
+  if (name) name.textContent = currentUser.role === 'admin'
+    ? 'Admin'
+    : `${currentUser.name} (${currentUser.role.toUpperCase()})`;
   if (dept) dept.textContent = currentUser.department || 'Hopewell Hospital';
 
   document.querySelectorAll('.sidebar-menu li a').forEach(link => {

@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Portal Dashboard | Hopewell Health Care</title>
+
+  <style>
+    /* ==========================================================================
+       1. Design Tokens & CSS Variables (Matches Site-wide Soft Monochrome)
+       ========================================================================== */
+    :root {
+      --color-primary: #1f2428;
+      --color-primary-dark: #111417;
+      --color-primary-light: #424a52;
+      
+      --color-accent: #2d3339;
+      --color-accent-subtle: #f3f5f7;
+      --color-accent-border: #d0d5dd;
+      
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-text: #24292e;
+      --color-text-muted: #64748b;
+      --color-border: #e2e8f0;
+      --color-border-dark: #cbd5e1;
+      
+      --color-success: #059669;
+      --color-success-bg: #ecfdf5;
+      --color-success-border: #a7f3d0;
+
+      --color-warning: #d97706;
+      --color-warning-bg: #fffbeb;
+      --color-warning-border: #fde68a;
+
+      --color-danger: #b91c1c;
+      --color-danger-bg: #fef2f2;
+      --color-danger-border: #fecaca;
+
+      --color-info: #0284c7;
+      --color-info-bg: #f0f9ff;
+      --color-info-border: #bae6fd;
+
+      --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-family-heading: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2rem;
+      --space-2xl: 3rem;
+      --space-3xl: 4.5rem;
+
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
+
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-full: 9999px;
+
+      --container-max: 1200px;
+    }
+
+    /* Base Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-family-base);
+      color: var(--color-text);
+      background-color: var(--color-bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .container {
+      width: 100%;
+      max-width: var(--container-max);
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: var(--space-lg);
+      padding-right: var(--space-lg);
+    }
+
+    /* ==========================================================================
+       2. Reusable Buttons & Badges
+       ========================================================================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+      padding: 0.7rem 1.25rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.1s ease;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background-color: var(--color-primary-dark);
+      border-color: var(--color-primary-dark);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: #333a42;
+      border-color: #333a42;
+      color: #ffffff;
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border-color: var(--color-primary-dark);
+      color: var(--color-primary-dark);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--color-primary-dark);
+      color: #ffffff;
+    }
+
+    .btn-secondary {
+      background-color: #f1f5f9;
+      border-color: var(--color-border);
+      color: var(--color-text);
+    }
+
+    .btn-secondary:hover {
+      background-color: #e2e8f0;
+      border-color: var(--color-border-dark);
+    }
+
+    .btn-danger-outline {
+      background-color: transparent;
+      border-color: var(--color-danger);
+      color: var(--color-danger);
+    }
+
+    .btn-danger-outline:hover {
+      background-color: var(--color-danger);
+      color: #ffffff;
+    }
+
+    .btn-sm {
+      padding: 0.45rem 0.85rem;
+      font-size: 0.82rem;
+    }
+
+    .demo-pill {
+      display: inline-block;
+      background-color: var(--color-accent-subtle);
+      color: var(--color-primary);
+      border: 1px solid var(--color-border);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-full);
+      margin-bottom: var(--space-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ==========================================================================
+       3. Utility Bar & Header
+       ========================================================================== */
+    .utility-bar {
+      background-color: #f1f4f8;
+      color: #475569;
+      font-size: 0.85rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .utility-bar .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .utility-links,
+    .utility-emergency {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      list-style: none;
+    }
+
+    .utility-bar a {
+      color: #334155;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.15s ease;
+    }
+
+    .utility-bar a:hover {
+      color: var(--color-primary-dark);
+      text-decoration: underline;
+    }
+
+    .emergency-tag {
+      color: #b91c1c;
+      font-weight: 700;
+      border-right: 1px solid var(--color-border);
+      padding-right: var(--space-md);
+    }
+
+    .site-header {
+      background-color: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .site-header .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 74px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background-color: var(--color-primary-dark);
+      color: #ffffff;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      font-weight: 800;
+    }
+
+    .brand-name {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-sub {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      letter-spacing: 0.05em;
+      font-weight: 600;
+      display: block;
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      list-style: none;
+    }
+
+    .nav-link {
+      position: relative;
+      font-weight: 600;
+      color: var(--color-text);
+      text-decoration: none;
+      font-size: 0.95rem;
+      padding: 0.55rem 0.85rem;
+      border-radius: var(--radius-sm);
+      transition: color 0.2s ease, background-color 0.2s ease, transform 0.15s ease;
+      display: inline-block;
+    }
+
+    .nav-link:hover {
+      color: var(--color-primary-dark);
+      background-color: #f1f5f9;
+      transform: translateY(-1px);
+    }
+
+    .nav-link::after {
+      content: "";
+      position: absolute;
+      bottom: 4px;
+      left: 0.85rem;
+      right: 0.85rem;
+      height: 2px;
+      background-color: var(--color-primary-dark);
+      border-radius: var(--radius-full);
+      transform: scaleX(0);
+      transform-origin: center;
+      transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-link:hover::after,
+    .nav-link.active::after {
+      transform: scaleX(1);
+    }
+
+    .nav-link.active {
+      color: var(--color-primary-dark);
+      background-color: #f8fafc;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .user-profile-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 0.75rem;
+      background-color: var(--color-accent-subtle);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--color-primary-dark);
+    }
+
+    .user-avatar-circle {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background-color: var(--color-primary-dark);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+    }
+
+    .mobile-nav-toggle {
+      display: none;
+      background: transparent;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-size: 1.4rem;
+      color: var(--color-primary-dark);
+      cursor: pointer;
+      padding: 0.35rem 0.6rem;
+      line-height: 1;
+    }
+
+    /* ==========================================================================
+       4. Dashboard Banner & Layout
+       ========================================================================== */
+    .dashboard-banner {
+      background-color: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-2xl) 0 var(--space-xl);
+    }
+
+    .banner-welcome-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+    }
+
+    .banner-title {
+      font-size: 2.1rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      letter-spacing: -0.02em;
+      margin-bottom: 0.35rem;
+    }
+
+    .banner-sub {
+      color: var(--color-text-muted);
+      font-size: 1rem;
+    }
+
+    .banner-actions {
+      display: flex;
+      gap: var(--space-sm);
+      flex-wrap: wrap;
+    }
+
+    .dashboard-layout-section {
+      padding: var(--space-2xl) 0 var(--space-3xl);
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: var(--space-2xl);
+      align-items: start;
+    }
+
+    /* ==========================================================================
+       5. Dashboard Cards & Modules
+       ========================================================================== */
+    .dash-module {
+      background-color: var(--color-surface);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: var(--space-2xl);
+      overflow: hidden;
+    }
+
+    .dash-module-header {
+      padding: var(--space-lg) var(--space-xl);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #fafbfc;
+    }
+
+    .dash-module-header h3 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      margin-bottom: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .dash-module-body {
+      padding: var(--space-xl);
+    }
+
+    /* Live Queue Callout Card */
+    .live-queue-card {
+      background: linear-gradient(145deg, #ffffff 0%, #fafbfc 100%);
+      border: 2px solid var(--color-primary-dark);
+      border-radius: var(--radius-md);
+      padding: var(--space-xl);
+      margin-bottom: var(--space-2xl);
+      box-shadow: var(--shadow-md);
+    }
+
+    .queue-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-md);
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+
+    .queue-status-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background-color: var(--color-info-bg);
+      color: var(--color-info);
+      border: 1px solid var(--color-info-border);
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-full);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: currentColor;
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.9); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.5; }
+      100% { transform: scale(0.9); opacity: 1; }
+    }
+
+    .queue-metrics-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-md);
+      text-align: center;
+      background-color: #f8fafc;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-md);
+      margin: var(--space-md) 0 var(--space-lg);
+    }
+
+    .qm-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      letter-spacing: 0.05em;
+      margin-bottom: 0.2rem;
+    }
+
+    .qm-val {
+      font-size: 1.85rem;
+      font-weight: 800;
+      font-family: monospace;
+      color: var(--color-primary-dark);
+      line-height: 1.1;
+    }
+
+    .qm-sub {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+    }
+
+    .queue-details-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      border-top: 1px solid var(--color-border);
+      padding-top: var(--space-md);
+      font-size: 0.88rem;
+    }
+
+    /* Appointment Cards */
+    .appointment-card {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-md);
+      background-color: var(--color-surface);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      position: relative;
+    }
+
+    .appointment-card:last-child {
+      margin-bottom: 0;
+    }
+
+    .appointment-card:hover {
+      border-color: var(--color-primary-dark);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .app-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--space-sm);
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+
+    .app-dept {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--color-primary-dark);
+      letter-spacing: 0.04em;
+    }
+
+    .app-status-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.15rem 0.55rem;
+      border-radius: var(--radius-full);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .status-confirmed {
+      background-color: var(--color-success-bg);
+      color: var(--color-success);
+      border: 1px solid var(--color-success-border);
+    }
+
+    .status-rescheduled {
+      background-color: var(--color-warning-bg);
+      color: var(--color-warning);
+      border: 1px solid var(--color-warning-border);
+    }
+
+    .app-doctor-name {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      margin-bottom: 0.2rem;
+    }
+
+    .app-meta-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-lg);
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin: var(--space-sm) 0 var(--space-md);
+    }
+
+    .app-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .app-meta-item strong {
+      color: var(--color-text);
+    }
+
+    .app-card-actions {
+      display: flex;
+      gap: var(--space-sm);
+      justify-content: flex-end;
+      border-top: 1px dashed var(--color-border);
+      padding-top: var(--space-sm);
+    }
+
+    /* History Table */
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      text-align: left;
+    }
+
+    .history-table th {
+      background-color: #f1f5f9;
+      color: var(--color-primary-dark);
+      font-weight: 700;
+      padding: 0.75rem 1rem;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1.5px solid var(--color-border-dark);
+    }
+
+    .history-table td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--color-border);
+      color: var(--color-text);
+      vertical-align: middle;
+    }
+
+    .history-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .history-table tr:hover td {
+      background-color: #fafbfc;
+    }
+
+    /* Sidebar Profile Card */
+    .profile-card {
+      background-color: var(--color-surface);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-xl);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: var(--space-xl);
+    }
+
+    .profile-header-center {
+      text-align: center;
+      padding-bottom: var(--space-lg);
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: var(--space-md);
+    }
+
+    .profile-avatar-large {
+      width: 72px;
+      height: 72px;
+      background-color: var(--color-primary-dark);
+      color: #ffffff;
+      border-radius: 50%;
+      font-size: 1.8rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto var(--space-sm);
+      border: 3px solid #e2e8f0;
+    }
+
+    .profile-name {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+      margin-bottom: 0.15rem;
+    }
+
+    .profile-mrn {
+      font-size: 0.78rem;
+      font-family: monospace;
+      color: var(--color-text-muted);
+    }
+
+    .profile-info-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      font-size: 0.88rem;
+      margin-bottom: var(--space-lg);
+    }
+
+    .profile-info-item {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed var(--color-border);
+      padding-bottom: 0.4rem;
+    }
+
+    .profile-info-item:last-child {
+      border-bottom: none;
+    }
+
+    .pi-label {
+      color: var(--color-text-muted);
+    }
+
+    .pi-val {
+      font-weight: 700;
+      color: var(--color-primary-dark);
+      text-align: right;
+    }
+
+    /* Modal dialogs */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background-color: rgba(17, 20, 23, 0.6);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-lg);
+      backdrop-filter: blur(2px);
+    }
+
+    .modal-overlay.is-active {
+      display: flex;
+    }
+
+    .modal-content {
+      background-color: var(--color-surface);
+      border-radius: var(--radius-md);
+      max-width: 500px;
+      width: 100%;
+      padding: var(--space-xl);
+      box-shadow: var(--shadow-lg);
+      animation: modalFade 0.2s ease forwards;
+    }
+
+    @keyframes modalFade {
+      from { opacity: 0; transform: translateY(10px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-header {
+      margin-bottom: var(--space-md);
+      padding-bottom: var(--space-sm);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .modal-header h3 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--color-primary-dark);
+    }
+
+    .modal-body {
+      font-size: 0.92rem;
+      color: var(--color-text);
+      margin-bottom: var(--space-xl);
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--space-sm);
+    }
+
+    /* Notification toast */
+    .toast-notice {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background-color: var(--color-primary-dark);
+      color: #ffffff;
+      padding: 0.85rem 1.4rem;
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-lg);
+      font-size: 0.9rem;
+      font-weight: 600;
+      z-index: 3000;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .toast-notice.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* ==========================================================================
+       6. Site Footer (Solid Deep Black)
+       ========================================================================== */
+    .site-footer {
+      background-color: #0f1115;
+      color: #94a3b8;
+      padding: var(--space-3xl) 0 var(--space-lg);
+      border-top: 1px solid #1e293b;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1.2fr;
+      gap: var(--space-2xl);
+      margin-bottom: var(--space-2xl);
+    }
+
+    .footer-col h4 {
+      color: #ffffff;
+      font-size: 1.05rem;
+      margin-bottom: var(--space-md);
+      font-weight: 700;
+    }
+
+    .footer-links {
+      list-style: none;
+    }
+
+    .footer-links li {
+      margin-bottom: var(--space-xs);
+    }
+
+    .footer-links a {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.15s ease;
+    }
+
+    .footer-links a:hover {
+      color: #ffffff;
+      text-decoration: underline;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid #1e293b;
+      padding-top: var(--space-lg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+
+    /* ==========================================================================
+       7. Responsive Breakpoints
+       ========================================================================== */
+    @media (max-width: 992px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .mobile-nav-toggle {
+        display: block;
+      }
+      .nav-menu {
+        position: absolute;
+        top: 74px;
+        left: 0;
+        right: 0;
+        background-color: var(--color-surface);
+        border-bottom: 2px solid var(--color-primary-dark);
+        flex-direction: column;
+        align-items: flex-start;
+        padding: var(--space-lg);
+        box-shadow: var(--shadow-md);
+        display: none;
+      }
+      .nav-menu.is-active {
+        display: flex;
+      }
+      .queue-metrics-strip {
+        grid-template-columns: 1fr;
+        gap: var(--space-sm);
+      }
+      .utility-bar .container {
+        flex-direction: column;
+        gap: var(--space-xs);
+        text-align: center;
+      }
+      .emergency-tag {
+        border-right: none;
+        padding-right: 0;
+      }
+      .banner-welcome-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+      .footer-bottom {
+        flex-direction: column;
+        gap: var(--space-sm);
+        text-align: center;
+      }
+      .history-table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+<body style="visibility: hidden;">
+
+  <!-- Top Utility Bar -->
+  <aside class="utility-bar" aria-label="Quick Access Bar">
+    <div class="container">
+      <div class="utility-emergency">
+        <span class="emergency-tag">Medical Emergency: Call 911 immediately</span>
+        <span>General Inquiry: (800) 555-0199</span>
+      </div>
+      <ul class="utility-links">
+        <li><a href="queue.html">Track Wait Time</a></li>
+        <li><a href="appointments.html">Schedule Visit</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- Primary Site Header & Navigation -->
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="brand" aria-label="Hopewell Health Care Home">
+        <div class="brand-icon" aria-hidden="true">+</div>
+        <div class="brand-text">
+          <span class="brand-name">Hopewell</span>
+          <span class="brand-sub">Health Care System</span>
+        </div>
+      </a>
+
+      <!-- Main Navigation Menu -->
+      <nav aria-label="Primary Navigation">
+        <ul class="nav-menu" id="primary-nav">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="doctors.html" class="nav-link">Find a Doctor</a></li>
+          <li><a href="departments.html" class="nav-link">Departments</a></li>
+          <li><a href="appointments.html" class="nav-link">Book Appointment</a></li>
+          <li><a href="queue.html" class="nav-link">Live Queue</a></li>
+          <li><a href="patient-dashboard.html" class="nav-link active">My Dashboard</a></li>
+        </ul>
+      </nav>
+
+      <!-- Active User Profile Indicator & Logout Button -->
+      <div class="nav-actions">
+        <div class="user-profile-badge" id="nav-user-badge">
+          <div class="user-avatar-circle" id="nav-user-avatar">AM</div>
+          <span id="nav-user-name"></span>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" id="logout-btn" title="Sign out of patient portal">
+          Sign Out
+        </button>
+        <button class="mobile-nav-toggle" id="mobile-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Toggle navigation menu">
+          &#9776;
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Patient Dashboard Banner -->
+    <section class="dashboard-banner">
+      <div class="container">
+        <div class="banner-welcome-row">
+          <div>
+            <span class="demo-pill">Patient Portal Overview</span>
+            <h1 class="banner-title" id="welcome-heading">Welcome back, Arthur</h1>
+            <p class="banner-sub">
+              Access your upcoming outpatient consultations, check live clinic wait times, and manage your health records.
+            </p>
+          </div>
+          <div class="banner-actions">
+            <a href="appointments.html" class="btn btn-primary">+ Book New Consultation</a>
+            <a href="queue.html" class="btn btn-outline">Check Facility Queues</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Dashboard Grid Layout -->
+    <section class="dashboard-layout-section">
+      <div class="container">
+        
+        <div class="dashboard-grid">
+          
+          <!-- LEFT COLUMN: Active Queue & Appointments -->
+          <div>
+            
+            <!-- 1. Active Outpatient Queue Card -->
+            <article class="live-queue-card" id="active-queue-widget">
+              <div class="queue-card-top">
+                <span class="demo-pill" style="margin-bottom: 0;">Live Consultation Ticket</span>
+                <div class="queue-status-tag" id="dash-queue-tag">
+                  <span class="pulse-dot" aria-hidden="true"></span>
+                  <span id="dash-queue-status">Waiting in Clinic Queue</span>
+                </div>
+              </div>
+
+              <div style="margin-bottom: 0.5rem;">
+                <h2 style="font-size: 1.4rem; color: var(--color-primary-dark); margin-bottom: 0.2rem;" id="dash-queue-dept">
+                  Cardiovascular Medicine &bull; Suite 302
+                </h2>
+                <p style="color: var(--color-text-muted); font-size: 0.9rem;" id="dash-queue-doc">
+                  Attending: <span id="dash-queue-doc-name">—</span> &bull; Token Ref: <strong style="font-family: monospace;" id="dash-queue-token">—</strong>
+                </p>
+              </div>
+
+              <!-- 3-Column Ticket Metrics -->
+              <div class="queue-metrics-strip">
+                <div>
+                  <div class="qm-label">Your Ticket Number</div>
+                  <div class="qm-val" id="dash-queue-ticket">—</div>
+                  <div class="qm-sub">Confirmed Check-In</div>
+                </div>
+                <div>
+                  <div class="qm-label">Now Serving</div>
+                  <div class="qm-val" style="color: #059669;" id="dash-queue-serving">—</div>
+                  <div class="qm-sub">Consulting Room Active</div>
+                </div>
+                <div>
+                  <div class="qm-label">Wait Estimate</div>
+                  <div class="qm-val" id="dash-queue-wait">Not estimated</div>
+                  <div class="qm-sub"><span id="dash-queue-ahead">—</span> patients ahead</div>
+                </div>
+              </div>
+
+              <div class="queue-details-row">
+                <span style="color: var(--color-text-muted);">
+                  Consultation window: <strong id="dash-queue-window">Not active</strong>
+                </span>
+                <a href="queue.html" id="full-queue-link" class="btn btn-primary btn-sm">
+                  Open Full Wait Screen &rarr;
+                </a>
+              </div>
+            </article>
+
+            <!-- 2. Upcoming Outpatient Appointments -->
+            <section class="dash-module" aria-label="Upcoming Scheduled Visits">
+              <div class="dash-module-header">
+                <h3>
+                  <span>Upcoming Scheduled Visits</span>
+                  <span class="demo-pill" id="upcoming-count-badge" style="margin-bottom: 0;">1 Scheduled</span>
+                </h3>
+                <a href="appointments.html" class="btn btn-outline btn-sm">+ Schedule New</a>
+              </div>
+
+              <div class="dash-module-body" id="upcoming-appointments-list">
+                
+                <!-- Appointment Item 1 -->
+                <article class="appointment-card" id="app-card-1">
+                  <div class="app-card-header">
+                    <div>
+                      <span class="app-dept">Cardiovascular Medicine</span>
+                      <h4 class="app-doctor-name">Dr. Eleanor Kim, MD</h4>
+                    </div>
+                    <span class="app-status-badge status-confirmed">Confirmed In-Person</span>
+                  </div>
+
+                  <div class="app-meta-list">
+                    <div class="app-meta-item">
+                      <span>Date:</span>
+                      <strong class="app-date-val">Today &bull; Oct 21, 2026</strong>
+                    </div>
+                    <div class="app-meta-item">
+                      <span>Time:</span>
+                      <strong class="app-time-val">10:00 AM – 10:30 AM</strong>
+                    </div>
+                    <div class="app-meta-item">
+                      <span>Location:</span>
+                      <strong>East Wing &bull; Suite 302</strong>
+                    </div>
+                    <div class="app-meta-item">
+                      <span>Token:</span>
+                      <code style="font-weight: 700;">—</code>
+                    </div>
+                  </div>
+
+                  <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: var(--space-sm);">
+                    <strong>Reason for Consultation:</strong> Routine outpatient cardiac rhythm screening and blood pressure review.
+                  </p>
+
+                  <div class="app-card-actions">
+                    <button type="button" class="btn btn-secondary btn-sm action-reschedule" data-id="app-1" data-doc="Dr. Eleanor Kim, MD">
+                      Reschedule
+                    </button>
+                    <button type="button" class="btn btn-danger-outline btn-sm action-cancel" data-id="app-1" data-doc="Dr. Eleanor Kim, MD">
+                      Cancel Booking
+                    </button>
+                  </div>
+                </article>
+
+              </div>
+            </section>
+
+            <!-- 3. Consultation History & Care Summaries -->
+            <section class="dash-module" aria-label="Consultation History">
+              <div class="dash-module-header">
+                <h3>Consultation History & Past Records</h3>
+                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Last 12 Months</span>
+              </div>
+
+              <div class="dash-module-body" style="padding: 0;">
+                <table class="history-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Physician / Specialist</th>
+                      <th>Department</th>
+                      <th>Diagnosis / Notes</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="appointment-history-list">
+                    <tr>
+                      <td><strong>Sep 14, 2026</strong></td>
+                      <td>Dr. Sarah Alvarez, MD</td>
+                      <td>Internal & General Med</td>
+                      <td>Annual comprehensive adult wellness screening</td>
+                      <td><span class="app-status-badge status-confirmed">Completed</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Jul 02, 2026</strong></td>
+                      <td>Dr. Jonathan Chen, MD</td>
+                      <td>Orthopedic Surgery</td>
+                      <td>Left knee arthroscopy post-operative follow-up</td>
+                      <td><span class="app-status-badge status-confirmed">Completed</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Mar 18, 2026</strong></td>
+                      <td>Dr. Eleanor Kim, MD</td>
+                      <td>Cardiovascular Med</td>
+                      <td>Baseline exercise stress test and ECG diagnostic</td>
+                      <td><span class="app-status-badge status-confirmed">Completed</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+          </div>
+
+          <!-- RIGHT COLUMN: Patient Demographic & Contact Overview -->
+          <aside aria-label="Patient Profile and Emergency Contacts">
+            
+            <div class="profile-card">
+              <div class="profile-header-center">
+                <div class="profile-avatar-large" id="profile-avatar">AM</div>
+                <h3 class="profile-name" id="profile-full-name"></h3>
+                <div class="profile-mrn">Patient Portal Profile</div>
+              </div>
+
+              <ul class="profile-info-list">
+                <li class="profile-info-item">
+                  <span class="pi-label">Email:</span>
+                  <span class="pi-val" id="profile-email">arthur.morgan@example.com</span>
+                </li>
+                <li class="profile-info-item">
+                  <span class="pi-label">Phone:</span>
+                  <span class="pi-val" id="profile-phone">(555) 019-2834</span>
+                </li>
+                <li class="profile-info-item">
+                  <span class="pi-label">Date of Birth:</span>
+                  <span class="pi-val" id="profile-dob">Jun 15, 1988</span>
+                </li>
+                <li class="profile-info-item">
+                  <span class="pi-label">Gender:</span>
+                  <span class="pi-val" id="profile-gender">Male</span>
+                </li>
+                <li class="profile-info-item">
+                  <span class="pi-label">Primary Care Clinic:</span>
+                  <span class="pi-val">East Wing Suite 302</span>
+                </li>
+                <li class="profile-info-item">
+                  <span class="pi-label">Emergency Contact:</span>
+                  <span class="pi-val">Mary Linton &bull; (555) 019-4821</span>
+                </li>
+              </ul>
+
+              <a href="appointments.html" class="btn btn-primary" style="width: 100%;">
+                Request Specialist Booking
+              </a>
+            </div>
+
+            <!-- Quick Assistance Box -->
+            <div style="background-color: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-lg); font-size: 0.85rem; color: var(--color-text-muted);">
+              <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--color-primary-dark); margin-bottom: 0.35rem;">
+                Need Outpatient Assistance?
+              </h4>
+              <p style="margin-bottom: 0.5rem;">
+                If your symptoms have changed or you need wheelchair intake at the main rotunda, contact central triage:
+              </p>
+              <p style="margin-bottom: 0;"><strong>Phone:</strong> (800) 555-0199 &bull; Ext. 201</p>
+            </div>
+
+          </aside>
+
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal: Reschedule Appointment -->
+  <div class="modal-overlay" id="reschedule-modal" role="dialog" aria-modal="true" aria-labelledby="modal-reschedule-title">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-reschedule-title">Reschedule Consultation</h3>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: var(--space-md);">
+          Select a new consultation slot with <strong id="reschedule-doc-name">Physician</strong>. Your current queue reference will be updated.
+        </p>
+        
+        <div style="display: flex; flex-direction: column; gap: var(--space-sm); margin-bottom: var(--space-md);">
+          <label for="reschedule-date" style="font-size: 0.85rem; font-weight: 700;">Select Date:</label>
+          <input type="date" id="reschedule-date" class="form-input" style="padding: 0.65rem; border: 1.5px solid var(--color-border); border-radius: var(--radius-sm);" required>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: var(--space-sm);">
+          <label for="reschedule-slot" style="font-size: 0.85rem; font-weight: 700;">Select New Daytime Slot:</label>
+          <select id="reschedule-slot" style="padding: 0.65rem; border: 1.5px solid var(--color-border); border-radius: var(--radius-sm);">
+            <option value="11:30 AM">11:30 AM (Same Day)</option>
+            <option value="02:00 PM">02:00 PM (Same Day)</option>
+            <option value="09:15 AM">09:15 AM (Next Available Day)</option>
+            <option value="10:45 AM">10:45 AM (Next Available Day)</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary btn-sm" id="close-reschedule-modal">Keep Current Slot</button>
+        <button type="button" class="btn btn-primary btn-sm" id="confirm-reschedule-btn">Confirm New Slot</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Cancel Appointment -->
+  <div class="modal-overlay" id="cancel-modal" role="dialog" aria-modal="true" aria-labelledby="modal-cancel-title">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-cancel-title">Cancel Outpatient Consultation</h3>
+      </div>
+      <div class="modal-body">
+        <p>
+          Are you sure you want to cancel your scheduled appointment with <strong id="cancel-doc-name">Physician</strong>? 
+          Your active queue ticket (<strong id="cancel-token-val">—</strong>) will be released to other waiting outpatients.
+        </p>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary btn-sm" id="close-cancel-modal">Back</button>
+        <button type="button" class="btn btn-danger-outline btn-sm" id="confirm-cancel-btn">Confirm Cancellation</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dynamic Toast Notification -->
+  <div class="toast-notice" id="toast" role="status" aria-live="polite">
+    <span id="toast-icon">&#10003;</span>
+    <span id="toast-message">Action successful</span>
+  </div>
+
+  <!-- Site Footer (Solid Deep Black) -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>Hopewell Health Care</h4>
+          <p>
+            An integrated healthcare management system engineered for streamlined patient appointment access, outpatient consultation routing, and real-time clinic queue tracking.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Patient Services</h4>
+          <ul class="footer-links">
+            <li><a href="appointments.html">Book Appointment</a></li>
+            <li><a href="queue.html">Check Queue Position</a></li>
+            <li><a href="doctors.html">Doctor Directory</a></li>
+            <li><a href="departments.html">Clinical Departments</a></li>
+            <li><a href="patient-dashboard.html">Patient Dashboard</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Hospital & Care</h4>
+          <ul class="footer-links">
+            <li><a href="about.html">About Hopewell</a></li>
+            <li><a href="contact.html">Hours & Directions</a></li>
+            <li><a href="contact.html">Send Inquiry</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Emergency & Contacts</h4>
+          <p>Emergency Department: <strong>Open 24/7</strong></p>
+          <p>General Reception: (800) 555-0199</p>
+          <p>Clinic Hours: 08:00 – 17:00 Mon–Sat</p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 Hopewell Health Care System. All rights reserved.</p>
+        <p>Providing trusted, patient-first clinical excellence across all outpatient centers.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/api.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      initMobileNavigation();
+      const authenticated = await initPatientSession();
+      if (!authenticated) return;
+      initAppointmentActions();
+    });
+
+    /**
+     * Mobile Menu Navigation Handler
+     */
+    function initMobileNavigation() {
+      const toggleBtn = document.getElementById('mobile-toggle');
+      const navMenu = document.getElementById('primary-nav');
+
+      if (!toggleBtn || !navMenu) return;
+
+      toggleBtn.addEventListener('click', () => {
+        const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+        toggleBtn.setAttribute('aria-expanded', String(!isExpanded));
+        navMenu.classList.toggle('is-active');
+      });
+
+      document.addEventListener('click', (event) => {
+        if (!toggleBtn.contains(event.target) && !navMenu.contains(event.target)) {
+          navMenu.classList.remove('is-active');
+          toggleBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+
+    async function initPatientSession() {
+      try {
+        const session = await HopewellAPI.request('auth/me.php');
+        if (!session.authenticated) {
+          window.location.replace('login.html');
+          return false;
+        }
+
+        const patient = session.patient;
+        const fullName = `${patient.first_name} ${patient.last_name}`;
+        document.getElementById('welcome-heading').textContent = `Welcome back, ${patient.first_name}`;
+        document.getElementById('nav-user-name').textContent = fullName;
+        document.getElementById('profile-full-name').textContent = fullName;
+        document.getElementById('profile-email').textContent = patient.email;
+        document.getElementById('profile-phone').textContent = patient.phone;
+        document.getElementById('profile-dob').textContent = HopewellAPI.formatDate(patient.date_of_birth);
+        document.getElementById('profile-gender').textContent = patient.gender
+          ? patient.gender.charAt(0).toUpperCase() + patient.gender.slice(1)
+          : 'Not specified';
+
+        const parts = fullName.split(/\s+/);
+        const initials = parts.length > 1
+          ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+          : parts[0].slice(0, 2).toUpperCase();
+        document.getElementById('nav-user-avatar').textContent = initials;
+        document.getElementById('profile-avatar').textContent = initials;
+
+        const [appointments, queueResult] = await Promise.all([
+          HopewellAPI.request('appointments/index.php'),
+          HopewellAPI.request('queue/status.php')
+        ]);
+        renderDashboardAppointments(appointments);
+        renderDashboardQueue(queueResult.queue);
+        document.body.style.visibility = 'visible';
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+          try {
+            await HopewellAPI.request('auth/logout.php', { method: 'POST', body: {} });
+            window.location.replace('login.html');
+          } catch (error) {
+            showToast(error.message, 5000);
+          }
+        });
+        return true;
+      } catch (error) {
+        document.querySelector('main').style.display = 'none';
+        document.getElementById('nav-user-name').textContent = '';
+        document.getElementById('nav-user-avatar').textContent = '';
+        document.body.style.visibility = 'visible';
+        showToast(error.message, 5000);
+        return false;
+      }
+    }
+
+    function renderDashboardAppointments(appointments) {
+      const upcomingList = document.getElementById('upcoming-appointments-list');
+      const historyList = document.getElementById('appointment-history-list');
+      const today = new Date();
+      const todayValue = HopewellAPI.localDateString(today);
+      const active = appointments.filter(item =>
+        ['pending', 'confirmed'].includes(item.status) && item.appointment_date >= todayValue
+      );
+      const history = appointments.filter(item => !active.includes(item));
+      const safe = HopewellAPI.escapeHtml;
+      const statusLabel = status => ({
+        pending: 'Pending',
+        confirmed: 'Confirmed',
+        completed: 'Completed',
+        cancelled: 'Cancelled'
+      }[status] || 'Status unavailable');
+      const statusClass = status => status === 'pending'
+        ? 'status-rescheduled'
+        : status === 'cancelled'
+          ? 'status-cancelled'
+          : 'status-confirmed';
+
+      document.getElementById('upcoming-count-badge').textContent =
+        `${active.length} Scheduled`;
+      upcomingList.innerHTML = active.length ? active.map(item => `
+        <article class="appointment-card" data-reference="${safe(item.reference_token)}">
+          <div class="app-card-header">
+            <div>
+              <span class="app-dept">${safe(item.department_name)}</span>
+              <h4 class="app-doctor-name">${safe(item.doctor_name)}</h4>
+            </div>
+            <span class="app-status-badge ${statusClass(item.status)}">${statusLabel(item.status)}</span>
+          </div>
+          <div class="app-meta-list">
+            <div class="app-meta-item"><span>Date:</span><strong class="app-date-val">${safe(HopewellAPI.formatDate(item.appointment_date))}</strong></div>
+            <div class="app-meta-item"><span>Time:</span><strong class="app-time-val">${safe(String(item.appointment_time).slice(0, 5))}</strong></div>
+            <div class="app-meta-item"><span>Location:</span><strong>${safe(item.room)}</strong></div>
+            <div class="app-meta-item"><span>Reference:</span><code>${safe(item.reference_token)}</code></div>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: var(--space-sm);">
+            <strong>Reason for Consultation:</strong> ${safe(item.reason)}
+          </p>
+          <div class="app-card-actions">
+            <button type="button" class="btn btn-secondary btn-sm action-reschedule"
+              data-reference="${safe(item.reference_token)}" data-doctor-id="${safe(item.doctor_id)}"
+              data-doc="${safe(item.doctor_name)}">Reschedule</button>
+            <button type="button" class="btn btn-danger-outline btn-sm action-cancel"
+              data-reference="${safe(item.reference_token)}" data-doc="${safe(item.doctor_name)}">Cancel Booking</button>
+          </div>
+        </article>
+      `).join('') : `
+        <div style="text-align: center; padding: var(--space-xl); color: var(--color-text-muted);">
+          <p>You have no active upcoming consultations scheduled.</p>
+          <a href="appointments.html" class="btn btn-outline btn-sm">Schedule an Appointment</a>
+        </div>`;
+
+      historyList.innerHTML = history.length ? history.map(item => `
+        <tr>
+          <td><strong>${safe(HopewellAPI.formatDate(item.appointment_date))}</strong></td>
+          <td>${safe(item.doctor_name)}</td>
+          <td>${safe(item.department_name)}</td>
+          <td>${safe(item.reason)}</td>
+          <td><span class="app-status-badge ${statusClass(item.status)}">${statusLabel(item.status)}</span></td>
+        </tr>
+      `).join('') : '<tr><td colspan="5">No previous appointments.</td></tr>';
+    }
+
+    function renderDashboardQueue(queue) {
+      const widget = document.getElementById('active-queue-widget');
+      if (!queue) {
+        widget.style.display = 'none';
+        return;
+      }
+      document.getElementById('dash-queue-status').textContent =
+        queue.queue_status === 'in_progress' ? 'Consultation in progress' : 'Waiting in clinic queue';
+      document.getElementById('dash-queue-dept').textContent = `${queue.department_name} • ${queue.room}`;
+      document.getElementById('dash-queue-doc-name').textContent = queue.doctor_name;
+      document.getElementById('dash-queue-token').textContent = queue.reference_token;
+      document.getElementById('dash-queue-ticket').textContent = `Q-${queue.queue_number}`;
+      document.getElementById('dash-queue-serving').textContent =
+        queue.now_serving === null ? '—' : `Q-${queue.now_serving}`;
+      document.getElementById('dash-queue-wait').textContent = 'Not estimated';
+      document.getElementById('dash-queue-ahead').textContent =
+        queue.patients_ahead === null ? '—' : queue.patients_ahead;
+      document.getElementById('dash-queue-window').textContent =
+        `${HopewellAPI.formatDate(queue.appointment_date)} at ${String(queue.appointment_time).slice(0, 5)}`;
+      document.getElementById('full-queue-link').href =
+        `queue.html?ref=${encodeURIComponent(queue.reference_token)}`;
+    }
+
+    function initAppointmentActions() {
+      const rescheduleModal = document.getElementById('reschedule-modal');
+      const cancelModal = document.getElementById('cancel-modal');
+      const rescheduleDate = document.getElementById('reschedule-date');
+      const rescheduleSlot = document.getElementById('reschedule-slot');
+      const tomorrow = new Date();
+      let activeReference = '';
+      let activeDoctorId = '';
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      rescheduleDate.min = HopewellAPI.localDateString(tomorrow);
+      rescheduleDate.value = rescheduleDate.min;
+
+      document.addEventListener('click', event => {
+        const rescheduleButton = event.target.closest('.action-reschedule');
+        const cancelButton = event.target.closest('.action-cancel');
+        if (rescheduleButton) {
+          activeReference = rescheduleButton.dataset.reference;
+          activeDoctorId = rescheduleButton.dataset.doctorId;
+          document.getElementById('reschedule-doc-name').textContent = rescheduleButton.dataset.doc;
+          rescheduleModal.classList.add('is-active');
+          loadRescheduleSlots();
+        }
+        if (cancelButton) {
+          activeReference = cancelButton.dataset.reference;
+          document.getElementById('cancel-doc-name').textContent = cancelButton.dataset.doc;
+          document.getElementById('cancel-token-val').textContent = activeReference;
+          cancelModal.classList.add('is-active');
+        }
+      });
+
+      document.getElementById('close-reschedule-modal').addEventListener('click', () => rescheduleModal.classList.remove('is-active'));
+      document.getElementById('close-cancel-modal').addEventListener('click', () => cancelModal.classList.remove('is-active'));
+      rescheduleDate.addEventListener('change', loadRescheduleSlots);
+      window.addEventListener('click', event => {
+        if (event.target === rescheduleModal) rescheduleModal.classList.remove('is-active');
+        if (event.target === cancelModal) cancelModal.classList.remove('is-active');
+      });
+
+      async function loadRescheduleSlots() {
+        rescheduleSlot.innerHTML = '<option value="">Loading available times...</option>';
+        try {
+          const result = await HopewellAPI.request(
+            `appointments/availability.php?doctor_id=${encodeURIComponent(activeDoctorId)}&date=${encodeURIComponent(rescheduleDate.value)}`
+          );
+          rescheduleSlot.innerHTML = result.slots.length
+            ? result.slots.map(slot => `<option value="${HopewellAPI.escapeHtml(slot)}">${HopewellAPI.escapeHtml(slot)}</option>`).join('')
+            : '<option value="">No available times on this date</option>';
+        } catch (error) {
+          rescheduleSlot.innerHTML = '<option value="">Availability unavailable</option>';
+          showToast(error.message, 5000);
+        }
+      }
+
+      document.getElementById('confirm-reschedule-btn').addEventListener('click', async () => {
+        if (!activeReference || !rescheduleSlot.value) {
+          showToast('Choose a date with an available time.');
+          return;
+        }
+        try {
+          await HopewellAPI.request('appointments/reschedule.php', {
+            method: 'POST',
+            body: { reference: activeReference, date: rescheduleDate.value, time: rescheduleSlot.value }
+          });
+          rescheduleModal.classList.remove('is-active');
+          await refreshDashboardData();
+          showToast('Appointment rescheduled.');
+        } catch (error) {
+          showToast(error.message, 5000);
+        }
+      });
+
+      document.getElementById('confirm-cancel-btn').addEventListener('click', async () => {
+        if (!activeReference) return;
+        try {
+          await HopewellAPI.request('appointments/cancel.php', {
+            method: 'POST',
+            body: { reference: activeReference }
+          });
+          cancelModal.classList.remove('is-active');
+          await refreshDashboardData();
+          showToast('Appointment cancelled.');
+        } catch (error) {
+          showToast(error.message, 5000);
+        }
+      });
+    }
+
+    async function refreshDashboardData() {
+      const [appointments, queueResult] = await Promise.all([
+        HopewellAPI.request('appointments/index.php'),
+        HopewellAPI.request('queue/status.php')
+      ]);
+      renderDashboardAppointments(appointments);
+      renderDashboardQueue(queueResult.queue);
+    }
+
+    /**
+     * Accessible Toast Message Display
+     */
+    function showToast(message, duration = 3000) {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toast-message');
+      toastMessage.textContent = message;
+      toast.classList.add('show');
+
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, duration);
+    }
+  </script>
+</body>
+</html>

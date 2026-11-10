@@ -9,9 +9,9 @@ On the current XAMPP PHP installation, `pdo_pgsql` and `pgsql` are present in `C
 
 ## Database setup
 
-The API reads `backend/.env` automatically. Copy `backend/.env.example` to `backend/.env` if needed, then enter your local PostgreSQL settings there. `.env` is excluded from Git; never put real credentials in `.env.example`. Existing process environment variables override values from `.env`. If the database was created from `schema.sql` before the API was added, run `database/migrations/001_add_patient_active.sql` once to add reversible patient archiving.
+Both portals use PostgreSQL and read `staff/backend/.env`. Copy `staff/backend/.env.example` to `staff/backend/.env` if needed, then enter your local PostgreSQL settings there. `.env` is excluded from Git; never put real credentials in `.env.example`. Existing process environment variables override values from `.env`. For a new database or to bring an older staff database up to date, run `database/hopewell_postgresql.sql` in pgAdmin while connected to `hopewell_hospital`.
 
-Create the first system administrator using the commented bootstrap query at the end of `database/schema.sql`. Generate the password hash using PHP:
+Create the first system administrator using the commented bootstrap query at the end of `database/hopewell_postgresql.sql`. Generate the password hash using PHP:
 
 ```powershell
 php -r "echo password_hash('replace-with-a-strong-password', PASSWORD_DEFAULT), PHP_EOL;"
@@ -19,15 +19,15 @@ php -r "echo password_hash('replace-with-a-strong-password', PASSWORD_DEFAULT), 
 
 Paste only the resulting hash into the SQL bootstrap query. Do not commit the hash or real credentials.
 
-## Run locally with XAMPP PHP
+## Run both portals together locally
 
-After filling in `backend/.env` and confirming PostgreSQL is running, run this from the repository root:
+After filling in `staff/backend/.env` and confirming PostgreSQL is running, run this from the repository root:
 
 ```powershell
-& 'C:\xampp\php\php.exe' -S 127.0.0.1:8000 -t frontend backend/public/router.php
+& 'C:\xampp\php\php.exe' -S 127.0.0.1:8000 -t . router.php
 ```
 
-Open `http://127.0.0.1:8000/staff/login.html`. Serving the frontend and API from this same PHP server keeps session cookies same-origin.
+Open `http://127.0.0.1:8000/patients/frontend/index.html` for the patient portal or `http://127.0.0.1:8000/staff/login.html` for staff. The pages stay separate while the root router sends both to the shared PostgreSQL database.
 
 ## API routes
 
